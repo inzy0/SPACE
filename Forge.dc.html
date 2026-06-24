@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Playfair+Display:ital,wght@0,500;0,600;1,500&amp;display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; }
+  html, body { margin:0; padding:0; background:#160a06; }
+  ::selection { background:rgba(255,140,70,.4); color:#fff; }
+  @keyframes pulseGlow { 0%,100%{opacity:.4} 50%{opacity:1} }
+  @keyframes risein { from{opacity:0; transform:translateY(26px)} to{opacity:1; transform:none} }
+  @keyframes shimmer { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
+  @keyframes emberRise { 0%{transform:translateY(0) translateX(0); opacity:0} 12%{opacity:.95} 100%{transform:translateY(-78vh) translateX(var(--dx,20px)); opacity:0} }
+  @keyframes heatGlow { 0%,100%{opacity:.5; transform:translateX(-50%) scale(1)} 50%{opacity:.95; transform:translateX(-50%) scale(1.14)} }
+  @keyframes flicker { 0%,100%{opacity:.85} 45%{opacity:1} 60%{opacity:.7} }
+</style>
+<script src="./bg-fx.js"></script>
+</helmet>
+
+<div ref="{{ rootRef }}" data-screen-label="Forge" style="position:relative; min-height:100vh; color:#f8ebe0; font-family:'Manrope',system-ui,sans-serif; overflow-x:hidden; -webkit-font-smoothing:antialiased; background:linear-gradient(180deg,#160a06 0%, #2a1208 52%, #371609 100%);">
+
+  <!-- ===== MOTIF: forge embers + heat ===== -->
+  <div style="position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none;">
+    <div style="position:absolute; left:50%; bottom:-12%; width:64vw; height:46vh; transform:translateX(-50%); border-radius:50%; filter:blur(70px); background:radial-gradient(circle, rgba(255,130,50,.42), rgba(255,80,30,.12) 55%, transparent 72%); animation:heatGlow 5s ease-in-out infinite;"></div>
+    <div style="position:absolute; left:0; right:0; bottom:0; height:30%; background:linear-gradient(180deg, transparent, rgba(255,90,30,.18)); animation:flicker 3.2s ease-in-out infinite;"></div>
+    <div ref="{{ emberRef }}" style="position:absolute; inset:0;"></div>
+  </div>
+
+  <!-- ===== SUITE NAV ===== -->
+  <nav style="position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between; padding:18px clamp(20px,5vw,56px); backdrop-filter:blur(14px); background:linear-gradient(180deg, rgba(22,10,6,.85), rgba(22,10,6,.3)); border-bottom:1px solid rgba(255,140,70,.16);">
+    <a href="PARALLED Landing.dc.html" style="display:flex; align-items:center; gap:11px; text-decoration:none; color:#f8ebe0;">
+      <svg width="28" height="28" viewBox="0 0 30 30" fill="none"><defs><linearGradient id="lg" x1="0" y1="0" x2="30" y2="30"><stop offset="0" stop-color="#ffce9e"/><stop offset=".5" stop-color="#ff8c46"/><stop offset="1" stop-color="#e8533a"/></linearGradient></defs><line x1="6" y1="24" x2="18" y2="4" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round"/><line x1="13" y1="26" x2="25" y2="6" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round"/></svg>
+      <span style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:17px; letter-spacing:.14em;">PARALLED</span>
+    </a>
+    <div style="display:flex; align-items:center; gap:18px; font-size:13px; flex-wrap:wrap; justify-content:flex-end;">
+      <sc-for list="{{ suite }}" as="s" hint-placeholder-count="7">
+        <a href="{{ s.href }}" style="color:{{ s.color }}; text-decoration:none; font-weight:{{ s.weight }}; white-space:nowrap;">{{ s.label }}</a>
+      </sc-for>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <header style="position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:clamp(56px,9vh,120px) clamp(20px,5vw,56px) clamp(30px,5vh,56px);">
+    <div style="animation:risein .8s ease both; display:inline-flex; align-items:center; gap:10px; padding:8px 16px; border-radius:999px; border:1px solid rgba(255,140,70,.34); background:rgba(255,140,70,.08); font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.16em; color:#ffce9e; margin-bottom:26px;">
+      <span style="width:7px; height:7px; border-radius:50%; background:#ff8c46; box-shadow:0 0 10px #ff8c46; animation:pulseGlow 2.2s ease-in-out infinite;"></span>
+      FORGE · BUILD &amp; RUN
+    </div>
+    <h1 style="animation:risein .8s ease both .08s; font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(40px,6.4vw,82px); line-height:1; letter-spacing:-.025em; margin:0 0 22px; max-width:880px;">Where method<br><span style="background:linear-gradient(110deg,#ffce9e,#ff8c46 50%,#e8533a); background-size:200% auto; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; animation:shimmer 7s linear infinite;">meets the fire.</span></h1>
+    <p style="animation:risein .8s ease both .16s; font-size:clamp(16px,1.6vw,19px); line-height:1.62; color:rgba(248,235,224,.86); max-width:600px; margin:0 0 34px;">Forge is the bench: build the experiment, run the pilot, capture results. Every run is reproducible and logged into the trail — and an <b style="color:#ffce9e;">ethics gate</b> stands between a bold idea and a live experiment.</p>
+    <div style="animation:risein .8s ease both .24s; display:flex; gap:clamp(18px,3vw,40px); flex-wrap:wrap; padding-top:26px; border-top:1px solid rgba(255,140,70,.18);">
+      <div><div style="font-family:'Space Grotesk',sans-serif; font-size:27px; font-weight:700; color:#ffce9e;">Pilot</div><div style="font-size:12.5px; color:rgba(248,235,224,.6); margin-top:2px;">before you scale</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif; font-size:27px; font-weight:700; color:#ffce9e;">Reproducible</div><div style="font-size:12.5px; color:rgba(248,235,224,.6); margin-top:2px;">every run logged</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif; font-size:27px; font-weight:700; color:#ffce9e;">Ethics gate</div><div style="font-size:12.5px; color:rgba(248,235,224,.6); margin-top:2px;">before going live</div></div>
+    </div>
+  </header>
+
+  <!-- ===== WHAT IT SPECIFIES ===== -->
+  <section style="position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:clamp(30px,5vh,64px) clamp(20px,5vw,56px);">
+    <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#ff8c46; margin-bottom:14px;">WHAT THE FORGE RUNS</div>
+    <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(26px,3.4vw,44px); line-height:1.04; letter-spacing:-.02em; margin:0 0 30px; max-width:680px;">From protocol to result, on the record.</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px;">
+      <sc-for list="{{ specs }}" as="c" hint-placeholder-count="4">
+        <div data-card="" style="padding:26px; border-radius:18px; border:1px solid rgba(255,140,70,.16); background:rgba(255,140,70,.04); transition:transform .4s cubic-bezier(.16,1,.3,1), border-color .4s, background .4s;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:rgba(248,235,224,.45); margin-bottom:13px;">{{ c.n }}</div>
+          <h3 style="font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:600; margin:0 0 9px;">{{ c.title }}</h3>
+          <p style="font-size:14px; line-height:1.6; color:rgba(248,235,224,.7); margin:0;">{{ c.body }}</p>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ===== PLANETARY RECORD ===== -->
+  <dc-import name="PlanetRecord"
+    title="Ignis" code="PRL-08 · FORGE" ptype="Molten world — method meets fire" orbit="Fires on demand"
+    surface="Protocols built to share" atmosphere="Pilots — cheap to fail, fast to learn" core="Reproducible runs, ethics-gated"
+    sats="Pilot first|Reproducible|Ethics gate|Logged"
+    ra="08h44m" dec="-21°37′"
+    c1="#ffd6a8" c2="#e8633a" c3="#6a1e08" glow="255,140,70" accent="#ffce9e" ring="false" moons="1"
+    hint-size="100%,480px"></dc-import>
+
+  <!-- ===== HOW IT'S DIFFERENT ===== -->
+  <section style="position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:clamp(30px,6vh,72px) clamp(20px,5vw,56px) clamp(60px,9vh,110px);">
+    <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#ff8c46; margin-bottom:14px;">HOW THE FORGE STANDS APART</div>
+    <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(26px,3.4vw,44px); line-height:1.04; letter-spacing:-.02em; margin:0 0 28px;">Experiments that account for themselves.</h2>
+    <div style="display:flex; flex-direction:column; gap:0; border-radius:18px; overflow:hidden; border:1px solid rgba(255,140,70,.18);">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.12em; text-transform:uppercase;">
+        <div style="padding:14px 22px; background:rgba(255,255,255,.03); color:rgba(248,235,224,.5);">A lab notebook + scripts</div>
+        <div style="padding:14px 22px; background:rgba(255,140,70,.1); color:#ffce9e;">The Forge</div>
+      </div>
+      <sc-for list="{{ diffs }}" as="d" hint-placeholder-count="4">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0; border-top:1px solid rgba(255,140,70,.12);">
+          <div style="padding:18px 22px; font-size:14.5px; color:rgba(248,235,224,.6); background:rgba(255,255,255,.01);">{{ d.old }}</div>
+          <div style="padding:18px 22px; font-size:14.5px; color:#f8ebe0; background:rgba(255,140,70,.05);">{{ d.new }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <a href="PARALLED Landing.dc.html#cta" style="display:inline-flex; align-items:center; gap:10px; margin-top:32px; text-decoration:none; font-size:14px; font-weight:600; color:#160a06; padding:13px 26px; border-radius:999px; background:linear-gradient(120deg,#ffce9e,#e8533a); box-shadow:0 10px 30px rgba(232,83,58,.34);">Fire up the forge →</a>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280}}">
+class Component extends DCLogic {
+  SUITE = [
+    { label: 'Discovery', file: 'Discovery.dc.html' },
+    { label: 'Studies', file: 'Studies.dc.html' },
+    { label: 'Neural Hub', file: 'Neural Hub.dc.html' },
+    { label: 'Synthesis', file: 'Synthesis.dc.html' },
+    { label: 'Canvas', file: 'Canvas.dc.html' },
+    { label: 'Loom', file: 'Loom.dc.html' },
+    { label: 'Forge', file: 'Forge.dc.html' }
+  ];
+  ACTIVE = 'Forge';
+
+  SPECS = [
+    { n: '01', title: 'Build the protocol', body: 'Assemble method, parameters and apparatus as a structured, shareable protocol — not loose notes.' },
+    { n: '02', title: 'Run a pilot', body: 'Fire a small run first. Cheap to fail, fast to learn, before the full experiment is committed.' },
+    { n: '03', title: 'Reproducible runs', body: 'Every execution captures its inputs, seed and environment, and lands in the reasoning trail.' },
+    { n: '04', title: 'Ethics gate', body: 'A bold idea passes an ethics checkpoint before it can go live — surfaced, reasoned and recorded.' }
+  ];
+
+  DIFFS = [
+    { old: 'Runs are hard to reproduce months later.', new: 'Inputs, seed and environment captured every run.' },
+    { old: 'You scale first and discover failure late.', new: 'Pilot first; scale only what the pilot proves.' },
+    { old: 'Ethics review is a separate, offline gate.', new: 'The ethics gate is inline, reasoned and logged.' },
+    { old: 'Results detach from the reasoning behind them.', new: 'Each result lands directly in the study trail.' }
+  ];
+
+  componentDidMount() { this.buildEmbers(); this.bindHover(); }
+  buildEmbers() {
+    if (!this.emberEl || this.emberEl.dataset.built) return;
+    this.emberEl.dataset.built = '1';
+    let html = '';
+    for (let i = 0; i < 34; i++) {
+      const x = (10 + Math.random() * 80).toFixed(1);
+      const dur = (4.5 + Math.random() * 5).toFixed(2), del = (-Math.random() * 9).toFixed(2);
+      const sz = (2 + Math.random() * 4).toFixed(1);
+      const dx = (Math.random() * 80 - 40).toFixed(0);
+      const c = Math.random() < 0.5 ? '255,180,90' : '255,110,50';
+      html += '<div style="position:absolute; left:' + x + '%; bottom:6%; --dx:' + dx + 'px; width:' + sz + 'px; height:' + sz + 'px; border-radius:50%; background:rgba(' + c + ',.95); box-shadow:0 0 10px rgba(' + c + ',.9); animation:emberRise ' + dur + 's ease-in ' + del + 's infinite;"></div>';
+    }
+    this.emberEl.innerHTML = html;
+  }
+  bindHover() {
+    if (!this.root) return;
+    this.root.querySelectorAll('[data-card]').forEach(c => {
+      if (c.dataset.bound) return; c.dataset.bound = '1';
+      c.addEventListener('mouseenter', () => { c.style.transform = 'translateY(-5px)'; c.style.borderColor = 'rgba(255,140,70,.5)'; c.style.background = 'rgba(255,140,70,.09)'; });
+      c.addEventListener('mouseleave', () => { c.style.transform = 'none'; c.style.borderColor = 'rgba(255,140,70,.16)'; c.style.background = 'rgba(255,140,70,.04)'; });
+    });
+  }
+
+  renderVals() {
+    const suite = this.SUITE.map(s => ({
+      label: s.label, href: s.file,
+      color: s.label === this.ACTIVE ? '#ffce9e' : 'rgba(248,235,224,.7)',
+      weight: s.label === this.ACTIVE ? 700 : 500
+    }));
+    return {
+      rootRef: (el) => { this.root = el; },
+      emberRef: (el) => { this.emberEl = el; this.buildEmbers(); },
+      suite, specs: this.SPECS, diffs: this.DIFFS
+    };
+  }
+}
+</script>
+</body>
+</html>

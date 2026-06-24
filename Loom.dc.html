@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Playfair+Display:ital,wght@0,500;0,600;1,500&amp;display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; }
+  html, body { margin:0; padding:0; background:#0a1410; }
+  ::selection { background:rgba(120,210,150,.4); color:#fff; }
+  @keyframes pulseGlow { 0%,100%{opacity:.4} 50%{opacity:1} }
+  @keyframes risein { from{opacity:0; transform:translateY(26px)} to{opacity:1; transform:none} }
+  @keyframes shimmer { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
+  @keyframes weaveX { 0%,100%{transform:translateX(0)} 50%{transform:translateX(22px)} }
+  @keyframes shuttle { 0%{left:-8%} 100%{left:108%} }
+  @keyframes caret { 0%,100%{opacity:1} 50%{opacity:0} }
+</style>
+<script src="./bg-fx.js"></script>
+</helmet>
+
+<div ref="{{ rootRef }}" data-screen-label="Loom" style="position:relative; min-height:100vh; color:#e8f5ec; font-family:'Manrope',system-ui,sans-serif; overflow-x:hidden; -webkit-font-smoothing:antialiased; background:linear-gradient(180deg,#0a1410 0%, #0f2018 50%, #122a1d 100%);">
+
+  <!-- ===== MOTIF: woven warp + weft threads ===== -->
+  <div style="position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none;">
+    <!-- warp (vertical) -->
+    <div style="position:absolute; inset:0; opacity:.4; background-image:repeating-linear-gradient(90deg, rgba(120,210,150,.14) 0 1px, transparent 1px 38px);"></div>
+    <!-- weft (horizontal, drifting) -->
+    <div ref="{{ weftRef }}" style="position:absolute; inset:0;"></div>
+    <!-- shuttle -->
+    <div style="position:absolute; top:34%; width:120px; height:3px; border-radius:3px; background:linear-gradient(90deg, transparent, rgba(120,210,150,.9), transparent); animation:shuttle 5.5s ease-in-out infinite;"></div>
+    <div style="position:absolute; top:58%; width:90px; height:3px; border-radius:3px; background:linear-gradient(90deg, transparent, rgba(180,235,150,.7), transparent); animation:shuttle 7s ease-in-out infinite 1.4s;"></div>
+    <div style="position:absolute; left:0; right:0; bottom:0; height:42%; background:radial-gradient(120% 90% at 50% 100%, rgba(120,210,150,.14), transparent 64%);"></div>
+  </div>
+
+  <!-- ===== SUITE NAV ===== -->
+  <nav style="position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between; padding:18px clamp(20px,5vw,56px); backdrop-filter:blur(14px); background:linear-gradient(180deg, rgba(10,20,16,.85), rgba(10,20,16,.3)); border-bottom:1px solid rgba(120,210,150,.16);">
+    <a href="PARALLED Landing.dc.html" style="display:flex; align-items:center; gap:11px; text-decoration:none; color:#e8f5ec;">
+      <svg width="28" height="28" viewBox="0 0 30 30" fill="none"><defs><linearGradient id="lg" x1="0" y1="0" x2="30" y2="30"><stop offset="0" stop-color="#9fe6b0"/><stop offset=".5" stop-color="#5fc47d"/><stop offset="1" stop-color="#3a8e84"/></linearGradient></defs><line x1="6" y1="24" x2="18" y2="4" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round"/><line x1="13" y1="26" x2="25" y2="6" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round"/></svg>
+      <span style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:17px; letter-spacing:.14em;">PARALLED</span>
+    </a>
+    <div style="display:flex; align-items:center; gap:18px; font-size:13px; flex-wrap:wrap; justify-content:flex-end;">
+      <sc-for list="{{ suite }}" as="s" hint-placeholder-count="7">
+        <a href="{{ s.href }}" style="color:{{ s.color }}; text-decoration:none; font-weight:{{ s.weight }}; white-space:nowrap;">{{ s.label }}</a>
+      </sc-for>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <header style="position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:clamp(56px,9vh,120px) clamp(20px,5vw,56px) clamp(30px,5vh,56px);">
+    <div style="animation:risein .8s ease both; display:inline-flex; align-items:center; gap:10px; padding:8px 16px; border-radius:999px; border:1px solid rgba(120,210,150,.34); background:rgba(120,210,150,.08); font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.16em; color:#9fe6b0; margin-bottom:26px;">
+      <span style="width:7px; height:7px; border-radius:50%; background:#5fc47d; box-shadow:0 0 10px #5fc47d; animation:pulseGlow 2.2s ease-in-out infinite;"></span>
+      LOOM · WHERE IT'S WRITTEN
+    </div>
+    <h1 style="animation:risein .8s ease both .08s; font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(40px,6.4vw,82px); line-height:1; letter-spacing:-.025em; margin:0 0 22px; max-width:880px;">Weave reasoning<br><span style="background:linear-gradient(110deg,#9fe6b0,#5fc47d 50%,#3a8e84); background-size:200% auto; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; animation:shimmer 7s linear infinite;">into the written record.<span style="-webkit-text-fill-color:#9fe6b0; animation:caret 1s step-end infinite;">▍</span></span></h1>
+    <p style="animation:risein .8s ease both .16s; font-size:clamp(16px,1.6vw,19px); line-height:1.62; color:rgba(232,245,236,.86); max-width:600px; margin:0 0 34px;">Loom is the writing surface where a study becomes a paper. Every sentence is threaded to the <b style="color:#9fe6b0;">trail</b>, the evidence and the reasoning behind it — so the manuscript and its provenance are never two separate things.</p>
+    <div style="animation:risein .8s ease both .24s; display:flex; gap:clamp(18px,3vw,40px); flex-wrap:wrap; padding-top:26px; border-top:1px solid rgba(120,210,150,.18);">
+      <div><div style="font-family:'Space Grotesk',sans-serif; font-size:27px; font-weight:700; color:#9fe6b0;">Threaded</div><div style="font-size:12.5px; color:rgba(232,245,236,.6); margin-top:2px;">claim to source</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif; font-size:27px; font-weight:700; color:#9fe6b0;">Versioned</div><div style="font-size:12.5px; color:rgba(232,245,236,.6); margin-top:2px;">every revision kept</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif; font-size:27px; font-weight:700; color:#9fe6b0;">Submit</div><div style="font-size:12.5px; color:rgba(232,245,236,.6); margin-top:2px;">straight to a call</div></div>
+    </div>
+  </header>
+
+  <!-- ===== WHAT IT SPECIFIES ===== -->
+  <section style="position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:clamp(30px,5vh,64px) clamp(20px,5vw,56px);">
+    <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#5fc47d; margin-bottom:14px;">WHAT LOOM WEAVES</div>
+    <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(26px,3.4vw,44px); line-height:1.04; letter-spacing:-.02em; margin:0 0 30px; max-width:680px;">Prose and provenance, one fabric.</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px;">
+      <sc-for list="{{ specs }}" as="c" hint-placeholder-count="4">
+        <div data-card="" style="padding:26px; border-radius:18px; border:1px solid rgba(120,210,150,.16); background:rgba(120,210,150,.04); transition:transform .4s cubic-bezier(.16,1,.3,1), border-color .4s, background .4s;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:rgba(232,245,236,.45); margin-bottom:13px;">{{ c.n }}</div>
+          <h3 style="font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:600; margin:0 0 9px;">{{ c.title }}</h3>
+          <p style="font-size:14px; line-height:1.6; color:rgba(232,245,236,.7); margin:0;">{{ c.body }}</p>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ===== PLANETARY RECORD ===== -->
+  <dc-import name="PlanetRecord"
+    title="Verdant" code="PRL-06 · LOOM" ptype="Verdant world — reasoning, woven" orbit="Writes the record"
+    surface="Sentences threaded to their source" atmosphere="Live citations that update" core="Reasoning held in the margin"
+    sats="Threaded|Versioned|Live cites|Submit in place"
+    ra="06h12m" dec="+33°09′"
+    c1="#c4f0cf" c2="#3a8e5a" c3="#103a26" glow="95,196,125" accent="#9fe6b0" ring="true" moons="1"
+    hint-size="100%,480px"></dc-import>
+
+  <!-- ===== HOW IT'S DIFFERENT ===== -->
+  <section style="position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:clamp(30px,6vh,72px) clamp(20px,5vw,56px) clamp(60px,9vh,110px);">
+    <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#5fc47d; margin-bottom:14px;">HOW LOOM STANDS APART</div>
+    <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(26px,3.4vw,44px); line-height:1.04; letter-spacing:-.02em; margin:0 0 28px;">The manuscript carries its own evidence.</h2>
+    <div style="display:flex; flex-direction:column; gap:0; border-radius:18px; overflow:hidden; border:1px solid rgba(120,210,150,.18);">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.12em; text-transform:uppercase;">
+        <div style="padding:14px 22px; background:rgba(255,255,255,.03); color:rgba(232,245,236,.5);">A word processor</div>
+        <div style="padding:14px 22px; background:rgba(120,210,150,.1); color:#9fe6b0;">Loom</div>
+      </div>
+      <sc-for list="{{ diffs }}" as="d" hint-placeholder-count="4">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0; border-top:1px solid rgba(120,210,150,.12);">
+          <div style="padding:18px 22px; font-size:14.5px; color:rgba(232,245,236,.6); background:rgba(255,255,255,.01);">{{ d.old }}</div>
+          <div style="padding:18px 22px; font-size:14.5px; color:#e8f5ec; background:rgba(120,210,150,.05);">{{ d.new }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <a href="PARALLED Landing.dc.html#cta" style="display:inline-flex; align-items:center; gap:10px; margin-top:32px; text-decoration:none; font-size:14px; font-weight:600; color:#0a1410; padding:13px 26px; border-radius:999px; background:linear-gradient(120deg,#9fe6b0,#3a8e84); box-shadow:0 10px 30px rgba(95,196,125,.34);">Open the loom →</a>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280}}">
+class Component extends DCLogic {
+  SUITE = [
+    { label: 'Discovery', file: 'Discovery.dc.html' },
+    { label: 'Studies', file: 'Studies.dc.html' },
+    { label: 'Neural Hub', file: 'Neural Hub.dc.html' },
+    { label: 'Synthesis', file: 'Synthesis.dc.html' },
+    { label: 'Canvas', file: 'Canvas.dc.html' },
+    { label: 'Loom', file: 'Loom.dc.html' },
+    { label: 'Forge', file: 'Forge.dc.html' }
+  ];
+  ACTIVE = 'Loom';
+
+  SPECS = [
+    { n: '01', title: 'Threaded sentences', body: 'Select any claim in your draft and see the trail, evidence and reasoning woven behind it.' },
+    { n: '02', title: 'Live citations', body: 'References point at real studies on the platform — they update if the source is revised.' },
+    { n: '03', title: 'Reasoning margins', body: 'The why sits alongside the what. Reviewers read the argument and its justification together.' },
+    { n: '04', title: 'Submit in place', body: 'When it meets the call\u2019s criteria, submit straight from Loom — provenance attached.' }
+  ];
+
+  DIFFS = [
+    { old: 'Text and evidence live in separate files.', new: 'Every sentence carries its evidence inline.' },
+    { old: 'Citations rot the moment a source changes.', new: 'Live links update when the source is revised.' },
+    { old: 'Reviewers see conclusions, not reasoning.', new: 'The reasoning travels in the margin alongside.' },
+    { old: 'Export, reformat, email, resubmit.', new: 'Submit straight into the call it answers.' }
+  ];
+
+  componentDidMount() { this.buildWeft(); this.bindHover(); }
+  buildWeft() {
+    if (!this.weftEl || this.weftEl.dataset.built) return;
+    this.weftEl.dataset.built = '1';
+    let html = '';
+    for (let i = 0; i < 22; i++) {
+      const top = (i * 4.6 + 1).toFixed(1);
+      const dur = (4 + Math.random() * 5).toFixed(2), del = (Math.random() * 4).toFixed(2);
+      const op = (0.06 + Math.random() * 0.14).toFixed(2);
+      html += '<div style="position:absolute; left:-10%; right:-10%; top:' + top + '%; height:1px; background:rgba(159,230,176,' + op + '); animation:weaveX ' + dur + 's ease-in-out ' + del + 's infinite;"></div>';
+    }
+    this.weftEl.innerHTML = html;
+  }
+  bindHover() {
+    if (!this.root) return;
+    this.root.querySelectorAll('[data-card]').forEach(c => {
+      if (c.dataset.bound) return; c.dataset.bound = '1';
+      c.addEventListener('mouseenter', () => { c.style.transform = 'translateY(-5px)'; c.style.borderColor = 'rgba(120,210,150,.5)'; c.style.background = 'rgba(120,210,150,.09)'; });
+      c.addEventListener('mouseleave', () => { c.style.transform = 'none'; c.style.borderColor = 'rgba(120,210,150,.16)'; c.style.background = 'rgba(120,210,150,.04)'; });
+    });
+  }
+
+  renderVals() {
+    const suite = this.SUITE.map(s => ({
+      label: s.label, href: s.file,
+      color: s.label === this.ACTIVE ? '#9fe6b0' : 'rgba(232,245,236,.7)',
+      weight: s.label === this.ACTIVE ? 700 : 500
+    }));
+    return {
+      rootRef: (el) => { this.root = el; },
+      weftRef: (el) => { this.weftEl = el; this.buildWeft(); },
+      suite, specs: this.SPECS, diffs: this.DIFFS
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Playfair+Display:ital,wght@0,500;0,600;1,500&amp;display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; }
+  html, body { margin:0; padding:0; background:#0c0a14; }
+  ::selection { background:rgba(241,120,182,.4); color:#fff; }
+  @keyframes pulseGlow { 0%,100%{opacity:.4} 50%{opacity:1} }
+  @keyframes risein { from{opacity:0; transform:translateY(26px)} to{opacity:1; transform:none} }
+  @keyframes shimmer { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
+  @keyframes gridDrift { from{background-position:0 0,0 0} to{background-position:60px 60px,60px 60px} }
+  @keyframes cardFloat { 0%,100%{transform:translateY(0) rotate(var(--r,0deg))} 50%{transform:translateY(-12px) rotate(var(--r,0deg))} }
+  @keyframes dashFlow { to{stroke-dashoffset:-40} }
+</style>
+<script src="./bg-fx.js"></script>
+</helmet>
+
+<div ref="{{ rootRef }}" data-screen-label="Canvas" style="position:relative; min-height:100vh; color:#f6ecf3; font-family:'Manrope',system-ui,sans-serif; overflow-x:hidden; -webkit-font-smoothing:antialiased; background:linear-gradient(180deg,#0c0a14 0%, #1a1020 50%, #21142a 100%);">
+
+  <!-- ===== MOTIF: infinite board grid + floating note cards + connectors ===== -->
+  <div style="position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none;">
+    <div style="position:absolute; inset:-30px; opacity:.45; background-image:radial-gradient(circle, rgba(241,120,182,.18) 1.5px, transparent 1.5px), radial-gradient(circle, rgba(155,123,255,.10) 1.5px, transparent 1.5px); background-size:60px 60px, 60px 60px; background-position:0 0, 30px 30px; animation:gridDrift 16s linear infinite; mask-image:radial-gradient(circle at 62% 40%, #000 8%, transparent 80%); -webkit-mask-image:radial-gradient(circle at 62% 40%, #000 8%, transparent 80%);"></div>
+    <svg width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid slice" style="position:absolute; inset:0; opacity:.6;">
+      <g stroke="#f178b6" stroke-width="1.4" fill="none" stroke-dasharray="6 6" style="animation:dashFlow 1.6s linear infinite;">
+        <path d="M210 200 C 340 200, 360 360, 500 360"/>
+        <path d="M500 360 C 660 360, 680 200, 800 220"/>
+        <path d="M500 360 C 520 480, 420 520, 360 540"/>
+      </g>
+    </svg>
+    <div ref="{{ cardsRef }}" style="position:absolute; inset:0;"></div>
+  </div>
+
+  <!-- ===== SUITE NAV ===== -->
+  <nav style="position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between; padding:18px clamp(20px,5vw,56px); backdrop-filter:blur(14px); background:linear-gradient(180deg, rgba(12,10,20,.85), rgba(12,10,20,.3)); border-bottom:1px solid rgba(241,120,182,.16);">
+    <a href="PARALLED Landing.dc.html" style="display:flex; align-items:center; gap:11px; text-decoration:none; color:#f6ecf3;">
+      <svg width="28" height="28" viewBox="0 0 30 30" fill="none"><defs><linearGradient id="lg" x1="0" y1="0" x2="30" y2="30"><stop offset="0" stop-color="#f9a8d4"/><stop offset=".5" stop-color="#f178b6"/><stop offset="1" stop-color="#9b7bff"/></linearGradient></defs><line x1="6" y1="24" x2="18" y2="4" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round"/><line x1="13" y1="26" x2="25" y2="6" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round"/></svg>
+      <span style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:17px; letter-spacing:.14em;">PARALLED</span>
+    </a>
+    <div style="display:flex; align-items:center; gap:18px; font-size:13px; flex-wrap:wrap; justify-content:flex-end;">
+      <sc-for list="{{ suite }}" as="s" hint-placeholder-count="7">
+        <a href="{{ s.href }}" style="color:{{ s.color }}; text-decoration:none; font-weight:{{ s.weight }}; white-space:nowrap;">{{ s.label }}</a>
+      </sc-for>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <header style="position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:clamp(56px,9vh,120px) clamp(20px,5vw,56px) clamp(30px,5vh,56px);">
+    <div style="animation:risein .8s ease both; display:inline-flex; align-items:center; gap:10px; padding:8px 16px; border-radius:999px; border:1px solid rgba(241,120,182,.34); background:rgba(241,120,182,.08); font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.16em; color:#f9a8d4; margin-bottom:26px;">
+      <span style="width:7px; height:7px; border-radius:50%; background:#f178b6; box-shadow:0 0 10px #f178b6; animation:pulseGlow 2.2s ease-in-out infinite;"></span>
+      CANVAS · SPATIAL THINKING
+    </div>
+    <h1 style="animation:risein .8s ease both .08s; font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(40px,6.4vw,82px); line-height:1; letter-spacing:-.025em; margin:0 0 22px; max-width:880px;">Think in space,<br><span style="background:linear-gradient(110deg,#f9a8d4,#f178b6 50%,#9b7bff); background-size:200% auto; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; animation:shimmer 7s linear infinite;">not in a stack.</span></h1>
+    <p style="animation:risein .8s ease both .16s; font-size:clamp(16px,1.6vw,19px); line-height:1.62; color:rgba(246,236,243,.86); max-width:600px; margin:0 0 34px;">An infinite board where claims, evidence and open questions live as cards you can move, cluster and connect. Canvas is where a study's structure becomes <b style="color:#f9a8d4;">visible</b> before it becomes prose.</p>
+    <div style="animation:risein .8s ease both .24s; display:flex; gap:clamp(18px,3vw,40px); flex-wrap:wrap; padding-top:26px; border-top:1px solid rgba(241,120,182,.18);">
+      <div><div style="font-family:'Space Grotesk',sans-serif; font-size:27px; font-weight:700; color:#f9a8d4;">Infinite</div><div style="font-size:12.5px; color:rgba(246,236,243,.6); margin-top:2px;">spatial board</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif; font-size:27px; font-weight:700; color:#f9a8d4;">Linked</div><div style="font-size:12.5px; color:rgba(246,236,243,.6); margin-top:2px;">to live trails</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif; font-size:27px; font-weight:700; color:#f9a8d4;">Shared</div><div style="font-size:12.5px; color:rgba(246,236,243,.6); margin-top:2px;">with your board</div></div>
+    </div>
+  </header>
+
+  <!-- ===== WHAT IT SPECIFIES ===== -->
+  <section style="position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:clamp(30px,5vh,64px) clamp(20px,5vw,56px);">
+    <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#f178b6; margin-bottom:14px;">WHAT LIVES ON CANVAS</div>
+    <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(26px,3.4vw,44px); line-height:1.04; letter-spacing:-.02em; margin:0 0 30px; max-width:680px;">Structure you can see and rearrange.</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px;">
+      <sc-for list="{{ specs }}" as="c" hint-placeholder-count="4">
+        <div data-card="" style="padding:26px; border-radius:18px; border:1px solid rgba(241,120,182,.16); background:rgba(241,120,182,.04); transition:transform .4s cubic-bezier(.16,1,.3,1), border-color .4s, background .4s;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:rgba(246,236,243,.45); margin-bottom:13px;">{{ c.n }}</div>
+          <h3 style="font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:600; margin:0 0 9px;">{{ c.title }}</h3>
+          <p style="font-size:14px; line-height:1.6; color:rgba(246,236,243,.7); margin:0;">{{ c.body }}</p>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ===== PLANETARY RECORD ===== -->
+  <dc-import name="PlanetRecord"
+    title="Lattice" code="PRL-05 · CANVAS" ptype="Spatial world — structure made visible" orbit="An infinite board"
+    surface="Claim cards you cluster and move" atmosphere="Evidence pinned, live" core="Semantic edges — supports, contradicts"
+    sats="Claim cards|Evidence pins|Open questions|Promote to study"
+    ra="05h36m" dec="+18°50′"
+    c1="#ffc8e6" c2="#d44b96" c3="#5a1c44" glow="241,120,182" accent="#f9a8d4" ring="false" moons="2"
+    hint-size="100%,480px"></dc-import>
+
+  <!-- ===== HOW IT'S DIFFERENT ===== -->
+  <section style="position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:clamp(30px,6vh,72px) clamp(20px,5vw,56px) clamp(60px,9vh,110px);">
+    <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#f178b6; margin-bottom:14px;">HOW CANVAS STANDS APART</div>
+    <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(26px,3.4vw,44px); line-height:1.04; letter-spacing:-.02em; margin:0 0 28px;">A whiteboard that's wired to your science.</h2>
+    <div style="display:flex; flex-direction:column; gap:0; border-radius:18px; overflow:hidden; border:1px solid rgba(241,120,182,.18);">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.12em; text-transform:uppercase;">
+        <div style="padding:14px 22px; background:rgba(255,255,255,.03); color:rgba(246,236,243,.5);">A generic whiteboard app</div>
+        <div style="padding:14px 22px; background:rgba(241,120,182,.1); color:#f9a8d4;">PARALLED Canvas</div>
+      </div>
+      <sc-for list="{{ diffs }}" as="d" hint-placeholder-count="4">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0; border-top:1px solid rgba(241,120,182,.12);">
+          <div style="padding:18px 22px; font-size:14.5px; color:rgba(246,236,243,.6); background:rgba(255,255,255,.01);">{{ d.old }}</div>
+          <div style="padding:18px 22px; font-size:14.5px; color:#f6ecf3; background:rgba(241,120,182,.05);">{{ d.new }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <a href="PARALLED Landing.dc.html#cta" style="display:inline-flex; align-items:center; gap:10px; margin-top:32px; text-decoration:none; font-size:14px; font-weight:600; color:#0c0a14; padding:13px 26px; border-radius:999px; background:linear-gradient(120deg,#f9a8d4,#9b7bff); box-shadow:0 10px 30px rgba(241,120,182,.34);">Open a canvas →</a>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280}}">
+class Component extends DCLogic {
+  SUITE = [
+    { label: 'Discovery', file: 'Discovery.dc.html' },
+    { label: 'Studies', file: 'Studies.dc.html' },
+    { label: 'Neural Hub', file: 'Neural Hub.dc.html' },
+    { label: 'Synthesis', file: 'Synthesis.dc.html' },
+    { label: 'Canvas', file: 'Canvas.dc.html' },
+    { label: 'Loom', file: 'Loom.dc.html' },
+    { label: 'Forge', file: 'Forge.dc.html' }
+  ];
+  ACTIVE = 'Canvas';
+
+  SPECS = [
+    { n: '01', title: 'Claim cards', body: 'Each hypothesis or sub-claim is a card you can move, recolour and cluster as the argument takes shape.' },
+    { n: '02', title: 'Evidence pins', body: 'Attach results, datasets and citations directly to a claim — the link is live, not a dead reference.' },
+    { n: '03', title: 'Open questions', body: 'Park what you don\u2019t yet know as its own card; promote it to a study or a call when you\u2019re ready.' },
+    { n: '04', title: 'Connectors', body: 'Draw supports, contradicts and depends-on edges. The map of reasoning is explicit, not implied.' }
+  ];
+
+  DIFFS = [
+    { old: 'Sticky notes that mean nothing to the platform.', new: 'Cards wired to real studies, trails and calls.' },
+    { old: 'Connections are decorative arrows.', new: 'Edges carry semantics: supports, contradicts, depends-on.' },
+    { old: 'Lives in a silo, separate from your work.', new: 'Promote any card straight into a study or call.' },
+    { old: 'No notion of rigor or provenance.', new: 'Every pinned result keeps its rigor tier and source.' }
+  ];
+
+  componentDidMount() { this.buildCards(); this.bindHover(); }
+  buildCards() {
+    if (!this.cardsEl || this.cardsEl.dataset.built) return;
+    this.cardsEl.dataset.built = '1';
+    const cols = ['241,120,182', '155,123,255', '124,140,255'];
+    let html = '';
+    const spots = [[16, 26], [76, 22], [22, 64], [70, 66], [46, 30], [52, 72]];
+    spots.forEach((p, i) => {
+      const c = cols[i % cols.length];
+      const r = (Math.random() * 6 - 3).toFixed(1);
+      const dur = (5 + Math.random() * 4).toFixed(2), del = (Math.random() * 3).toFixed(2);
+      html += '<div style="position:absolute; left:' + p[0] + '%; top:' + p[1] + '%; --r:' + r + 'deg; width:120px; height:74px; border-radius:10px; background:rgba(' + c + ',.08); border:1px solid rgba(' + c + ',.35); box-shadow:0 8px 24px rgba(0,0,0,.3); animation:cardFloat ' + dur + 's ease-in-out ' + del + 's infinite;">' +
+        '<div style="height:5px; border-radius:10px 10px 0 0; background:rgba(' + c + ',.6);"></div>' +
+        '<div style="padding:10px 11px;"><div style="width:64%; height:5px; border-radius:3px; background:rgba(' + c + ',.5); margin-bottom:7px;"></div><div style="width:88%; height:4px; border-radius:3px; background:rgba(255,255,255,.14); margin-bottom:5px;"></div><div style="width:72%; height:4px; border-radius:3px; background:rgba(255,255,255,.12);"></div></div></div>';
+    });
+    this.cardsEl.innerHTML = html;
+  }
+  bindHover() {
+    if (!this.root) return;
+    this.root.querySelectorAll('[data-card]').forEach(c => {
+      if (c.dataset.bound) return; c.dataset.bound = '1';
+      c.addEventListener('mouseenter', () => { c.style.transform = 'translateY(-5px)'; c.style.borderColor = 'rgba(241,120,182,.5)'; c.style.background = 'rgba(241,120,182,.09)'; });
+      c.addEventListener('mouseleave', () => { c.style.transform = 'none'; c.style.borderColor = 'rgba(241,120,182,.16)'; c.style.background = 'rgba(241,120,182,.04)'; });
+    });
+  }
+
+  renderVals() {
+    const suite = this.SUITE.map(s => ({
+      label: s.label, href: s.file,
+      color: s.label === this.ACTIVE ? '#f9a8d4' : 'rgba(246,236,243,.7)',
+      weight: s.label === this.ACTIVE ? 700 : 500
+    }));
+    return {
+      rootRef: (el) => { this.root = el; },
+      cardsRef: (el) => { this.cardsEl = el; this.buildCards(); },
+      suite, specs: this.SPECS, diffs: this.DIFFS
+    };
+  }
+}
+</script>
+</body>
+</html>

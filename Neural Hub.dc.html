@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Playfair+Display:ital,wght@0,500;0,600;1,500&amp;display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; }
+  html, body { margin:0; padding:0; background:#0d0820; }
+  ::selection { background:rgba(178,130,255,.4); color:#fff; }
+  @keyframes pulseGlow { 0%,100%{opacity:.4} 50%{opacity:1} }
+  @keyframes risein { from{opacity:0; transform:translateY(26px)} to{opacity:1; transform:none} }
+  @keyframes shimmer { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
+  @keyframes synFloat { 0%,100%{transform:translate(0,0)} 50%{transform:translate(8px,-12px)} }
+  @keyframes nebula { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(6%,-5%) scale(1.2)} }
+</style>
+<script src="./bg-fx.js"></script>
+</helmet>
+
+<div ref="{{ rootRef }}" data-screen-label="Neural Hub" style="position:relative; min-height:100vh; color:#efe9ff; font-family:'Manrope',system-ui,sans-serif; overflow-x:hidden; -webkit-font-smoothing:antialiased; background:linear-gradient(180deg,#0d0820 0%, #160d33 50%, #1d1140 100%);">
+
+  <!-- ===== MOTIF: synaptic network ===== -->
+  <div style="position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none;">
+    <div style="position:absolute; top:-12%; left:40%; width:60vw; height:60vw; border-radius:50%; filter:blur(110px); opacity:.5; background:radial-gradient(circle, rgba(155,123,255,.5), transparent 70%); animation:nebula 24s ease-in-out infinite;"></div>
+    <svg ref="{{ netRef }}" width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid slice" style="position:absolute; inset:0;"></svg>
+  </div>
+
+  <!-- ===== SUITE NAV ===== -->
+  <nav style="position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between; padding:18px clamp(20px,5vw,56px); backdrop-filter:blur(14px); background:linear-gradient(180deg, rgba(13,8,32,.85), rgba(13,8,32,.3)); border-bottom:1px solid rgba(178,130,255,.16);">
+    <a href="PARALLED Landing.dc.html" style="display:flex; align-items:center; gap:11px; text-decoration:none; color:#efe9ff;">
+      <svg width="28" height="28" viewBox="0 0 30 30" fill="none"><defs><linearGradient id="lg" x1="0" y1="0" x2="30" y2="30"><stop offset="0" stop-color="#c79af0"/><stop offset=".5" stop-color="#9b7bff"/><stop offset="1" stop-color="#7c8cff"/></linearGradient></defs><line x1="6" y1="24" x2="18" y2="4" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round"/><line x1="13" y1="26" x2="25" y2="6" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round"/></svg>
+      <span style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:17px; letter-spacing:.14em;">PARALLED</span>
+    </a>
+    <div style="display:flex; align-items:center; gap:18px; font-size:13px; flex-wrap:wrap; justify-content:flex-end;">
+      <sc-for list="{{ suite }}" as="s" hint-placeholder-count="7">
+        <a href="{{ s.href }}" style="color:{{ s.color }}; text-decoration:none; font-weight:{{ s.weight }}; white-space:nowrap;">{{ s.label }}</a>
+      </sc-for>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <header style="position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:clamp(56px,9vh,120px) clamp(20px,5vw,56px) clamp(30px,5vh,56px);">
+    <div style="animation:risein .8s ease both; display:inline-flex; align-items:center; gap:10px; padding:8px 16px; border-radius:999px; border:1px solid rgba(178,130,255,.34); background:rgba(178,130,255,.08); font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.16em; color:#c79af0; margin-bottom:26px;">
+      <span style="width:7px; height:7px; border-radius:50%; background:#9b7bff; box-shadow:0 0 10px #9b7bff; animation:pulseGlow 2.2s ease-in-out infinite;"></span>
+      NEURAL HUB · CO-RESEARCHER
+    </div>
+    <h1 style="animation:risein .8s ease both .08s; font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(40px,6.4vw,82px); line-height:1; letter-spacing:-.025em; margin:0 0 22px; max-width:880px;">An AI that reasons<br><span style="background:linear-gradient(110deg,#c79af0,#9b7bff 50%,#7c8cff); background-size:200% auto; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; animation:shimmer 7s linear infinite;">in the open with you.</span></h1>
+    <p style="animation:risein .8s ease both .16s; font-size:clamp(16px,1.6vw,19px); line-height:1.62; color:rgba(239,233,255,.86); max-width:600px; margin:0 0 34px;">Not a black box you copy-paste from. The Neural Hub works <b style="color:#c79af0;">inside</b> your study — grounded in the call's criteria and your own reasoning trail. Every inference it makes is recorded, challengeable and on the record.</p>
+    <div style="animation:risein .8s ease both .24s; display:flex; gap:clamp(18px,3vw,40px); flex-wrap:wrap; padding-top:26px; border-top:1px solid rgba(178,130,255,.18);">
+      <div><div style="font-family:'Space Grotesk',sans-serif; font-size:27px; font-weight:700; color:#c79af0;">Shows</div><div style="font-size:12.5px; color:rgba(239,233,255,.6); margin-top:2px;">its working</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif; font-size:27px; font-weight:700; color:#c79af0;">Grounded</div><div style="font-size:12.5px; color:rgba(239,233,255,.6); margin-top:2px;">in your trail</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif; font-size:27px; font-weight:700; color:#c79af0;">On record</div><div style="font-size:12.5px; color:rgba(239,233,255,.6); margin-top:2px;">every inference</div></div>
+    </div>
+  </header>
+
+  <!-- ===== WHAT IT SPECIFIES ===== -->
+  <section style="position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:clamp(30px,5vh,64px) clamp(20px,5vw,56px);">
+    <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#9b7bff; margin-bottom:14px;">WHAT THE HUB DOES</div>
+    <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(26px,3.4vw,44px); line-height:1.04; letter-spacing:-.02em; margin:0 0 30px; max-width:680px;">A partner, not an oracle.</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px;">
+      <sc-for list="{{ specs }}" as="c" hint-placeholder-count="4">
+        <div data-card="" style="padding:26px; border-radius:18px; border:1px solid rgba(178,130,255,.16); background:rgba(178,130,255,.04); transition:transform .4s cubic-bezier(.16,1,.3,1), border-color .4s, background .4s;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:rgba(239,233,255,.45); margin-bottom:13px;">{{ c.n }}</div>
+          <h3 style="font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:600; margin:0 0 9px;">{{ c.title }}</h3>
+          <p style="font-size:14px; line-height:1.6; color:rgba(239,233,255,.7); margin:0;">{{ c.body }}</p>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ===== PLANETARY RECORD ===== -->
+  <dc-import name="PlanetRecord"
+    title="Cortex" code="PRL-03 · NEURAL HUB" ptype="Cognition world — reasons with you" orbit="Active inside every study"
+    surface="Grounded suggestions, tied to your trail" atmosphere="Gaps and weak assumptions, surfaced" core="Conflicts logged, never hidden"
+    sats="Shows working|Grounded|Challengeable|On record"
+    ra="03h27m" dec="+41°02′"
+    c1="#e3ccff" c2="#7c5fd6" c3="#2a1860" glow="199,154,240" accent="#c79af0" ring="false" moons="2"
+    hint-size="100%,480px"></dc-import>
+
+  <!-- ===== HOW IT'S DIFFERENT ===== -->
+  <section style="position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:clamp(30px,6vh,72px) clamp(20px,5vw,56px) clamp(60px,9vh,110px);">
+    <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#9b7bff; margin-bottom:14px;">HOW THE HUB STANDS APART</div>
+    <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(26px,3.4vw,44px); line-height:1.04; letter-spacing:-.02em; margin:0 0 28px;">Reasoning you can audit.</h2>
+    <div style="display:flex; flex-direction:column; gap:0; border-radius:18px; overflow:hidden; border:1px solid rgba(178,130,255,.18);">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.12em; text-transform:uppercase;">
+        <div style="padding:14px 22px; background:rgba(255,255,255,.03); color:rgba(239,233,255,.5);">A chatbot in a tab</div>
+        <div style="padding:14px 22px; background:rgba(178,130,255,.1); color:#c79af0;">The Neural Hub</div>
+      </div>
+      <sc-for list="{{ diffs }}" as="d" hint-placeholder-count="4">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0; border-top:1px solid rgba(178,130,255,.12);">
+          <div style="padding:18px 22px; font-size:14.5px; color:rgba(239,233,255,.6); background:rgba(255,255,255,.01);">{{ d.old }}</div>
+          <div style="padding:18px 22px; font-size:14.5px; color:#efe9ff; background:rgba(178,130,255,.05);">{{ d.new }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <a href="PARALLED Landing.dc.html#cta" style="display:inline-flex; align-items:center; gap:10px; margin-top:32px; text-decoration:none; font-size:14px; font-weight:600; color:#0d0820; padding:13px 26px; border-radius:999px; background:linear-gradient(120deg,#c79af0,#7c8cff); box-shadow:0 10px 30px rgba(155,123,255,.34);">Open the Hub →</a>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280}}">
+class Component extends DCLogic {
+  SUITE = [
+    { label: 'Discovery', file: 'Discovery.dc.html' },
+    { label: 'Studies', file: 'Studies.dc.html' },
+    { label: 'Neural Hub', file: 'Neural Hub.dc.html' },
+    { label: 'Synthesis', file: 'Synthesis.dc.html' },
+    { label: 'Canvas', file: 'Canvas.dc.html' },
+    { label: 'Loom', file: 'Loom.dc.html' },
+    { label: 'Forge', file: 'Forge.dc.html' }
+  ];
+  ACTIVE = 'Neural Hub';
+
+  SPECS = [
+    { n: '01', title: 'Grounded reasoning', body: 'Every suggestion is tied to the call\u2019s criteria and your study trail — not floating, unsourced text.' },
+    { n: '02', title: 'Surfaces the gaps', body: 'Flags missing controls, weak assumptions and the rigor tier your method actually supports.' },
+    { n: '03', title: 'Conflicts in the open', body: 'When the model and the board disagree, the conflict is surfaced and logged — never quietly resolved.' },
+    { n: '04', title: 'Always challengeable', body: 'Each inference enters the revisable trail. You can overrule it, and the overrule is recorded too.' }
+  ];
+
+  DIFFS = [
+    { old: 'Answers arrive with no visible reasoning.', new: 'Every step is shown and enters the audit trail.' },
+    { old: 'Output is detached from your actual project.', new: 'It reasons inside the study, on your real context.' },
+    { old: 'Disagreement is invisible — you just get text.', new: 'Model–board conflicts are surfaced explicitly.' },
+    { old: 'You copy-paste and lose provenance.', new: 'Provenance travels with every claim it makes.' }
+  ];
+
+  componentDidMount() {
+    this.buildNet();
+    this.bindHover();
+  }
+  buildNet() {
+    const svg = this.netEl;
+    if (!svg || svg.dataset.built) return;
+    svg.dataset.built = '1';
+    const NS = 'http://www.w3.org/2000/svg';
+    const nodes = [];
+    for (let i = 0; i < 26; i++) nodes.push({ x: 40 + Math.random() * 920, y: 30 + Math.random() * 640 });
+    // edges: connect near neighbours
+    const edges = [];
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
+        if (Math.hypot(dx, dy) < 190) edges.push([i, j]);
+      }
+    }
+    edges.forEach(([a, b]) => {
+      const l = document.createElementNS(NS, 'line');
+      l.setAttribute('x1', nodes[a].x); l.setAttribute('y1', nodes[a].y);
+      l.setAttribute('x2', nodes[b].x); l.setAttribute('y2', nodes[b].y);
+      l.setAttribute('stroke', 'rgba(155,123,255,0.16)'); l.setAttribute('stroke-width', '1');
+      svg.appendChild(l);
+    });
+    nodes.forEach((n, i) => {
+      const c = document.createElementNS(NS, 'circle');
+      c.setAttribute('cx', n.x); c.setAttribute('cy', n.y); c.setAttribute('r', (2 + Math.random() * 2.4).toFixed(1));
+      c.setAttribute('fill', Math.random() < 0.5 ? '#c79af0' : '#9b7bff');
+      c.style.animation = 'pulseGlow ' + (2 + Math.random() * 2.5).toFixed(2) + 's ease-in-out ' + (Math.random() * 2).toFixed(2) + 's infinite';
+      svg.appendChild(c);
+    });
+    // travelling pulses along a few edges
+    this._pulseTimer = setInterval(() => {
+      if (!edges.length) return;
+      const [a, b] = edges[(Math.random() * edges.length) | 0];
+      const p = document.createElementNS(NS, 'circle');
+      p.setAttribute('r', '3'); p.setAttribute('fill', '#e9dcff');
+      p.setAttribute('cx', nodes[a].x); p.setAttribute('cy', nodes[a].y);
+      svg.appendChild(p);
+      const am = document.createElementNS(NS, 'animate');
+      am.setAttribute('attributeName', 'cx'); am.setAttribute('from', nodes[a].x); am.setAttribute('to', nodes[b].x); am.setAttribute('dur', '1.1s'); am.setAttribute('fill', 'freeze');
+      const am2 = document.createElementNS(NS, 'animate');
+      am2.setAttribute('attributeName', 'cy'); am2.setAttribute('from', nodes[a].y); am2.setAttribute('to', nodes[b].y); am2.setAttribute('dur', '1.1s'); am2.setAttribute('fill', 'freeze');
+      p.appendChild(am); p.appendChild(am2);
+      am.beginElement && am.beginElement(); am2.beginElement && am2.beginElement();
+      setTimeout(() => p.remove(), 1200);
+    }, 420);
+  }
+  componentWillUnmount() { if (this._pulseTimer) clearInterval(this._pulseTimer); }
+  bindHover() {
+    if (!this.root) return;
+    this.root.querySelectorAll('[data-card]').forEach(c => {
+      if (c.dataset.bound) return; c.dataset.bound = '1';
+      c.addEventListener('mouseenter', () => { c.style.transform = 'translateY(-5px)'; c.style.borderColor = 'rgba(178,130,255,.5)'; c.style.background = 'rgba(178,130,255,.09)'; });
+      c.addEventListener('mouseleave', () => { c.style.transform = 'none'; c.style.borderColor = 'rgba(178,130,255,.16)'; c.style.background = 'rgba(178,130,255,.04)'; });
+    });
+  }
+
+  renderVals() {
+    const suite = this.SUITE.map(s => ({
+      label: s.label, href: s.file,
+      color: s.label === this.ACTIVE ? '#c79af0' : 'rgba(239,233,255,.7)',
+      weight: s.label === this.ACTIVE ? 700 : 500
+    }));
+    return {
+      rootRef: (el) => { this.root = el; },
+      netRef: (el) => { this.netEl = el; this.buildNet(); },
+      suite, specs: this.SPECS, diffs: this.DIFFS
+    };
+  }
+}
+</script>
+</body>
+</html>

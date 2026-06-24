@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Playfair+Display:ital,wght@0,500;0,600;1,500&amp;display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; }
+  html, body { margin:0; padding:0; background:#0a0f24; }
+  ::selection { background:rgba(124,140,255,.4); color:#fff; }
+  @keyframes gridPan { from{background-position:0 0} to{background-position:0 64px} }
+  @keyframes drawLine { from{stroke-dashoffset:var(--len)} to{stroke-dashoffset:0} }
+  @keyframes nodeFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+  @keyframes pulseGlow { 0%,100%{opacity:.4} 50%{opacity:1} }
+  @keyframes risein { from{opacity:0; transform:translateY(26px)} to{opacity:1; transform:none} }
+  @keyframes shimmer { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+</style>
+<script src="./bg-fx.js"></script>
+</helmet>
+
+<div ref="{{ rootRef }}" data-screen-label="Studies" style="position:relative; min-height:100vh; color:#e7ebff; font-family:'Manrope',system-ui,sans-serif; overflow-x:hidden; -webkit-font-smoothing:antialiased; background:linear-gradient(180deg,#0a0f24 0%, #111634 50%, #161a3a 100%);">
+
+  <!-- ===== MOTIF: blueprint grid + drafting lines ===== -->
+  <div style="position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none;">
+    <div style="position:absolute; inset:-40px; opacity:.5; background-image:linear-gradient(rgba(124,140,255,.09) 1px, transparent 1px), linear-gradient(90deg, rgba(124,140,255,.09) 1px, transparent 1px); background-size:64px 64px; animation:gridPan 9s linear infinite; mask-image:radial-gradient(circle at 60% 36%, #000 6%, transparent 76%); -webkit-mask-image:radial-gradient(circle at 60% 36%, #000 6%, transparent 76%);"></div>
+    <svg width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid slice" style="position:absolute; inset:0; opacity:.5;">
+      <g stroke="#7c8cff" stroke-width="1.4" fill="none">
+        <path d="M120 560 L120 300 L420 300 L420 140" style="--len:920; stroke-dasharray:920; animation:drawLine 5s ease-in-out infinite alternate;"/>
+        <path d="M880 580 L880 360 L600 360 L600 200 L760 200" style="--len:980; stroke-dasharray:980; animation:drawLine 6.5s ease-in-out infinite alternate;"/>
+        <path d="M500 660 L500 460 L320 460" style="--len:560; stroke-dasharray:560; animation:drawLine 4.2s ease-in-out infinite alternate;"/>
+      </g>
+      <g fill="#9aa6ff">
+        <circle cx="420" cy="140" r="4"><animate attributeName="opacity" values=".3;1;.3" dur="2.4s" repeatCount="indefinite"/></circle>
+        <circle cx="760" cy="200" r="4"><animate attributeName="opacity" values="1;.3;1" dur="2.8s" repeatCount="indefinite"/></circle>
+        <circle cx="320" cy="460" r="4"><animate attributeName="opacity" values=".3;1;.3" dur="2s" repeatCount="indefinite"/></circle>
+      </g>
+    </svg>
+    <div ref="{{ dotRef }}" style="position:absolute; inset:0;"></div>
+  </div>
+
+  <!-- ===== SUITE NAV ===== -->
+  <nav style="position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between; padding:18px clamp(20px,5vw,56px); backdrop-filter:blur(14px); background:linear-gradient(180deg, rgba(10,15,36,.85), rgba(10,15,36,.3)); border-bottom:1px solid rgba(124,140,255,.16);">
+    <a href="PARALLED Landing.dc.html" style="display:flex; align-items:center; gap:11px; text-decoration:none; color:#e7ebff;">
+      <svg width="28" height="28" viewBox="0 0 30 30" fill="none"><defs><linearGradient id="lg" x1="0" y1="0" x2="30" y2="30"><stop offset="0" stop-color="#9aa6ff"/><stop offset=".5" stop-color="#7c8cff"/><stop offset="1" stop-color="#5b8def"/></linearGradient></defs><line x1="6" y1="24" x2="18" y2="4" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round"/><line x1="13" y1="26" x2="25" y2="6" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round"/></svg>
+      <span style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:17px; letter-spacing:.14em;">PARALLED</span>
+    </a>
+    <div style="display:flex; align-items:center; gap:18px; font-size:13px; flex-wrap:wrap; justify-content:flex-end;">
+      <sc-for list="{{ suite }}" as="s" hint-placeholder-count="7">
+        <a href="{{ s.href }}" style="color:{{ s.color }}; text-decoration:none; font-weight:{{ s.weight }}; white-space:nowrap;">{{ s.label }}</a>
+      </sc-for>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <header style="position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:clamp(56px,9vh,120px) clamp(20px,5vw,56px) clamp(30px,5vh,56px);">
+    <div style="animation:risein .8s ease both; display:inline-flex; align-items:center; gap:10px; padding:8px 16px; border-radius:999px; border:1px solid rgba(124,140,255,.34); background:rgba(124,140,255,.08); font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.16em; color:#9aa6ff; margin-bottom:26px;">
+      <span style="width:7px; height:7px; border-radius:50%; background:#7c8cff; box-shadow:0 0 10px #7c8cff; animation:pulseGlow 2.2s ease-in-out infinite;"></span>
+      STUDIES · YOUR WORKSPACE
+    </div>
+    <h1 style="animation:risein .8s ease both .08s; font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(40px,6.4vw,82px); line-height:1; letter-spacing:-.025em; margin:0 0 22px; max-width:880px;">Where a bare idea<br><span style="background:linear-gradient(110deg,#9aa6ff,#7c8cff 50%,#5b8def); background-size:200% auto; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; animation:shimmer 7s linear infinite;">becomes a study.</span></h1>
+    <p style="animation:risein .8s ease both .16s; font-size:clamp(16px,1.6vw,19px); line-height:1.62; color:rgba(231,235,255,.86); max-width:600px; margin:0 0 34px;">You don't need a call to begin. Start from a hunch and let it grow into rigorous work — every decision, every dead end, every revision held in a <b style="color:#9aa6ff;">reasoning trail</b> visible to you, your team and the board.</p>
+    <div style="animation:risein .8s ease both .24s; display:flex; gap:clamp(18px,3vw,40px); flex-wrap:wrap; padding-top:26px; border-top:1px solid rgba(124,140,255,.18);">
+      <div><div style="font-family:'Space Grotesk',sans-serif; font-size:27px; font-weight:700; color:#9aa6ff;">Bare idea</div><div style="font-size:12.5px; color:rgba(231,235,255,.6); margin-top:2px;">valid starting point</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif; font-size:27px; font-weight:700; color:#9aa6ff;">Visible</div><div style="font-size:12.5px; color:rgba(231,235,255,.6); margin-top:2px;">reasoning trail</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif; font-size:27px; font-weight:700; color:#9aa6ff;">Pilot</div><div style="font-size:12.5px; color:rgba(231,235,255,.6); margin-top:2px;">before you scale</div></div>
+    </div>
+  </header>
+
+  <!-- ===== WHAT IT SPECIFIES ===== -->
+  <section style="position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:clamp(30px,5vh,64px) clamp(20px,5vw,56px);">
+    <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#7c8cff; margin-bottom:14px;">WHAT A STUDY HOLDS</div>
+    <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(26px,3.4vw,44px); line-height:1.04; letter-spacing:-.02em; margin:0 0 30px; max-width:680px;">A workspace that remembers how you thought.</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px;">
+      <sc-for list="{{ specs }}" as="c" hint-placeholder-count="4">
+        <div data-card="" style="padding:26px; border-radius:18px; border:1px solid rgba(124,140,255,.16); background:rgba(124,140,255,.04); transition:transform .4s cubic-bezier(.16,1,.3,1), border-color .4s, background .4s;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:rgba(231,235,255,.45); margin-bottom:13px;">{{ c.n }}</div>
+          <h3 style="font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:600; margin:0 0 9px;">{{ c.title }}</h3>
+          <p style="font-size:14px; line-height:1.6; color:rgba(231,235,255,.7); margin:0;">{{ c.body }}</p>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ===== PLANETARY RECORD ===== -->
+  <dc-import name="PlanetRecord"
+    title="Meridian" code="PRL-01 · STUDIES" ptype="Workspace world — ideas take form" orbit="Grows with your work"
+    surface="A bare idea, claimed without a call" atmosphere="A visible, revisable reasoning trail" core="Pilot before you scale"
+    sats="Bare-idea start|Team-visible|Rigor by choice|Dead ends kept"
+    ra="01h08m" dec="+12°44′"
+    c1="#cdd4ff" c2="#5b8def" c3="#1c2a5e" glow="124,140,255" accent="#9aa6ff" ring="true" moons="1"
+    hint-size="100%,480px"></dc-import>
+
+  <!-- ===== HOW IT'S DIFFERENT ===== -->
+  <section style="position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:clamp(30px,6vh,72px) clamp(20px,5vw,56px) clamp(60px,9vh,110px);">
+    <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#7c8cff; margin-bottom:14px;">HOW STUDIES STANDS APART</div>
+    <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(26px,3.4vw,44px); line-height:1.04; letter-spacing:-.02em; margin:0 0 28px;">Not a document. A line of reasoning.</h2>
+    <div style="display:flex; flex-direction:column; gap:0; border-radius:18px; overflow:hidden; border:1px solid rgba(124,140,255,.18);">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.12em; text-transform:uppercase;">
+        <div style="padding:14px 22px; background:rgba(255,255,255,.03); color:rgba(231,235,255,.5);">A doc + citation manager</div>
+        <div style="padding:14px 22px; background:rgba(124,140,255,.1); color:#9aa6ff;">A PARALLED study</div>
+      </div>
+      <sc-for list="{{ diffs }}" as="d" hint-placeholder-count="4">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0; border-top:1px solid rgba(124,140,255,.12);">
+          <div style="padding:18px 22px; font-size:14.5px; color:rgba(231,235,255,.6); background:rgba(255,255,255,.01);">{{ d.old }}</div>
+          <div style="padding:18px 22px; font-size:14.5px; color:#e7ebff; background:rgba(124,140,255,.05);">{{ d.new }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <a href="PARALLED Landing.dc.html#cta" style="display:inline-flex; align-items:center; gap:10px; margin-top:32px; text-decoration:none; font-size:14px; font-weight:600; color:#0a0f24; padding:13px 26px; border-radius:999px; background:linear-gradient(120deg,#9aa6ff,#5b8def); box-shadow:0 10px 30px rgba(91,141,239,.34);">Start a study →</a>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280}}">
+class Component extends DCLogic {
+  SUITE = [
+    { label: 'Discovery', file: 'Discovery.dc.html' },
+    { label: 'Studies', file: 'Studies.dc.html' },
+    { label: 'Neural Hub', file: 'Neural Hub.dc.html' },
+    { label: 'Synthesis', file: 'Synthesis.dc.html' },
+    { label: 'Canvas', file: 'Canvas.dc.html' },
+    { label: 'Loom', file: 'Loom.dc.html' },
+    { label: 'Forge', file: 'Forge.dc.html' }
+  ];
+  ACTIVE = 'Studies';
+
+  SPECS = [
+    { n: '01', title: 'Start from nothing', body: 'No call required. A bare idea is a first-class starting point — claim a call later if one fits, or never.' },
+    { n: '02', title: 'A reasoning trail', body: 'Every choice and discarded path is recorded. Visible to you, your team and the board — and always revisable.' },
+    { n: '03', title: 'Your rigor tier', body: 'Choose Easy, Medium, Complex or Expertised. An honest baseline is complete work, not a stripped-down draft.' },
+    { n: '04', title: 'Pilot, then scale', body: 'Run a small pilot to test whether the idea holds before committing the full apparatus.' }
+  ];
+
+  DIFFS = [
+    { old: 'The final write-up hides how you got there.', new: 'The trail shows every turn — including the wrong ones.' },
+    { old: 'Dead ends are deleted and forgotten.', new: 'Dead ends are recorded; they inform the next attempt.' },
+    { old: 'You commit fully before you know it works.', new: 'You pilot first, and scale only if it holds.' },
+    { old: 'Collaborators see a frozen draft.', new: 'Team and board watch the reasoning unfold live.' }
+  ];
+
+  componentDidMount() {
+    if (this.dotEl && !this.dotEl.dataset.built) {
+      this.dotEl.dataset.built = '1';
+      let html = '';
+      for (let i = 0; i < 16; i++) {
+        const x = (Math.random() * 100).toFixed(1), y = (Math.random() * 100).toFixed(1);
+        const dur = (4 + Math.random() * 5).toFixed(2), del = (Math.random() * 4).toFixed(2);
+        html += '<div style="position:absolute; left:' + x + '%; top:' + y + '%; width:5px; height:5px; border-radius:50%; background:rgba(154,166,255,.7); box-shadow:0 0 10px rgba(124,140,255,.7); animation:nodeFloat ' + dur + 's ease-in-out ' + del + 's infinite;"></div>';
+      }
+      this.dotEl.innerHTML = html;
+    }
+    this.bindHover();
+  }
+  bindHover() {
+    if (!this.root) return;
+    this.root.querySelectorAll('[data-card]').forEach(c => {
+      if (c.dataset.bound) return; c.dataset.bound = '1';
+      c.addEventListener('mouseenter', () => { c.style.transform = 'translateY(-5px)'; c.style.borderColor = 'rgba(124,140,255,.5)'; c.style.background = 'rgba(124,140,255,.09)'; });
+      c.addEventListener('mouseleave', () => { c.style.transform = 'none'; c.style.borderColor = 'rgba(124,140,255,.16)'; c.style.background = 'rgba(124,140,255,.04)'; });
+    });
+  }
+
+  renderVals() {
+    const suite = this.SUITE.map(s => ({
+      label: s.label, href: s.file,
+      color: s.label === this.ACTIVE ? '#9aa6ff' : 'rgba(231,235,255,.7)',
+      weight: s.label === this.ACTIVE ? 700 : 500
+    }));
+    return {
+      rootRef: (el) => { this.root = el; },
+      dotRef: (el) => { this.dotEl = el; },
+      suite, specs: this.SPECS, diffs: this.DIFFS
+    };
+  }
+}
+</script>
+</body>
+</html>

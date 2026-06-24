@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Playfair+Display:ital,wght@0,500;0,600;1,500&amp;display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; background:#1c2540; }
+  ::selection { background: rgba(56,192,176,.4); color:#fff; }
+  input[type=range]{ cursor:pointer; height:6px; }
+  input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; appearance:none; width:16px; height:16px; border-radius:50%; background:#fff; border:2px solid currentColor; box-shadow:0 1px 4px rgba(0,0,0,.35); cursor:pointer; margin-top:-5px; }
+  input[type=range]::-moz-range-thumb{ width:16px; height:16px; border-radius:50%; background:#fff; border:2px solid currentColor; cursor:pointer; }
+  input[type=range]::-webkit-slider-runnable-track{ height:6px; border-radius:6px; }
+  input[type=range]::-moz-range-track{ height:6px; border-radius:6px; }
+  @keyframes cloudDrift { from{transform:translateX(-6vw)} to{transform:translateX(106vw)} }
+  @keyframes sunBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  @keyframes waveShift { from{background-position:0 0} to{background-position:-600px 0} }
+  @keyframes waveShift2 { from{background-position:0 0} to{background-position:600px 0} }
+  @keyframes shimmer { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
+  @keyframes palmSway { 0%,100%{transform:rotate(-2.2deg)} 50%{transform:rotate(2.2deg)} }
+  @keyframes palmSwayB { 0%,100%{transform:rotate(1.8deg)} 50%{transform:rotate(-1.8deg)} }
+  @keyframes frondSway { 0%,100%{transform:rotate(-3deg)} 50%{transform:rotate(3deg)} }
+  @keyframes leafFloat { 0%{transform:translate(0,0) rotate(0deg); opacity:0} 8%{opacity:.85} 92%{opacity:.85} 100%{transform:translate(70vw,18vh) rotate(420deg); opacity:0} }
+  @keyframes introZoom { 0%{transform:scale(1.14); opacity:0; filter:blur(6px)} 100%{transform:scale(1); opacity:1; filter:blur(0)} }
+  @keyframes risein { from{opacity:0; transform:translateY(24px)} to{opacity:1; transform:none} }
+  @keyframes spinSlow { to{transform:rotate(360deg)} }
+  @keyframes pulseRing { 0%{transform:scale(.7); opacity:.6} 100%{transform:scale(1.9); opacity:0} }
+  @keyframes glowPulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+  @keyframes vuIdle { 0%,100%{transform:scaleY(.16)} 50%{transform:scaleY(.4)} }
+  /* 4D ocean + greenery */
+  @keyframes swell { 0%,100%{transform:translateY(0) scaleY(1)} 50%{transform:translateY(-7px) scaleY(1.06)} }
+  @keyframes splash { 0%{transform:translateY(8px) scale(.4); opacity:0} 30%{opacity:.95} 100%{transform:translateY(-46px) scale(1.15); opacity:0} }
+  @keyframes foamRoll { 0%{transform:translateX(0) scaleY(1); opacity:.5} 50%{transform:translateX(-18px) scaleY(1.5); opacity:.85} 100%{transform:translateX(0) scaleY(1); opacity:.5} }
+  @keyframes bushSway { 0%,100%{transform:rotate(-1.6deg)} 50%{transform:rotate(1.6deg)} }
+  @keyframes bushSwayB { 0%,100%{transform:rotate(1.3deg)} 50%{transform:rotate(-1.3deg)} }
+  @keyframes flowerBob { 0%,100%{transform:translateY(0) rotate(-4deg)} 50%{transform:translateY(-3px) rotate(4deg)} }
+  @keyframes birdFly { 0%{transform:translate(0,0)} 50%{transform:translate(46vw,-7vh)} 100%{transform:translate(92vw,2vh)} }
+  /* alien takeover */
+  @keyframes alienDark { from{opacity:0} to{opacity:1} }
+  @keyframes warpStar { 0%{transform:translateX(0); opacity:0} 12%{opacity:.9} 100%{transform:translateX(-60vw); opacity:0} }
+  @keyframes shipFly { 0%{transform:translate(60vw,-12vh) scale(.5) rotate(8deg); opacity:0} 18%{opacity:1} 55%{transform:translate(0,0) scale(1) rotate(0deg)} 78%{transform:translate(0,0) scale(1) rotate(0deg)} 100%{transform:translate(-66vw,-14vh) scale(.5) rotate(-8deg); opacity:0} }
+  @keyframes shipHover { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  @keyframes doorOpen { 0%{transform:scaleY(1)} 100%{transform:scaleY(.04)} }
+  @keyframes beamDrop { 0%{transform:scaleY(0); opacity:0} 100%{transform:scaleY(1); opacity:.8} }
+  @keyframes alienPop { 0%{transform:translateY(20px) scale(.4); opacity:0} 100%{transform:translateY(0) scale(1); opacity:1} }
+  @keyframes alienFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+  @keyframes bubblePop { 0%{transform:scale(.3); opacity:0} 60%{transform:scale(1.08)} 100%{transform:scale(1); opacity:1} }
+  @keyframes shake { 0%,100%{transform:translate(0,0)} 20%{transform:translate(-6px,3px)} 40%{transform:translate(7px,-2px)} 60%{transform:translate(-5px,-3px)} 80%{transform:translate(4px,4px)} }
+  @keyframes ringExpand { 0%{transform:scale(.2); opacity:.9} 100%{transform:scale(3.4); opacity:0} }
+  @keyframes ufoGlow { 0%,100%{opacity:.5} 50%{opacity:1} }
+  @keyframes codeFall { 0%{transform:translateY(0)} 100%{transform:translateY(150vh)} }
+  @keyframes fleetCross { from{transform:translateX(0) scale(var(--s,.3))} to{transform:translateX(calc(124vw * var(--fd,1))) scale(var(--s,.3))} }
+</style>
+<script src="./bg-fx.js"></script>
+</helmet>
+
+<div ref="{{ rootRef }}" data-screen-label="Relax" style="position:relative; min-height:100vh; color:#fdf3e7; font-family:'Manrope',system-ui,sans-serif; overflow-x:hidden; -webkit-font-smoothing:antialiased;">
+
+  <!-- ===== BEACH SCENE (fixed) ===== -->
+  <div style="position:fixed; inset:0; z-index:0; overflow:hidden; background:linear-gradient(180deg, #2b3a67 0%, #51517e 30%, #9a6f93 52%, #e89a78 72%, #ffc78f 88%, #ffe2b6 100%);">
+    <!-- sun -->
+    <div style="position:absolute; left:50%; top:46%; width:230px; height:230px; transform:translate(-50%,-50%); border-radius:50%; background:radial-gradient(circle, #fff3d6 0%, #ffd79c 38%, rgba(255,200,140,.5) 60%, rgba(255,200,140,0) 75%); animation:sunBob 9s ease-in-out infinite;"></div>
+    <div style="position:absolute; left:50%; top:46%; width:96px; height:96px; transform:translate(-50%,-50%); border-radius:50%; background:radial-gradient(circle, #fffaf0, #ffe0a8); box-shadow:0 0 80px 30px rgba(255,221,160,.6);"></div>
+    <!-- clouds -->
+    <div style="position:absolute; top:14%; left:0; width:230px; height:42px; border-radius:50px; background:rgba(255,240,225,.55); filter:blur(14px); animation:cloudDrift 60s linear infinite;"></div>
+    <div style="position:absolute; top:24%; left:0; width:160px; height:30px; border-radius:50px; background:rgba(255,240,225,.4); filter:blur(12px); animation:cloudDrift 86s linear infinite 8s;"></div>
+    <div style="position:absolute; top:9%; left:0; width:300px; height:50px; border-radius:60px; background:rgba(255,240,225,.35); filter:blur(18px); animation:cloudDrift 110s linear infinite 22s;"></div>
+
+    <!-- ocean (layered swells for 4D depth) -->
+    <div style="position:absolute; left:0; right:0; top:52%; bottom:24%; background:linear-gradient(180deg, #b97f7a 0%, #6f7f96 16%, #3f7b86 48%, #2b5e6b 100%); overflow:hidden;">
+      <div style="position:absolute; left:50%; top:0; bottom:0; width:160px; transform:translateX(-50%); background:linear-gradient(180deg, rgba(255,224,170,.7), rgba(255,224,170,0) 70%); filter:blur(3px); opacity:.8;"></div>
+      <div style="position:absolute; inset:0; opacity:.5; background-image:repeating-linear-gradient(90deg, transparent 0 26px, rgba(255,255,255,.18) 26px 28px); animation:waveShift 9s linear infinite;"></div>
+      <div style="position:absolute; inset:0; opacity:.35; background-image:repeating-linear-gradient(90deg, transparent 0 40px, rgba(255,255,255,.12) 40px 41px); animation:waveShift2 13s linear infinite;"></div>
+      <!-- rolling swell crests -->
+      <div style="position:absolute; left:-10%; right:-10%; bottom:30%; height:26px; border-radius:50%; background:rgba(255,255,255,.16); filter:blur(6px); animation:swell 6s ease-in-out infinite;"></div>
+      <div style="position:absolute; left:-10%; right:-10%; bottom:12%; height:34px; border-radius:50%; background:rgba(255,255,255,.22); filter:blur(7px); animation:swell 7.6s ease-in-out infinite .8s;"></div>
+    </div>
+
+    <!-- breaking foam line + splashes -->
+    <div style="position:absolute; left:0; right:0; top:75.5%; height:14px; background:rgba(255,250,240,.55); filter:blur(5px); animation:foamRoll 6s ease-in-out infinite;"></div>
+    <div ref="{{ splashRef }}" style="position:absolute; left:0; right:0; top:73%; height:40px; pointer-events:none;"></div>
+
+    <!-- sand -->
+    <div style="position:absolute; left:0; right:0; bottom:0; height:24%; background:linear-gradient(180deg, #eccfa1 0%, #e0bd8b 40%, #d2ad79 100%);"></div>
+    <div style="position:absolute; left:0; right:0; bottom:0; height:24%; opacity:.4; background:radial-gradient(120% 80% at 50% 0%, rgba(255,240,210,.7), transparent 60%);"></div>
+
+    <!-- GREENERY: lower-left cluster (~30% width) -->
+    <div style="position:absolute; left:0; bottom:0; width:32%; height:30%; pointer-events:none;">
+      <div style="position:absolute; left:6%; bottom:2%; width:120px; height:96px; transform-origin:bottom center; animation:bushSway 6s ease-in-out infinite;">
+        <div style="position:absolute; left:8px; bottom:0; width:80px; height:70px; border-radius:50% 50% 46% 46%; background:radial-gradient(circle at 40% 30%, #5fb86a, #2f7d44);"></div>
+        <div style="position:absolute; left:34px; bottom:6px; width:78px; height:78px; border-radius:50%; background:radial-gradient(circle at 40% 30%, #6cc473, #357f47);"></div>
+        <div style="position:absolute; left:0; bottom:4px; width:60px; height:58px; border-radius:50%; background:radial-gradient(circle at 40% 30%, #57b066, #2c763f);"></div>
+      </div>
+      <div style="position:absolute; left:40%; bottom:0; width:90px; height:130px; transform-origin:bottom center; animation:bushSwayB 7.4s ease-in-out infinite;">
+        <div style="position:absolute; left:40px; bottom:0; width:9px; height:62px; background:linear-gradient(#7a5230,#5a3a22); border-radius:4px;"></div>
+        <div style="position:absolute; left:6px; bottom:42px; width:78px; height:74px; border-radius:50%; background:radial-gradient(circle at 40% 30%, #74cf7c, #357f47);"></div>
+        <div style="position:absolute; left:24px; bottom:66px; width:54px; height:52px; border-radius:50%; background:radial-gradient(circle at 40% 30%, #82d98a, #3f8f52);"></div>
+      </div>
+      <!-- little flowers -->
+      <div style="position:absolute; left:22%; bottom:8%; font-size:20px; transform-origin:bottom center; animation:flowerBob 4.5s ease-in-out infinite;">🌼</div>
+      <div style="position:absolute; left:62%; bottom:5%; font-size:17px; transform-origin:bottom center; animation:flowerBob 5.2s ease-in-out infinite .6s;">🌺</div>
+      <div style="position:absolute; left:50%; bottom:14%; font-size:15px; transform-origin:bottom center; animation:flowerBob 4s ease-in-out infinite .3s;">🌿</div>
+    </div>
+
+    <!-- GREENERY: lower-right cluster (~30% width) -->
+    <div style="position:absolute; right:0; bottom:0; width:30%; height:26%; pointer-events:none;">
+      <div style="position:absolute; right:8%; bottom:2%; width:110px; height:88px; transform-origin:bottom center; animation:bushSwayB 6.8s ease-in-out infinite;">
+        <div style="position:absolute; right:8px; bottom:0; width:74px; height:66px; border-radius:50% 50% 46% 46%; background:radial-gradient(circle at 60% 30%, #5fb86a, #2f7d44);"></div>
+        <div style="position:absolute; right:30px; bottom:6px; width:72px; height:72px; border-radius:50%; background:radial-gradient(circle at 60% 30%, #6cc473, #357f47);"></div>
+      </div>
+      <div style="position:absolute; right:42%; bottom:6%; font-size:18px; transform-origin:bottom center; animation:flowerBob 4.8s ease-in-out infinite .4s;">🌸</div>
+      <div style="position:absolute; right:24%; bottom:3%; font-size:15px; transform-origin:bottom center; animation:flowerBob 5.5s ease-in-out infinite;">🌿</div>
+    </div>
+
+    <!-- gulls -->
+    <div style="position:absolute; top:18%; left:-4%; color:rgba(60,50,70,.5); font-size:16px; animation:birdFly 34s linear infinite;">︶</div>
+    <div style="position:absolute; top:22%; left:-4%; color:rgba(60,50,70,.4); font-size:12px; animation:birdFly 40s linear infinite 5s;">︶</div>
+
+    <!-- palms -->
+    <div style="position:absolute; left:-14px; bottom:14%; width:240px; height:340px; transform-origin:bottom center; animation:palmSway 7s ease-in-out infinite;">
+      <svg viewBox="0 0 240 340" width="100%" height="100%" fill="none">
+        <defs>
+          <linearGradient id="trunk" x1="0" y1="0" x2="0" y2="340"><stop offset="0" stop-color="#8a5a36"/><stop offset="1" stop-color="#5a3a22"/></linearGradient>
+          <linearGradient id="frond" x1="0" y1="0" x2="240" y2="120"><stop offset="0" stop-color="#3f8f5a"/><stop offset="1" stop-color="#22633c"/></linearGradient>
+        </defs>
+        <path d="M104 340 C112 250 120 170 118 96 L132 96 C136 180 128 260 122 340 Z" fill="url(#trunk)"/>
+        <g style="transform-origin:122px 96px; animation:frondSway 5.5s ease-in-out infinite;">
+          <path d="M122 98 C70 70 30 64 0 78 C44 64 86 76 122 98Z" fill="url(#frond)"/>
+          <path d="M122 98 C150 50 200 36 240 44 C196 40 152 60 122 98Z" fill="url(#frond)"/>
+          <path d="M122 98 C92 44 96 8 120 -6 C108 30 116 64 122 98Z" fill="url(#frond)"/>
+          <path d="M122 98 C168 78 214 96 240 128 C198 100 156 88 122 98Z" fill="url(#frond)"/>
+          <path d="M122 98 C76 92 36 118 16 150 C58 110 92 96 122 98Z" fill="url(#frond)"/>
+          <path d="M122 98 C150 92 186 70 208 40 C176 78 146 90 122 98Z" fill="url(#frond)"/>
+        </g>
+      </svg>
+    </div>
+    <div style="position:absolute; right:-30px; bottom:13%; width:180px; height:260px; transform:scaleX(-1); transform-origin:bottom center; animation:palmSwayB 8.5s ease-in-out infinite;">
+      <svg viewBox="0 0 240 340" width="100%" height="100%" fill="none">
+        <path d="M104 340 C112 250 120 170 118 96 L132 96 C136 180 128 260 122 340 Z" fill="url(#trunk)"/>
+        <g style="transform-origin:122px 96px; animation:frondSway 6.5s ease-in-out infinite .4s;">
+          <path d="M122 98 C70 70 30 64 0 78 C44 64 86 76 122 98Z" fill="url(#frond)"/>
+          <path d="M122 98 C150 50 200 36 240 44 C196 40 152 60 122 98Z" fill="url(#frond)"/>
+          <path d="M122 98 C92 44 96 8 120 -6 C108 30 116 64 122 98Z" fill="url(#frond)"/>
+          <path d="M122 98 C168 78 214 96 240 128 C198 100 156 88 122 98Z" fill="url(#frond)"/>
+          <path d="M122 98 C76 92 36 118 16 150 C58 110 92 96 122 98Z" fill="url(#frond)"/>
+        </g>
+      </svg>
+    </div>
+
+    <!-- drifting leaves / breeze -->
+    <div style="position:absolute; top:30%; left:0; width:11px; height:7px; border-radius:0 60% 0 60%; background:rgba(90,160,90,.7); animation:leafFloat 17s linear infinite;"></div>
+    <div style="position:absolute; top:42%; left:0; width:8px; height:5px; border-radius:0 60% 0 60%; background:rgba(120,180,110,.6); animation:leafFloat 23s linear infinite 6s;"></div>
+    <div style="position:absolute; top:25%; left:0; width:9px; height:6px; border-radius:0 60% 0 60%; background:rgba(110,170,100,.6); animation:leafFloat 29s linear infinite 13s;"></div>
+
+    <div style="position:absolute; inset:0; background:radial-gradient(120% 90% at 50% 30%, transparent 50%, rgba(30,30,60,.28)); pointer-events:none;"></div>
+  </div>
+
+  <!-- ===== NAV ===== -->
+  <nav style="position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between; padding:20px clamp(20px,5vw,56px); backdrop-filter:blur(12px); background:linear-gradient(180deg, rgba(28,37,64,.5), rgba(28,37,64,0)); ">
+    <a href="PARALLED Landing.dc.html" style="display:flex; align-items:center; gap:12px; text-decoration:none; color:#fdf3e7;">
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><defs><linearGradient id="lg" x1="0" y1="0" x2="30" y2="30"><stop offset="0" stop-color="#ffce9e"/><stop offset="0.5" stop-color="#ff9e7a"/><stop offset="1" stop-color="#38c0b0"/></linearGradient></defs><line x1="6" y1="24" x2="18" y2="4" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round"/><line x1="13" y1="26" x2="25" y2="6" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round"/></svg>
+      <span style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:18px; letter-spacing:.14em;">PARALLED</span>
+    </a>
+    <div style="display:flex; align-items:center; gap:12px; font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.14em; color:rgba(253,243,231,.85);">
+      <span style="width:7px; height:7px; border-radius:50%; background:#38c0b0; box-shadow:0 0 10px #38c0b0; animation:glowPulse 2.4s ease-in-out infinite;"></span>
+      RELAXED · SHORELINE STATION
+    </div>
+    <a href="PARALLED Landing.dc.html#platform" style="text-decoration:none; font-size:13px; font-weight:600; color:#1c2540; padding:10px 20px; border-radius:999px; background:linear-gradient(120deg,#ffce9e,#ff9e7a);">← Ecosystem</a>
+  </nav>
+
+  <!-- ===== ALIEN BUTTON ===== -->
+  <button onClick="{{ onAlien }}" title="Don't press this." style="position:fixed; z-index:55; right:22px; bottom:22px; cursor:pointer; display:flex; align-items:center; gap:9px; font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; letter-spacing:.12em; padding:12px 18px; border-radius:999px; border:1px solid rgba(150,255,225,.5); background:linear-gradient(120deg, rgba(10,30,40,.85), rgba(20,60,70,.85)); color:#9bf3df; backdrop-filter:blur(8px); box-shadow:0 8px 28px rgba(0,0,0,.4), 0 0 18px rgba(56,192,176,.4);">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><ellipse cx="12" cy="14" rx="9" ry="3.2"/><path d="M7 12a5 5 0 0 1 10 0Z" opacity="0.7"/></svg>
+    ALIEN
+  </button>
+
+  <!-- ===== ALIEN TAKEOVER ===== -->
+  <sc-if value="{{ alienActive }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; z-index:90; overflow:hidden; pointer-events:auto;">
+      <!-- darkness -->
+      <div style="position:absolute; inset:0; background:radial-gradient(circle at 50% 42%, #0a1f2a 0%, #04080f 70%, #000 100%); animation:alienDark .5s ease both;"></div>
+      <!-- cracking code rain -->
+      <div ref="{{ codeRef }}" style="position:absolute; inset:0; font-family:'JetBrains Mono',monospace; font-size:14px; line-height:1.15; overflow:hidden; opacity:.85;"></div>
+      <!-- decoded banner -->
+      <div ref="{{ crackRef }}" style="position:absolute; left:50%; top:13%; transform:translateX(-50%); text-align:center; opacity:0; animation:bubblePop .6s cubic-bezier(.2,1.4,.4,1) both 1.1s;">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.34em; color:rgba(120,255,225,.6);">DECRYPTING HUMAN NETWORK…</div>
+        <div ref="{{ crackTextRef }}" style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(20px,3vw,34px); letter-spacing:.06em; color:#9bf3df; text-shadow:0 0 18px rgba(56,192,176,.6); margin-top:6px;">█████ ████ ██████</div>
+      </div>
+      <!-- warp stars -->
+      <div ref="{{ warpRef }}" style="position:absolute; inset:0;"></div>
+      <!-- impact flash / shake -->
+      <div ref="{{ flashRef }}" style="position:absolute; inset:0;"></div>
+
+      <!-- FLEET (background squadron) -->
+      <div ref="{{ fleetRef }}" style="position:absolute; inset:0; pointer-events:none;"></div>
+
+      <!-- SHIP -->
+      <div style="position:absolute; left:50%; top:36%; transform:translate(-50%,-50%); animation:shipFly 8.5s cubic-bezier(.5,0,.2,1) both;">
+        <div style="animation:shipHover 2.4s ease-in-out infinite; position:relative;">
+          <!-- beam -->
+          <div style="position:absolute; left:50%; top:74%; transform:translateX(-50%); transform-origin:top center; width:120px; height:230px; background:linear-gradient(180deg, rgba(120,255,225,.45), rgba(120,255,225,.04) 70%, transparent); clip-path:polygon(34% 0, 66% 0, 100% 100%, 0 100%); animation:beamDrop .8s ease both 2s; filter:blur(1px);"></div>
+          <!-- saucer -->
+          <svg width="280" height="150" viewBox="0 0 280 150" fill="none" style="position:relative; display:block; filter:drop-shadow(0 14px 30px rgba(0,0,0,.6));">
+            <defs>
+              <linearGradient id="ufoBody" x1="0" y1="70" x2="0" y2="120"><stop offset="0" stop-color="#3a6f7a"/><stop offset="1" stop-color="#0d2027"/></linearGradient>
+              <linearGradient id="ufoRim" x1="0" y1="0" x2="280" y2="0"><stop offset="0" stop-color="#78ffe1"/><stop offset=".5" stop-color="#9aa6ff"/><stop offset="1" stop-color="#f196c8"/></linearGradient>
+              <radialGradient id="dome" cx="50%" cy="38%" r="60%"><stop offset="0" stop-color="#d6fbff"/><stop offset="1" stop-color="#4aa6b8"/></radialGradient>
+            </defs>
+            <ellipse cx="140" cy="92" rx="132" ry="30" fill="url(#ufoBody)"/>
+            <ellipse cx="140" cy="84" rx="132" ry="11" fill="none" stroke="url(#ufoRim)" stroke-width="2.2"/>
+            <path d="M86 80 a54 40 0 0 1 108 0 Z" fill="url(#dome)" opacity="0.92"/>
+            <ellipse cx="120" cy="58" rx="16" ry="9" fill="rgba(255,255,255,.5)"/>
+            <g>
+              <circle cx="60" cy="92" r="5" fill="#78ffe1"><animate attributeName="opacity" values="1;.2;1" dur="1.1s" repeatCount="indefinite"/></circle>
+              <circle cx="100" cy="100" r="5" fill="#9aa6ff"><animate attributeName="opacity" values=".2;1;.2" dur="1.4s" repeatCount="indefinite"/></circle>
+              <circle cx="140" cy="103" r="5" fill="#f196c8"><animate attributeName="opacity" values="1;.2;1" dur=".9s" repeatCount="indefinite"/></circle>
+              <circle cx="180" cy="100" r="5" fill="#9aa6ff"><animate attributeName="opacity" values=".2;1;.2" dur="1.5s" repeatCount="indefinite"/></circle>
+              <circle cx="220" cy="92" r="5" fill="#78ffe1"><animate attributeName="opacity" values="1;.2;1" dur="1.2s" repeatCount="indefinite"/></circle>
+            </g>
+          </svg>
+          <!-- door slot under dome -->
+          <div style="position:absolute; left:50%; top:64px; transform:translateX(-50%); width:46px; height:18px; border-radius:0 0 8px 8px; background:#06141a; box-shadow:inset 0 0 8px rgba(0,0,0,.8);">
+            <div style="position:absolute; inset:0; background:linear-gradient(180deg,#1b3a44,#0a1c22); transform-origin:top center; animation:doorOpen .7s ease both 1.7s;"></div>
+          </div>
+          <!-- little alien peeking from beam -->
+          <div style="position:absolute; left:50%; top:150px; transform:translateX(-50%); animation:alienPop .6s cubic-bezier(.2,1.5,.4,1) both 2.3s;">
+            <div style="animation:alienFloat 2s ease-in-out infinite;">
+              <svg width="64" height="74" viewBox="0 0 64 74" fill="none">
+                <ellipse cx="32" cy="40" rx="18" ry="24" fill="#7fe6b0"/>
+                <ellipse cx="32" cy="20" rx="20" ry="17" fill="#8df0bd"/>
+                <ellipse cx="24" cy="20" rx="6" ry="9" fill="#0a1c14"/>
+                <ellipse cx="40" cy="20" rx="6" ry="9" fill="#0a1c14"/>
+                <ellipse cx="22" cy="17" rx="2" ry="3" fill="#fff" opacity=".8"/>
+                <ellipse cx="38" cy="17" rx="2" ry="3" fill="#fff" opacity=".8"/>
+                <path d="M14 60 q18 12 36 0" stroke="#4fae84" stroke-width="3" fill="none" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SPEECH BUBBLE -->
+      <div ref="{{ bubbleRef }}" style="position:absolute; left:50%; top:60%; transform:translateX(-50%); opacity:0; animation:bubblePop .5s cubic-bezier(.2,1.4,.4,1) both 2.7s; text-align:center; width:min(440px,86vw);">
+        <div style="position:relative; padding:20px 28px; border-radius:18px; background:rgba(8,24,30,.92); border:1px solid rgba(120,255,225,.5); box-shadow:0 14px 40px rgba(0,0,0,.5), 0 0 24px rgba(56,192,176,.3); backdrop-filter:blur(6px);">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:14px; letter-spacing:.1em; color:#9bf3df; margin-bottom:8px;">hiii human 👽</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:24px; letter-spacing:.18em; color:#78ffe1; text-shadow:0 0 14px rgba(120,255,225,.6);">⟁⌖⎔ ⏃⌇⟒⟡ ⌬⊹⟓</div>
+          <div style="font-size:13px; color:rgba(190,240,235,.7); margin-top:10px; font-style:italic;">— auto-translated —</div>
+          <div style="font-family:'Playfair Display',serif; font-style:italic; font-size:20px; line-height:1.4; color:#fdf3e7; margin-top:3px;">"Your code has errors. Humans make mistakes.<br>We have colonised this place. Welcome to the <b style="font-style:normal; color:#78ffe1;">PARALLED WORLD</b>.<br>Now — just relax. Be an <b style="font-style:normal; color:#9aa6ff;">ALIEN</b>."</div>
+          <div style="position:absolute; left:50%; bottom:-9px; transform:translateX(-50%) rotate(45deg); width:18px; height:18px; background:rgba(8,24,30,.92); border-right:1px solid rgba(120,255,225,.5); border-bottom:1px solid rgba(120,255,225,.5);"></div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== HERO ===== -->
+  <header style="position:relative; z-index:1; text-align:center; max-width:760px; margin:0 auto; padding:clamp(28px,5vh,60px) 24px clamp(10px,2vh,24px);">
+    <div style="animation:risein .9s ease both; font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.24em; color:rgba(255,236,210,.9); margin-bottom:18px;">GOLDEN HOUR · LIVE</div>
+    <h1 style="animation:risein .9s ease both .1s; font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(40px,7vw,76px); line-height:1; letter-spacing:-.02em; margin:0 0 16px; text-shadow:0 2px 30px rgba(20,20,50,.3);">Tune out.<span style="font-style:italic; color:#ffe2b6;"> Tune in.</span></h1>
+    <p style="animation:risein .9s ease both .2s; font-size:clamp(15px,1.6vw,18px); line-height:1.6; color:rgba(253,243,231,.92); max-width:520px; margin:0 auto; text-shadow:0 1px 12px rgba(20,20,50,.3);">Pull up a chair on the shore. Mix the surf, the breeze and the fire — then drop the needle on your own songs.</p>
+  </header>
+
+  <!-- ===== RADIO + PLAYER ===== -->
+  <main style="position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:clamp(16px,3vh,36px) clamp(16px,4vw,40px) clamp(60px,9vh,110px); display:grid; grid-template-columns:1.15fr .85fr; gap:24px; align-items:start;">
+
+    <!-- THE RADIO (vintage set) -->
+    <section data-screen-label="Radio Player" style="animation:introZoom 1.3s cubic-bezier(.16,1,.3,1) both; position:relative; border-radius:18px; padding:clamp(20px,2.6vw,30px); background:linear-gradient(160deg, #6b4423 0%, #8a5a30 30%, #6e4626 70%, #4f3018 100%); background-image:repeating-linear-gradient(90deg, rgba(0,0,0,.06) 0 3px, rgba(255,255,255,.03) 3px 7px); box-shadow:0 30px 70px rgba(20,20,50,.5), inset 0 2px 0 rgba(255,220,180,.35), inset 0 -4px 10px rgba(0,0,0,.45); border:2px solid #3a2412; color:#3a2c1c;">
+      <!-- bakelite inner face -->
+      <div style="border-radius:12px; padding:clamp(16px,2vw,22px); background:linear-gradient(165deg, #f0ddbc 0%, #e3caa0 50%, #d2b27f 100%); box-shadow:inset 0 2px 0 rgba(255,255,255,.5), inset 0 -3px 8px rgba(120,80,40,.3); border:1px solid #b89060;">
+      <!-- top bar: dial scale + brand plate -->
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:9px;">
+          <div style="width:13px; height:13px; border-radius:50%; background:radial-gradient(circle at 35% 35%, #ffd27a, #c8502f); box-shadow:0 0 9px rgba(255,140,60,.8), inset 0 -1px 2px rgba(0,0,0,.4); animation:glowPulse 2.6s ease-in-out infinite;"></div>
+          <span style="font-family:'Playfair Display',serif; font-weight:600; font-style:italic; letter-spacing:.04em; font-size:16px; color:#5a3a1e;">Paralled</span>
+          <span style="font-family:'JetBrains Mono',monospace; font-weight:500; letter-spacing:.18em; font-size:10px; color:#7a5430; border:1px solid #a07a48; border-radius:4px; padding:1px 5px;">FM · AM</span>
+        </div>
+        <div style="display:flex; gap:4px; align-items:flex-end; height:16px;">
+          <div style="width:3px; height:16px; background:#8a6a44;"></div><div style="width:3px; height:11px; background:#9a7a54;"></div><div style="width:3px; height:16px; background:#8a6a44;"></div><div style="width:3px; height:9px; background:#9a7a54;"></div><div style="width:3px; height:14px; background:#8a6a44;"></div>
+        </div>
+      </div>
+      <!-- tuning frequency scale -->
+      <div style="position:relative; height:22px; margin-bottom:14px; border-radius:5px; background:linear-gradient(180deg,#f7ecd2,#e6d2ab); box-shadow:inset 0 1px 3px rgba(120,80,40,.35); overflow:hidden;">
+        <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:space-between; padding:0 8px; font-family:'JetBrains Mono',monospace; font-size:8.5px; color:#8a6238; letter-spacing:.04em;">
+          <span>88</span><span>92</span><span>96</span><span>100</span><span>104</span><span>108</span>
+        </div>
+        <div style="position:absolute; inset:0; background-image:repeating-linear-gradient(90deg, transparent 0 13px, rgba(120,80,40,.3) 13px 14px);"></div>
+        <div style="position:absolute; top:0; bottom:0; left:64%; width:2px; background:#c8502f; box-shadow:0 0 6px rgba(200,80,40,.8);"></div>
+      </div>
+
+      <!-- DISPLAY SCREEN -->
+      <div style="border-radius:18px; padding:20px 22px; background:linear-gradient(165deg, #10342f, #08201d); box-shadow:inset 0 3px 14px rgba(0,0,0,.6), inset 0 0 0 1px rgba(56,192,176,.25); color:#bdf3e6;">
+        <div style="display:flex; align-items:center; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; color:rgba(120,220,200,.7); margin-bottom:14px;">
+          <span>NOW PLAYING</span>
+          <span ref="{{ stationRef }}">— · — FM</span>
+        </div>
+        <!-- equalizer -->
+        <div ref="{{ vuRef }}" style="display:flex; align-items:flex-end; gap:3px; height:46px; margin-bottom:14px;"></div>
+        <div style="font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:19px; line-height:1.2; min-height:24px; color:#eafff9; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ trackName }}</div>
+        <div style="font-size:12px; color:rgba(150,220,205,.7); margin-top:3px;">{{ trackSub }}</div>
+        <!-- scrubber -->
+        <div style="display:flex; align-items:center; gap:10px; margin-top:16px;">
+          <span ref="{{ curRef }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:rgba(150,220,205,.8); min-width:34px;">0:00</span>
+          <input ref="{{ seekRef }}" onInput="{{ onSeek }}" type="range" min="0" max="1000" value="0" style="flex:1; height:5px; border-radius:5px; accent-color:#38c0b0; background:rgba(56,192,176,.22); border-radius:5px;">
+          <span ref="{{ durRef }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:rgba(150,220,205,.8); min-width:34px; text-align:right;">0:00</span>
+        </div>
+      </div>
+
+      <!-- TRANSPORT (chrome buttons) -->
+      <div style="display:flex; align-items:center; justify-content:center; gap:20px; margin-top:22px;">
+        <button onClick="{{ onPrev }}" data-rbtn="" title="Previous" style="cursor:pointer; width:50px; height:50px; border-radius:50%; border:2px solid #6a4a2c; background:radial-gradient(circle at 38% 30%, #f3e6cf, #c9a877 70%, #a07f4e); color:#4a3115; display:grid; place-items:center; box-shadow:0 4px 10px rgba(0,0,0,.35), inset 0 2px 3px rgba(255,255,255,.6), inset 0 -3px 5px rgba(120,80,40,.4); transition:transform .12s;">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M7 6v12H5V6h2zm12 0v12l-9-6 9-6z"/></svg>
+        </button>
+        <button onClick="{{ onPlay }}" data-rbtn-main="" title="Play / Pause" style="cursor:pointer; width:78px; height:78px; border-radius:50%; border:3px solid #5a3a1e; background:radial-gradient(circle at 38% 28%, #ffce9e, #e8633a 62%, #b8431f); color:#fff; display:grid; place-items:center; box-shadow:0 8px 20px rgba(180,70,40,.5), inset 0 3px 4px rgba(255,255,255,.5), inset 0 -4px 8px rgba(120,30,10,.5); transition:transform .12s;">
+          <sc-if value="{{ isPlaying }}" hint-placeholder-val="{{ false }}"><svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg></sc-if>
+          <sc-if value="{{ isPaused }}" hint-placeholder-val="{{ true }}"><svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></sc-if>
+        </button>
+        <button onClick="{{ onNext }}" data-rbtn="" title="Next" style="cursor:pointer; width:50px; height:50px; border-radius:50%; border:2px solid #6a4a2c; background:radial-gradient(circle at 38% 30%, #f3e6cf, #c9a877 70%, #a07f4e); color:#4a3115; display:grid; place-items:center; box-shadow:0 4px 10px rgba(0,0,0,.35), inset 0 2px 3px rgba(255,255,255,.6), inset 0 -3px 5px rgba(120,80,40,.4); transition:transform .12s;">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M17 6v12h2V6h-2zM5 6v12l9-6-9-6z"/></svg>
+        </button>
+      </div>
+
+      <!-- volume + import + playlist toggle -->
+      <div style="display:flex; align-items:center; gap:14px; margin-top:22px; padding-top:18px; border-top:1px solid rgba(120,80,40,.2);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#6a4a2c" style="flex:none;"><path d="M5 9v6h4l5 5V4L9 9H5zm11.5 3a3.5 3.5 0 0 0-2-3.15v6.3A3.5 3.5 0 0 0 16.5 12z"/></svg>
+        <input onInput="{{ onVol }}" type="range" min="0" max="100" value="90" style="flex:1; height:5px; border-radius:5px; accent-color:#e8633a; background:rgba(120,80,40,.18);">
+        <button onClick="{{ onImport }}" data-rbtn="" title="Import songs" style="cursor:pointer; display:flex; align-items:center; gap:8px; font-family:'Manrope',sans-serif; font-weight:600; font-size:13px; padding:10px 16px; border-radius:999px; border:none; background:#3a2c1c; color:#ffe2b6; transition:transform .2s, background .2s;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.5l3.5-3.5 1.4 1.4L12 16.3 7.1 11.4l1.4-1.4L12 13.5V3zM5 19h14v2H5z"/></svg>Import
+        </button>
+        <input ref="{{ fileRef }}" onChange="{{ onFiles }}" type="file" accept="audio/*" multiple="" style="display:none;">
+      </div>
+      </div>
+    </section>
+
+    <!-- SIDE: PLAYLIST + AMBIENT -->
+    <aside style="display:flex; flex-direction:column; gap:20px; animation:risein 1s ease both .4s;">
+      <!-- PLAYLIST -->
+      <div style="border-radius:22px; padding:20px; background:rgba(28,40,60,.42); backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,.16); box-shadow:0 18px 44px rgba(20,20,50,.32);">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+          <h3 style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:700; letter-spacing:.04em; margin:0;">Your playlist</h3>
+          <span ref="{{ countRef }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:rgba(253,243,231,.6);">{{ trackCount }}</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px; max-height:230px; overflow-y:auto;">
+          <sc-for list="{{ tracks }}" as="t" hint-placeholder-count="3">
+            <div onClick="{{ t.onSelect }}" data-track-row="" style="display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:12px; cursor:pointer; background:{{ t.bg }}; border:1px solid {{ t.border }}; transition:background .25s;">
+              <div style="flex:none; width:30px; height:30px; border-radius:8px; display:grid; place-items:center; background:{{ t.dot }};">
+                <sc-if value="{{ t.active }}" hint-placeholder-val="{{ false }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></sc-if>
+                <sc-if value="{{ t.inactive }}" hint-placeholder-val="{{ true }}"><span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#1c2540; font-weight:600;">{{ t.num }}</span></sc-if>
+              </div>
+              <div style="flex:1; min-width:0;">
+                <div style="font-size:13.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#fdf3e7;">{{ t.name }}</div>
+              </div>
+              <button onClick="{{ t.onDelete }}" title="Remove" style="cursor:pointer; flex:none; width:24px; height:24px; border-radius:50%; border:none; background:transparent; color:rgba(253,243,231,.5); display:grid; place-items:center;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M6 7h12l-1 13H7L6 7zm3-3h6l1 2H8l1-2z"/></svg>
+              </button>
+            </div>
+          </sc-for>
+          <sc-if value="{{ noTracks }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ onImport }}" style="cursor:pointer; text-align:center; padding:26px 14px; border:1.5px dashed rgba(253,243,231,.3); border-radius:14px; color:rgba(253,243,231,.7);">
+              <div style="font-size:13.5px; font-weight:600; margin-bottom:4px;">No songs yet</div>
+              <div style="font-size:12px; color:rgba(253,243,231,.55);">Tap to import — saved on this device.</div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+
+      <!-- AMBIENT MIXER -->
+      <div style="border-radius:22px; padding:20px; background:rgba(28,40,60,.42); backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,.16); box-shadow:0 18px 44px rgba(20,20,50,.32);">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+          <h3 style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:700; letter-spacing:.04em; margin:0;">Ambient mix</h3>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.1em; color:rgba(253,243,231,.55);">LIVE SYNTH</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:9px;">
+          <sc-for list="{{ ambient }}" as="s" hint-placeholder-count="6">
+            <div style="display:flex; align-items:center; gap:12px; padding:9px 11px; border-radius:13px; background:{{ s.bg }}; border:1px solid {{ s.border }}; transition:background .3s, border-color .3s;">
+              <button onClick="{{ s.onToggle }}" title="{{ s.name }}" style="cursor:pointer; flex:none; width:34px; height:34px; border-radius:50%; border:none; position:relative; background:{{ s.orb }}; box-shadow:{{ s.glow }}; transition:transform .2s, box-shadow .3s;">
+                <span style="position:absolute; inset:0; border-radius:50%; border:2px solid rgba(255,255,255,.5); opacity:{{ s.ringOpacity }};"></span>
+              </button>
+              <div style="flex:1; min-width:0;">
+                <div style="font-size:13.5px; font-weight:600; color:#fdf3e7;">{{ s.name }}</div>
+                <div style="font-size:11px; color:rgba(253,243,231,.55);">{{ s.sub }}</div>
+              </div>
+              <input onInput="{{ s.onVol }}" type="range" min="0" max="100" value="{{ s.volVal }}" style="flex:none; width:88px; height:4px; border-radius:4px; accent-color:{{ s.accent }}; background:rgba(255,255,255,.18);">
+            </div>
+          </sc-for>
+        </div>
+        <!-- master + sleep -->
+        <div style="display:flex; align-items:center; gap:12px; margin-top:16px; padding-top:14px; border-top:1px solid rgba(255,255,255,.12);">
+          <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.1em; color:rgba(253,243,231,.6); flex:none;">SLEEP</span>
+          <sc-for list="{{ sleepOpts }}" as="o" hint-placeholder-count="4">
+            <button onClick="{{ o.onClick }}" style="cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:11px; padding:6px 11px; border-radius:999px; border:1px solid {{ o.border }}; background:{{ o.bg }}; color:{{ o.color }}; transition:all .2s;">{{ o.label }}</button>
+          </sc-for>
+          <span ref="{{ sleepRef }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#38c0b0; margin-left:auto;"></span>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <audio ref="{{ audioRef }}" style="display:none;"></audio>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280}}">
+class Component extends DCLogic {
+  state = { tracks: [], current: -1, isPlaying: false, amb: {}, sleep: 0, alienActive: false };
+
+  AMBIENT = [
+    { key: 'waves', name: 'Ocean Waves', sub: 'rolling surf', c1: '#38b0c0', c2: '#2f6f8a', accent: '#38c0b0' },
+    { key: 'rain', name: 'Rainfall', sub: 'steady rain', c1: '#7f9ad8', c2: '#4a5fb0', accent: '#7f9ad8' },
+    { key: 'breeze', name: 'Sea Breeze', sub: 'soft wind', c1: '#8fd3c0', c2: '#4fae9a', accent: '#8fd3c0' },
+    { key: 'birds', name: 'Shore Birds', sub: 'distant calls', c1: '#f0c46a', c2: '#e0935a', accent: '#f0c46a' },
+    { key: 'fire', name: 'Beach Fire', sub: 'crackling embers', c1: '#ff8a5a', c2: '#e8543a', accent: '#ff8a5a' },
+    { key: 'night', name: 'Night Crickets', sub: 'evening chorus', c1: '#9a8ad8', c2: '#5f4fae', accent: '#9a8ad8' },
+    { key: 'stream', name: 'Forest Stream', sub: 'babbling brook', c1: '#6fd0c4', c2: '#3a8e84', accent: '#6fd0c4' },
+    { key: 'chimes', name: 'Wind Chimes', sub: 'gentle bells', c1: '#f0d98a', c2: '#caa24a', accent: '#f0d98a' },
+    { key: 'thunder', name: 'Distant Thunder', sub: 'rolling storm', c1: '#8a93b8', c2: '#4a527a', accent: '#8a93b8' },
+    { key: 'nirvana', name: 'Nirvana Beats', sub: 'meditative drone', c1: '#c79af0', c2: '#7a4fae', accent: '#c79af0' }
+  ];
+  SLEEP_OPTS = [0, 15, 30, 60];
+
+  componentDidMount() {
+    const amb = {};
+    this.AMBIENT.forEach(s => { amb[s.key] = { on: false, vol: 0.5 }; });
+    this.setState({ amb });
+
+    // equalizer bars
+    if (this.vuEl) {
+      this.vuBars = [];
+      for (let i = 0; i < 28; i++) {
+        const b = document.createElement('div');
+        b.style.cssText = 'flex:1; min-width:2px; border-radius:2px; transform:scaleY(.16); transform-origin:bottom; background:linear-gradient(180deg,#7df0d6,#2f9e9e); animation:vuIdle ' + (1.4 + Math.random()) + 's ease-in-out ' + (Math.random()) + 's infinite;';
+        this.vuEl.appendChild(b); this.vuBars.push(b);
+      }
+    }
+
+    // splash droplets along the shoreline
+    if (this.splashEl && !this.splashEl.dataset.built) {
+      this.splashEl.dataset.built = '1';
+      let html = '';
+      for (let i = 0; i < 16; i++) {
+        const x = (4 + Math.random() * 92).toFixed(1);
+        const dur = (2.4 + Math.random() * 2.4).toFixed(2);
+        const del = (Math.random() * 5).toFixed(2);
+        const w = (3 + Math.random() * 4).toFixed(1);
+        html += '<span style="position:absolute; left:' + x + '%; bottom:0; width:' + w + 'px; height:' + (w * 2.6).toFixed(1) + 'px; border-radius:50% 50% 50% 50%/60% 60% 40% 40%; background:linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.1)); animation:splash ' + dur + 's ease-out ' + del + 's infinite;"></span>';
+      }
+      this.splashEl.innerHTML = html;
+    }
+
+    // audio element events
+    const a = this.audio;
+    if (a) {
+      a.addEventListener('timeupdate', () => this.onTime());
+      a.addEventListener('loadedmetadata', () => this.onTime());
+      a.addEventListener('ended', () => this.next());
+      a.addEventListener('play', () => { this.setState({ isPlaying: true }); this.startVU(); });
+      a.addEventListener('pause', () => { this.setState({ isPlaying: false }); this.stopVU(); });
+      a.volume = 0.9;
+    }
+
+    this.loadTracks();
+  }
+
+  componentWillUnmount() {
+    this.stopVU();
+    if (this._sleepInt) clearInterval(this._sleepInt);
+    if (this._sleepTo) clearTimeout(this._sleepTo);
+    if (this._alienTo) clearTimeout(this._alienTo);
+    if (this._decodeInt) clearInterval(this._decodeInt);
+    if (this._schedInt) clearInterval(this._schedInt);
+    if (this.actx) { try { this.actx.close(); } catch (e) {} }
+    (this.state.tracks || []).forEach(t => { if (t.url) try { URL.revokeObjectURL(t.url); } catch (e) {} });
+  }
+
+  /* ---------- IndexedDB ---------- */
+  idb() {
+    return new Promise((res, rej) => {
+      let r; try { r = indexedDB.open('relaxDB', 1); } catch (e) { return rej(e); }
+      r.onupgradeneeded = () => { r.result.createObjectStore('tracks', { keyPath: 'id' }); };
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+  }
+  async idbAll() { try { const db = await this.idb(); return await new Promise(res => { const q = db.transaction('tracks').objectStore('tracks').getAll(); q.onsuccess = () => res(q.result || []); q.onerror = () => res([]); }); } catch (e) { return []; } }
+  async idbPut(rec) { try { const db = await this.idb(); await new Promise(res => { const tx = db.transaction('tracks', 'readwrite'); tx.objectStore('tracks').put(rec); tx.oncomplete = () => res(); tx.onerror = () => res(); }); } catch (e) {} }
+  async idbDel(id) { try { const db = await this.idb(); await new Promise(res => { const tx = db.transaction('tracks', 'readwrite'); tx.objectStore('tracks').delete(id); tx.oncomplete = () => res(); tx.onerror = () => res(); }); } catch (e) {} }
+
+  async loadTracks() {
+    const recs = await this.idbAll();
+    recs.sort((a, b) => (a.added || 0) - (b.added || 0));
+    const tracks = recs.map(r => ({ id: r.id, name: r.name, blob: r.blob, url: URL.createObjectURL(r.blob) }));
+    this.setState({ tracks });
+    // restore last position
+    let pos = null; try { pos = JSON.parse(localStorage.getItem('relax_pos') || 'null'); } catch (e) {}
+    if (pos && tracks.length) {
+      const idx = tracks.findIndex(t => t.id === pos.id);
+      if (idx >= 0) { this._restoreTime = pos.t || 0; this.load(idx, false); }
+    }
+  }
+
+  /* ---------- import ---------- */
+  onImport = () => { if (this.fileEl) this.fileEl.click(); };
+  onFiles = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    const added = [];
+    for (const f of files) {
+      const id = 'tk_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+      const name = f.name.replace(/\.[a-z0-9]+$/i, '');
+      const rec = { id, name, blob: f, added: Date.now() + added.length };
+      await this.idbPut(rec);
+      added.push({ id, name, blob: f, url: URL.createObjectURL(f) });
+    }
+    const tracks = this.state.tracks.concat(added);
+    this.setState({ tracks });
+    if (this.state.current < 0) this.load(tracks.length - added.length, false);
+    if (this.fileEl) this.fileEl.value = '';
+  };
+
+  /* ---------- playback ---------- */
+  ensureCtx() {
+    if (this.actx) { if (this.actx.state === 'suspended') this.actx.resume(); return; }
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    this.actx = new AC();
+    this.masterGain = this.actx.createGain();
+    this.masterGain.gain.value = 0.85;
+    this.masterGain.connect(this.actx.destination);
+    this.whiteBuf = this.makeNoise(false);
+    this.brownBuf = this.makeNoise(true);
+    this.sounds = {};
+    this.AMBIENT.forEach(s => this.buildSound(s.key));
+    this._schedInt = setInterval(() => this.scheduleTick(), 110);
+    // re-apply any toggled-on sounds
+    const amb = this.state.amb;
+    Object.keys(amb).forEach(k => { if (amb[k] && amb[k].on) this.applySound(k); });
+  }
+
+  routeMusic() {
+    if (this._routed || !this.actx || !this.audio) return;
+    try {
+      this.musicSrc = this.actx.createMediaElementSource(this.audio);
+      this.analyser = this.actx.createAnalyser();
+      this.analyser.fftSize = 128;
+      this.musicSrc.connect(this.analyser);
+      this.analyser.connect(this.actx.destination);
+      this._routed = true;
+    } catch (e) {}
+  }
+
+  load(i, play) {
+    const t = this.state.tracks[i];
+    if (!t || !this.audio) return;
+    this.setState({ current: i });
+    this.audio.src = t.url;
+    this.audio.load();
+    if (this._restoreTime) {
+      const rt = this._restoreTime; this._restoreTime = 0;
+      const onmeta = () => { try { this.audio.currentTime = Math.min(rt, this.audio.duration || rt); } catch (e) {} this.audio.removeEventListener('loadedmetadata', onmeta); };
+      this.audio.addEventListener('loadedmetadata', onmeta);
+    }
+    if (play) this.play();
+  }
+
+  play() {
+    if (this.state.current < 0 && this.state.tracks.length) { this.load(0, false); }
+    if (!this.audio || !this.audio.src) return;
+    this.ensureCtx(); this.routeMusic(); this.autoConfigure();
+    const p = this.audio.play();
+    if (p && p.catch) p.catch(() => {});
+  }
+
+  onPlay = () => {
+    if (!this.state.tracks.length) { this.onImport(); return; }
+    if (this.audio.paused) this.play(); else this.audio.pause();
+  };
+  onPrev = () => { if (!this.state.tracks.length) return; const n = this.state.tracks.length; const i = (this.state.current - 1 + n) % n; this.load(i, true); };
+  onNext = () => this.next();
+  next() { if (!this.state.tracks.length) return; const n = this.state.tracks.length; const i = (this.state.current + 1) % n; this.load(i, true); }
+
+  selectTrack = (i) => this.load(i, true);
+  deleteTrack = async (i, e) => {
+    if (e && e.stopPropagation) e.stopPropagation();
+    const t = this.state.tracks[i]; if (!t) return;
+    await this.idbDel(t.id);
+    if (t.url) try { URL.revokeObjectURL(t.url); } catch (er) {}
+    const tracks = this.state.tracks.slice(); tracks.splice(i, 1);
+    let cur = this.state.current;
+    if (i === cur) { this.audio.pause(); this.audio.removeAttribute('src'); this.audio.load(); cur = -1; }
+    else if (i < cur) cur -= 1;
+    this.setState({ tracks, current: cur });
+  };
+
+  onSeek = (e) => { if (!this.audio || !this.audio.duration) return; this.audio.currentTime = (e.target.value / 1000) * this.audio.duration; };
+  onVol = (e) => { if (this.audio) this.audio.volume = e.target.value / 100; };
+
+  onTime() {
+    const a = this.audio; if (!a) return;
+    if (this.curEl) this.curEl.textContent = this.fmt(a.currentTime);
+    if (this.durEl) this.durEl.textContent = this.fmt(a.duration || 0);
+    if (this.seekEl && a.duration) this.seekEl.value = Math.round((a.currentTime / a.duration) * 1000);
+    const t = this.state.tracks[this.state.current];
+    if (t) { try { localStorage.setItem('relax_pos', JSON.stringify({ id: t.id, t: a.currentTime })); } catch (e) {} }
+  }
+
+  fmt(s) { s = Math.max(0, s | 0); const m = (s / 60) | 0; const r = s % 60; return m + ':' + (r < 10 ? '0' : '') + r; }
+
+  /* ---------- equalizer ---------- */
+  startVU() {
+    if (this._vuRAF || !this.vuBars) return;
+    if (!this.analyser) { this.vuBars.forEach(b => b.style.animationPlayState = 'running'); return; }
+    this.vuBars.forEach(b => b.style.animation = 'none');
+    const data = new Uint8Array(this.analyser.frequencyBinCount);
+    const loop = () => {
+      this.analyser.getByteFrequencyData(data);
+      const n = this.vuBars.length;
+      for (let i = 0; i < n; i++) {
+        const idx = Math.floor((i / n) * data.length * 0.7);
+        const v = data[idx] / 255;
+        this.vuBars[i].style.transform = 'scaleY(' + (0.16 + v * 0.95).toFixed(3) + ')';
+      }
+      this._vuRAF = requestAnimationFrame(loop);
+    };
+    loop();
+  }
+  stopVU() {
+    if (this._vuRAF) { cancelAnimationFrame(this._vuRAF); this._vuRAF = null; }
+    if (this.vuBars) this.vuBars.forEach(b => { b.style.transition = 'transform .4s ease'; b.style.transform = 'scaleY(.16)'; b.style.animationPlayState = 'paused'; });
+  }
+
+  /* ---------- ambient synthesis ---------- */
+  makeNoise(brown) {
+    const ctx = this.actx, len = ctx.sampleRate * 4, buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0);
+    let last = 0;
+    for (let i = 0; i < len; i++) {
+      const w = Math.random() * 2 - 1;
+      if (brown) { last = (last + 0.02 * w) / 1.02; d[i] = last * 3.5; } else { d[i] = w; }
+    }
+    return buf;
+  }
+  noiseSrc(brown) { const s = this.actx.createBufferSource(); s.buffer = brown ? this.brownBuf : this.whiteBuf; s.loop = true; return s; }
+
+  buildSound(key) {
+    const ctx = this.actx;
+    const g = ctx.createGain(); g.gain.value = 0; g.connect(this.masterGain);
+    const snd = { g, started: false, sched: 0 };
+    if (key === 'waves') {
+      const n = this.noiseSrc(true); const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 420;
+      const amp = ctx.createGain(); amp.gain.value = 0.5;
+      const lfo = ctx.createOscillator(); lfo.frequency.value = 0.1; const lg = ctx.createGain(); lg.gain.value = 0.4;
+      lfo.connect(lg).connect(amp.gain); n.connect(lp).connect(amp).connect(g); n.start(); lfo.start();
+    } else if (key === 'rain') {
+      const n = this.noiseSrc(false); const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 800;
+      const bp = ctx.createBiquadFilter(); bp.type = 'lowpass'; bp.frequency.value = 6500;
+      const amp = ctx.createGain(); amp.gain.value = 0.5; n.connect(hp).connect(bp).connect(amp).connect(g); n.start();
+    } else if (key === 'breeze') {
+      const n = this.noiseSrc(false); const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 600; bp.Q.value = 2.5;
+      const lfo = ctx.createOscillator(); lfo.frequency.value = 0.08; const lg = ctx.createGain(); lg.gain.value = 300;
+      lfo.connect(lg).connect(bp.frequency); const amp = ctx.createGain(); amp.gain.value = 0.7;
+      n.connect(bp).connect(amp).connect(g); n.start(); lfo.start();
+    } else if (key === 'fire') {
+      const n = this.noiseSrc(true); const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1100;
+      const amp = ctx.createGain(); amp.gain.value = 0.5; n.connect(lp).connect(amp).connect(g); n.start();
+      snd.crackle = true;
+    } else if (key === 'birds') {
+      snd.birds = true; // scheduled chirps only
+    } else if (key === 'night') {
+      const n = this.noiseSrc(false); const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 4600; bp.Q.value = 12;
+      const trem = ctx.createGain(); trem.gain.value = 0.5;
+      const lfo = ctx.createOscillator(); lfo.type = 'square'; lfo.frequency.value = 11; const lg = ctx.createGain(); lg.gain.value = 0.5;
+      lfo.connect(lg).connect(trem.gain); n.connect(bp).connect(trem).connect(g); n.start(); lfo.start();
+    } else if (key === 'stream') {
+      const n = this.noiseSrc(false); const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1100; bp.Q.value = 1.2;
+      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 3200;
+      const lfo = ctx.createOscillator(); lfo.frequency.value = 3.5; const lg = ctx.createGain(); lg.gain.value = 500;
+      lfo.connect(lg).connect(bp.frequency); const amp = ctx.createGain(); amp.gain.value = 0.6;
+      n.connect(bp).connect(lp).connect(amp).connect(g); n.start(); lfo.start();
+    } else if (key === 'chimes') {
+      snd.chimes = true; // scheduled bell tones
+    } else if (key === 'thunder') {
+      const n = this.noiseSrc(true); const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 260;
+      const amp = ctx.createGain(); amp.gain.value = 0.18; n.connect(lp).connect(amp).connect(g); n.start();
+      snd.thunder = true; // plus scheduled rumbles
+    } else if (key === 'nirvana') {
+      // meditative drone + slow pulse "beat"
+      const base = 110; const freqs = [base, base * 1.5, base * 2, base * 3];
+      freqs.forEach((f, i) => {
+        const o = ctx.createOscillator(); o.type = i === 0 ? 'sine' : 'triangle'; o.frequency.value = f;
+        const og = ctx.createGain(); og.gain.value = (i === 0 ? 0.28 : 0.12) / (i + 1);
+        const det = ctx.createOscillator(); det.frequency.value = 0.05 + i * 0.03; const dg = ctx.createGain(); dg.gain.value = 1.5;
+        det.connect(dg).connect(o.detune); o.connect(og).connect(g); o.start(); det.start();
+      });
+      // slow heartbeat pulse on the drone
+      const pulse = ctx.createGain(); pulse.gain.value = 1;
+      const plfo = ctx.createOscillator(); plfo.type = 'sine'; plfo.frequency.value = 0.9; const plg = ctx.createGain(); plg.gain.value = 0.25;
+      plfo.connect(plg).connect(pulse.gain); g.disconnect(); g.connect(pulse).connect(this.masterGain); plfo.start();
+      snd.bowl = true; // occasional singing-bowl shimmer
+    }
+    this.sounds[key] = snd;
+  }
+
+  scheduleTick() {
+    if (!this.actx) return;
+    const now = this.actx.currentTime;
+    const amb = this.state.amb;
+    // fire crackle
+    const fire = this.sounds.fire;
+    if (fire && amb.fire && amb.fire.on) {
+      if (now > (fire.sched || 0)) {
+        const gap = 0.04 + Math.random() * 0.22; fire.sched = now + gap;
+        this.crackle(fire.g);
+      }
+    }
+    const birds = this.sounds.birds;
+    if (birds && amb.birds && amb.birds.on) {
+      if (now > (birds.sched || 0)) {
+        birds.sched = now + 1.4 + Math.random() * 3.6;
+        this.chirp(birds.g);
+      }
+    }
+    const chimes = this.sounds.chimes;
+    if (chimes && amb.chimes && amb.chimes.on) {
+      if (now > (chimes.sched || 0)) {
+        chimes.sched = now + 0.7 + Math.random() * 2.6;
+        this.bell(chimes.g, [523.25, 587.33, 659.25, 783.99, 880][(Math.random() * 5) | 0]);
+      }
+    }
+    const thunder = this.sounds.thunder;
+    if (thunder && amb.thunder && amb.thunder.on) {
+      if (now > (thunder.sched || 0)) {
+        thunder.sched = now + 7 + Math.random() * 12;
+        this.rumble(thunder.g);
+      }
+    }
+    const nirvana = this.sounds.nirvana;
+    if (nirvana && amb.nirvana && amb.nirvana.on) {
+      if (now > (nirvana.sched || 0)) {
+        nirvana.sched = now + 6 + Math.random() * 6;
+        this.bell(nirvana.g, [220, 277.18, 329.63][(Math.random() * 3) | 0], 4.5, 0.5);
+      }
+    }
+  }
+  bell(g, freq, dur, vol) {
+    const ctx = this.actx, t = ctx.currentTime; dur = dur || 2.4; vol = vol || 0.32;
+    [1, 2.01, 3.03, 4.9].forEach((m, i) => {
+      const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = freq * m;
+      const ge = ctx.createGain(); ge.gain.setValueAtTime(0.0001, t);
+      ge.gain.linearRampToValueAtTime(vol / (i + 1), t + 0.01);
+      ge.gain.exponentialRampToValueAtTime(0.0001, t + dur * (1 - i * 0.16));
+      o.connect(ge).connect(g); o.start(t); o.stop(t + dur + 0.1);
+    });
+  }
+  rumble(g) {
+    const ctx = this.actx, t = ctx.currentTime;
+    const s = this.noiseSrc(true); const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 180;
+    const ge = ctx.createGain(); ge.gain.setValueAtTime(0.0001, t);
+    ge.gain.linearRampToValueAtTime(0.6, t + 0.4 + Math.random() * 0.6);
+    ge.gain.exponentialRampToValueAtTime(0.0001, t + 2.5 + Math.random() * 2);
+    s.connect(lp).connect(ge).connect(g); s.start(t); s.stop(t + 5);
+  }
+  crackle(g) {
+    const ctx = this.actx, t = ctx.currentTime;
+    const s = this.noiseSrc(false); const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 1600;
+    const ge = ctx.createGain(); ge.gain.setValueAtTime(0.0001, t);
+    ge.gain.linearRampToValueAtTime(0.25 + Math.random() * 0.35, t + 0.004);
+    ge.gain.exponentialRampToValueAtTime(0.0001, t + 0.04 + Math.random() * 0.06);
+    s.connect(hp).connect(ge).connect(g); s.start(t); s.stop(t + 0.16);
+  }
+  chirp(g) {
+    const ctx = this.actx, t = ctx.currentTime;
+    const reps = 1 + (Math.random() * 3 | 0);
+    for (let r = 0; r < reps; r++) {
+      const st = t + r * 0.12;
+      const o = ctx.createOscillator(); o.type = 'sine';
+      const f0 = 1900 + Math.random() * 900;
+      o.frequency.setValueAtTime(f0, st);
+      o.frequency.exponentialRampToValueAtTime(f0 + 500 + Math.random() * 500, st + 0.05);
+      o.frequency.exponentialRampToValueAtTime(f0, st + 0.1);
+      const ge = ctx.createGain(); ge.gain.setValueAtTime(0.0001, st);
+      ge.gain.linearRampToValueAtTime(0.32, st + 0.01);
+      ge.gain.exponentialRampToValueAtTime(0.0001, st + 0.11);
+      o.connect(ge).connect(g); o.start(st); o.stop(st + 0.14);
+    }
+  }
+  applySound(key) {
+    if (!this.actx || !this.sounds[key]) return;
+    const s = this.sounds[key]; const cfg = this.state.amb[key];
+    const target = cfg.on ? cfg.vol * 0.7 : 0;
+    s.g.gain.setTargetAtTime(target, this.actx.currentTime, 0.25);
+  }
+
+  toggleSound = (key) => {
+    this.ensureCtx();
+    const amb = Object.assign({}, this.state.amb);
+    amb[key] = Object.assign({}, amb[key], { on: !amb[key].on });
+    this.setState({ amb }, () => this.applySound(key));
+  };
+  setSoundVol = (key, v) => {
+    const amb = Object.assign({}, this.state.amb);
+    amb[key] = Object.assign({}, amb[key], { vol: v / 100 });
+    this.state.amb[key].vol = v / 100; // immediate for audio
+    this.applySound(key);
+  };
+
+  /* ---------- sleep timer ---------- */
+  setSleep = (min) => {
+    if (this._sleepTo) clearTimeout(this._sleepTo);
+    if (this._sleepInt) clearInterval(this._sleepInt);
+    this.setState({ sleep: min });
+    if (!min) { if (this.sleepEl) this.sleepEl.textContent = ''; return; }
+    this._sleepEnd = Date.now() + min * 60000;
+    const tick = () => {
+      const left = Math.max(0, this._sleepEnd - Date.now());
+      if (this.sleepEl) this.sleepEl.textContent = this.fmt(left / 1000);
+      if (left <= 0) { clearInterval(this._sleepInt); this.fadeOutAll(); }
+    };
+    tick(); this._sleepInt = setInterval(tick, 1000);
+    this._sleepTo = setTimeout(() => {}, min * 60000);
+  };
+  fadeOutAll() {
+    if (this.audio && !this.audio.paused) {
+      const a = this.audio; const v0 = a.volume; let k = 0;
+      const f = setInterval(() => { k++; a.volume = Math.max(0, v0 * (1 - k / 20)); if (k >= 20) { clearInterval(f); a.pause(); a.volume = v0; } }, 150);
+    }
+    if (this.actx && this.masterGain) this.masterGain.gain.setTargetAtTime(0, this.actx.currentTime, 1.2);
+    const amb = Object.assign({}, this.state.amb);
+    Object.keys(amb).forEach(k => amb[k] = Object.assign({}, amb[k], { on: false }));
+    this.setState({ amb, sleep: 0 });
+    if (this.sleepEl) this.sleepEl.textContent = '';
+    setTimeout(() => { if (this.actx && this.masterGain) this.masterGain.gain.setTargetAtTime(0.85, this.actx.currentTime, 0.5); }, 2600);
+  }
+
+  /* ---------- auto-configure relax bed (once, on first play) ---------- */
+  autoConfigure() {
+    if (this._autoCfgDone) return; this._autoCfgDone = true;
+    this.ensureCtx();
+    const amb = Object.assign({}, this.state.amb);
+    amb.waves = Object.assign({}, amb.waves, { on: true, vol: amb.waves ? amb.waves.vol : 0.45 });
+    this.setState({ amb }, () => this.applySound('waves'));
+  }
+
+  /* ---------- ALIEN takeover ---------- */
+  onAlien = () => {
+    if (this.state.alienActive) return;
+    this.ensureCtx();
+    this.alienSound();
+    this.setState({ alienActive: true });
+    // refs attach after the overlay renders — build on the next tick
+    setTimeout(() => {
+      if (this.flashEl) {
+        setTimeout(() => { if (this.flashEl) { this.flashEl.style.transition = 'none'; this.flashEl.style.background = 'rgba(190,255,245,.85)'; requestAnimationFrame(() => { this.flashEl.style.transition = 'background 1.1s ease'; this.flashEl.style.background = 'rgba(180,255,240,0)'; }); } }, 1500);
+      }
+      if (this.warpEl) {
+        let html = '';
+        for (let i = 0; i < 26; i++) {
+          const y = (Math.random() * 100).toFixed(1), w = (60 + Math.random() * 180).toFixed(0);
+          const dur = (0.6 + Math.random() * 1).toFixed(2), del = (Math.random() * 2.2).toFixed(2);
+          const c = ['120,255,225', '150,170,255', '241,150,200'][(Math.random() * 3) | 0];
+          html += '<span style="position:absolute; right:-20%; top:' + y + '%; width:' + w + 'px; height:2px; border-radius:2px; background:linear-gradient(90deg, transparent, rgba(' + c + ',.85)); animation:warpStar ' + dur + 's linear ' + del + 's infinite;"></span>';
+        }
+        this.warpEl.innerHTML = html;
+      }
+      this.buildCodeRain();
+      this.buildFleet();
+      this.runDecode();
+    }, 60);
+    // reset back out
+    this._alienTo = setTimeout(() => { this.setState({ alienActive: false }); this.stopAlienLoops(); }, 11000);
+  };
+
+  buildCodeRain() {
+    if (!this.codeEl) return;
+    const GL = '01⟁⌖⎔⏃⌇⊹⋔⟒⟡⌬⍉⟓⟐◈◇⬡{}<>/\\=+*#%01';
+    const cols = Math.max(14, Math.floor(window.innerWidth / 22));
+    let html = '';
+    for (let c = 0; c < cols; c++) {
+      const x = (c / cols * 100).toFixed(2);
+      const dur = (3.2 + Math.random() * 4).toFixed(2);
+      const del = (-Math.random() * 6).toFixed(2);
+      const len = 14 + (Math.random() * 18 | 0);
+      let chars = '';
+      for (let i = 0; i < len; i++) {
+        const g = GL[(Math.random() * GL.length) | 0];
+        const bright = i < 2 ? '#d6fff6' : (Math.random() < 0.12 ? '#9aa6ff' : 'rgba(120,255,225,' + (0.85 - i / len * 0.7).toFixed(2) + ')');
+        chars += '<div style="color:' + bright + ';">' + g + '</div>';
+      }
+      html += '<div style="position:absolute; top:-40%; left:' + x + '%; width:22px; text-align:center; animation:codeFall ' + dur + 's linear ' + del + 's infinite;">' + chars + '</div>';
+    }
+    this.codeEl.innerHTML = html;
+  }
+
+  buildFleet() {
+    if (!this.fleetEl) return;
+    let html = '';
+    for (let i = 0; i < 7; i++) {
+      const top = (8 + Math.random() * 60).toFixed(1);
+      const scale = (0.18 + Math.random() * 0.4).toFixed(2);
+      const dur = (5 + Math.random() * 5).toFixed(2);
+      const del = (Math.random() * 4).toFixed(2);
+      const dir = Math.random() < 0.5 ? 1 : -1;
+      const c = ['120,255,225', '150,170,255', '241,150,200'][(Math.random() * 3) | 0];
+      html += '<div style="position:absolute; top:' + top + '%; left:' + (dir > 0 ? '-12%' : '112%') + '; --s:' + scale + ';' +
+        ' animation:fleetCross ' + dur + 's linear ' + del + 's infinite;' + (dir < 0 ? ' --fd:-1;' : '') + '">' +
+        '<div style="position:relative; width:120px; height:46px;">' +
+        '<div style="position:absolute; left:50%; top:46%; transform:translate(-50%,-50%); width:120px; height:30px; border-radius:50%; background:radial-gradient(circle at 50% 30%, rgba(' + c + ',.9), rgba(10,30,36,.95)); box-shadow:0 0 18px rgba(' + c + ',.6);"></div>' +
+        '<div style="position:absolute; left:50%; top:8%; transform:translateX(-50%); width:42px; height:24px; border-radius:50% 50% 30% 30%; background:radial-gradient(circle at 50% 30%, #d6fbff, #4aa6b8);"></div>' +
+        '<div style="position:absolute; left:50%; bottom:-2px; transform:translateX(-50%); width:8px; height:8px; border-radius:50%; background:rgba(' + c + ',1); box-shadow:0 0 12px rgba(' + c + ',.9); animation:ufoGlow 1.1s ease-in-out infinite;"></div>' +
+        '</div></div>';
+    }
+    this.fleetEl.innerHTML = html;
+  }
+
+  runDecode() {
+    if (!this.crackTextEl) return;
+    const target = 'WELCOME · PARALLED WORLD';
+    const GL = '⟁⌖⎔⏃⌇⊹⋔⟒⟡⌬01#%<>';
+    let frame = 0;
+    clearInterval(this._decodeInt);
+    this._decodeInt = setInterval(() => {
+      frame++;
+      const revealed = Math.floor(frame / 2);
+      let out = '';
+      for (let i = 0; i < target.length; i++) {
+        if (target[i] === ' ') { out += ' '; continue; }
+        out += i < revealed ? target[i] : GL[(Math.random() * GL.length) | 0];
+      }
+      this.crackTextEl.textContent = out;
+      if (revealed > target.length) { clearInterval(this._decodeInt); this.crackTextEl.textContent = target; }
+    }, 70);
+  }
+
+  stopAlienLoops() {
+    clearInterval(this._decodeInt);
+    if (this.codeEl) this.codeEl.innerHTML = '';
+    if (this.fleetEl) this.fleetEl.innerHTML = '';
+    if (this.warpEl) this.warpEl.innerHTML = '';
+  }
+
+  alienSound() {
+    const ctx = this.actx; if (!ctx) return;
+    const t = ctx.currentTime;
+    const out = ctx.createGain(); out.gain.value = 0.5; out.connect(ctx.destination);
+    // descending whoosh
+    const o = ctx.createOscillator(); o.type = 'sawtooth';
+    o.frequency.setValueAtTime(900, t); o.frequency.exponentialRampToValueAtTime(70, t + 1.3);
+    const og = ctx.createGain(); og.gain.setValueAtTime(0.0001, t);
+    og.gain.linearRampToValueAtTime(0.28, t + 0.1); og.gain.exponentialRampToValueAtTime(0.0001, t + 1.5);
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1600;
+    o.connect(lp).connect(og).connect(out); o.start(t); o.stop(t + 1.6);
+    // UFO warble while it hovers (2s..5.5s)
+    const w = ctx.createOscillator(); w.type = 'sine'; w.frequency.value = 320;
+    const vib = ctx.createOscillator(); vib.frequency.value = 7; const vg = ctx.createGain(); vg.gain.value = 60;
+    vib.connect(vg).connect(w.frequency);
+    const wg = ctx.createGain(); wg.gain.setValueAtTime(0.0001, t + 1.7);
+    wg.gain.linearRampToValueAtTime(0.14, t + 2.1); wg.gain.setValueAtTime(0.14, t + 5); wg.gain.exponentialRampToValueAtTime(0.0001, t + 6);
+    w.connect(wg).connect(out); w.start(t + 1.7); w.stop(t + 6.2); vib.start(t + 1.7); vib.stop(t + 6.2);
+    // friendly chime when alien greets (~2.7s)
+    [659.25, 880, 1046.5].forEach((f, i) => {
+      const c = ctx.createOscillator(); c.type = 'sine'; c.frequency.value = f;
+      const cg = ctx.createGain(); const st2 = t + 2.7 + i * 0.12;
+      cg.gain.setValueAtTime(0.0001, st2); cg.gain.linearRampToValueAtTime(0.2, st2 + 0.02); cg.gain.exponentialRampToValueAtTime(0.0001, st2 + 0.9);
+      c.connect(cg).connect(out); c.start(st2); c.stop(st2 + 1);
+    });
+  }
+
+  renderVals() {
+    const st = this.state;
+    const cur = st.tracks[st.current];
+    const tracks = st.tracks.map((t, i) => {
+      const active = i === st.current && st.isPlaying;
+      return {
+        name: t.name,
+        num: String(i + 1).padStart(2, '0'),
+        active,
+        inactive: !active,
+        onSelect: () => this.selectTrack(i),
+        onDelete: (e) => this.deleteTrack(i, e),
+        bg: i === st.current ? 'rgba(56,192,176,.16)' : 'rgba(255,255,255,.04)',
+        border: i === st.current ? 'rgba(56,192,176,.4)' : 'rgba(255,255,255,.08)',
+        dot: i === st.current ? 'linear-gradient(150deg,#38c0b0,#2f8a8a)' : 'rgba(255,226,182,.85)'
+      };
+    });
+    const ambient = this.AMBIENT.map(s => {
+      const c = st.amb[s.key] || { on: false, vol: 0.5 };
+      return {
+        name: s.name, sub: s.sub, accent: s.accent,
+        volVal: Math.round((c.vol != null ? c.vol : 0.5) * 100),
+        onToggle: () => this.toggleSound(s.key),
+        onVol: (e) => this.setSoundVol(s.key, e.target.value),
+        orb: 'radial-gradient(circle at 35% 30%, ' + s.c1 + ', ' + s.c2 + ')',
+        glow: c.on ? '0 0 16px ' + s.c1 + ', inset 0 1px 2px rgba(255,255,255,.5)' : 'inset 0 1px 2px rgba(255,255,255,.3)',
+        ringOpacity: c.on ? '1' : '0',
+        bg: c.on ? 'rgba(56,192,176,.12)' : 'rgba(255,255,255,.04)',
+        border: c.on ? 'rgba(56,192,176,.32)' : 'rgba(255,255,255,.08)'
+      };
+    });
+    const sleepOpts = this.SLEEP_OPTS.map(m => ({
+      label: m === 0 ? 'Off' : m + 'm',
+      onClick: () => this.setSleep(m),
+      bg: st.sleep === m ? 'rgba(56,192,176,.2)' : 'transparent',
+      border: st.sleep === m ? 'rgba(56,192,176,.5)' : 'rgba(255,255,255,.16)',
+      color: st.sleep === m ? '#7df0d6' : 'rgba(253,243,231,.75)'
+    }));
+
+    return {
+      rootRef: (el) => { this.root = el; },
+      audioRef: (el) => { this.audio = el; },
+      fileRef: (el) => { this.fileEl = el; },
+      vuRef: (el) => { this.vuEl = el; },
+      seekRef: (el) => { this.seekEl = el; },
+      curRef: (el) => { this.curEl = el; },
+      durRef: (el) => { this.durEl = el; },
+      sleepRef: (el) => { this.sleepEl = el; },
+      stationRef: (el) => { this.stationEl = el; },
+      countRef: (el) => { this.countEl = el; },
+      splashRef: (el) => { this.splashEl = el; },
+      warpRef: (el) => { this.warpEl = el; },
+      codeRef: (el) => { this.codeEl = el; },
+      crackRef: (el) => { this.crackEl = el; },
+      crackTextRef: (el) => { this.crackTextEl = el; },
+      fleetRef: (el) => { this.fleetEl = el; },
+      flashRef: (el) => { this.flashEl = el; },
+      bubbleRef: (el) => { this.bubbleEl = el; },
+      alienActive: st.alienActive,
+      onAlien: this.onAlien,
+      onPlay: this.onPlay, onPrev: this.onPrev, onNext: this.onNext,
+      onSeek: this.onSeek, onVol: this.onVol, onImport: this.onImport, onFiles: this.onFiles,
+      isPlaying: st.isPlaying, isPaused: !st.isPlaying,
+      trackName: cur ? cur.name : 'Nothing on air',
+      trackSub: cur ? 'from your playlist' : 'import a song to begin',
+      trackCount: st.tracks.length + (st.tracks.length === 1 ? ' track' : ' tracks'),
+      tracks, noTracks: st.tracks.length === 0,
+      ambient, sleepOpts
+    };
+  }
+}
+</script>
+</body>
+</html>

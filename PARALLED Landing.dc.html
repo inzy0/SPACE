@@ -1,0 +1,1635 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Playfair+Display:ital,wght@0,500;0,600;1,500&amp;display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  :root, [data-theme="dark"] {
+    --bg:#060611; --ink:#ECEAF5; --ink-soft:#B6B3CC; --ink-mute:#9D9AB5; --ink-faint:#6E6B86;
+    --hair:rgba(255,255,255,.08); --hair-s:rgba(255,255,255,.14);
+    --panel:rgba(255,255,255,.03); --panel-s:rgba(255,255,255,.05); --nav-bg:linear-gradient(180deg, rgba(6,6,17,.82), rgba(6,6,17,.35));
+  }
+  [data-theme="light"] {
+    --bg:#bfe0fb; --ink:#15263f; --ink-soft:#39506e; --ink-mute:#5d7189; --ink-faint:#8aa0b8;
+    --hair:rgba(20,45,80,.14); --hair-s:rgba(20,45,80,.26);
+    --panel:rgba(255,255,255,.6); --panel-s:rgba(255,255,255,.8); --nav-bg:linear-gradient(180deg, rgba(244,250,255,.85), rgba(244,250,255,.45));
+  }
+  [data-theme="alien"] {
+    --bg:#060f1a; --ink:#E6FCFF; --ink-soft:#9fdce8; --ink-mute:#74c0d2; --ink-faint:#4a8498;
+    --hair:rgba(110,255,225,.16); --hair-s:rgba(110,255,225,.3);
+    --panel:rgba(18,52,62,.34); --panel-s:rgba(22,70,82,.46); --nav-bg:linear-gradient(180deg, rgba(6,15,26,.85), rgba(6,15,26,.4));
+  }
+  html, body { margin: 0; padding: 0; background: var(--bg); transition: background .9s ease; }
+  ::selection { background: rgba(155,123,255,0.35); color: #fff; }
+  @keyframes auroraA { 0%{transform:translate(0,0) scale(1)} 50%{transform:translate(7%,-5%) scale(1.18)} 100%{transform:translate(0,0) scale(1)} }
+  @keyframes auroraB { 0%{transform:translate(0,0) scale(1.1)} 50%{transform:translate(-9%,6%) scale(1.3)} 100%{transform:translate(0,0) scale(1.1)} }
+  @keyframes auroraC { 0%{transform:translate(0,0) scale(1)} 50%{transform:translate(5%,8%) scale(1.22)} 100%{transform:translate(0,0) scale(1)} }
+  @keyframes floatY { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-16px)} }
+  @keyframes pulseGlow { 0%,100%{opacity:.45} 50%{opacity:1} }
+  @keyframes spinSlow { to{transform:rotate(360deg)} }
+  @keyframes spinRev { to{transform:rotate(-360deg)} }
+  @keyframes shimmer { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
+  @keyframes scrollDot { 0%{transform:translateY(0);opacity:0} 35%{opacity:1} 100%{transform:translateY(15px);opacity:0} }
+  @keyframes orbitDot { 0%,100%{opacity:.4;transform:scale(.8)} 50%{opacity:1;transform:scale(1.3)} }
+  @keyframes stickerDrift { 0%{transform:translateY(0) rotate(-4deg)} 50%{transform:translateY(-26px) rotate(4deg)} 100%{transform:translateY(0) rotate(-4deg)} }
+  @keyframes quoteFade { 0%,12%{opacity:0;transform:translateY(14px)} 20%,80%{opacity:1;transform:translateY(0)} 92%,100%{opacity:0;transform:translateY(-14px)} }
+  @keyframes scan { 0%{transform:translateY(-100%)} 100%{transform:translateY(900%)} }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.15} }
+  @keyframes waveBar { 0%,100%{transform:scaleY(.3)} 50%{transform:scaleY(1)} }
+  @keyframes marqueeUp { 0%{transform:translateY(0)} 100%{transform:translateY(-50%)} }
+  @keyframes warpIn { 0%{opacity:0;transform:perspective(1200px) rotateX(18deg) translateY(60px) scale(.94)} 100%{opacity:1;transform:perspective(1200px) rotateX(0) translateY(0) scale(1)} }
+  @keyframes hueShift { 0%{filter:hue-rotate(0deg)} 100%{filter:hue-rotate(360deg)} }
+  @keyframes ringPing { 0%{transform:scale(.6);opacity:.7} 100%{transform:scale(2.2);opacity:0} }
+  @keyframes orbitRot { to{transform:rotate(360deg)} }
+  @keyframes orbitRev { to{transform:rotate(-360deg)} }
+  @keyframes planetBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  @keyframes driftSlow { 0%{transform:translate(0,0)} 50%{transform:translate(-30px,24px)} 100%{transform:translate(0,0)} }
+  @keyframes twinkleStar { 0%,100%{opacity:.2} 50%{opacity:1} }
+  @keyframes cometShoot { 0%{transform:translate(0,0) rotate(28deg);opacity:0} 8%{opacity:1} 100%{transform:translate(-120vw,52vw) rotate(28deg);opacity:0} }
+  @keyframes cockpitSway { 0%,100%{transform:translate(0,0)} 25%{transform:translate(-5px,3px)} 50%{transform:translate(4px,-3px)} 75%{transform:translate(3px,4px)} }
+  @keyframes reticleSpin { to{transform:rotate(360deg)} }
+  @keyframes reticlePulse { 0%,100%{opacity:.5;transform:scale(1)} 50%{opacity:.95;transform:scale(1.06)} }
+  @keyframes gaugeNeedle { 0%{transform:rotate(-46deg)} 50%{transform:rotate(52deg)} 100%{transform:rotate(-46deg)} }
+  @keyframes radarSweep { to{transform:rotate(360deg)} }
+  @keyframes throttleBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+  @keyframes glyphTravel { 0%{opacity:0;transform:translateX(30px)} 14%{opacity:.85} 80%{opacity:.85} 100%{opacity:0;transform:translateX(-90px)} }
+  @keyframes hudFlick { 0%,97%,100%{opacity:1} 98%{opacity:.55} 99%{opacity:.85} }
+  @keyframes barPulse { 0%,100%{opacity:.35} 50%{opacity:1} }
+  @keyframes warpStreak { 0%{transform:translateX(0);opacity:0} 12%{opacity:.7} 100%{transform:translateX(-220px);opacity:0} }
+  [data-tilt]{ transition:transform .25s cubic-bezier(.16,1,.3,1); transform-style:preserve-3d; will-change:transform; }
+  [data-cockpit]{ opacity:0; }
+  [data-theme="alien"] [data-cockpit]{ opacity:.6; }
+  [data-motif="grass"], [data-motif="craft"]{ display:none; }
+  [data-theme="light"] [data-motif="orbit"]{ display:none; }
+  [data-theme="light"] [data-motif="grass"]{ display:block; }
+  [data-theme="alien"] [data-motif="orbit"]{ display:none; }
+  [data-theme="alien"] [data-motif="craft"]{ display:block; }
+  @keyframes grassSway { 0%,100%{transform:rotate(-7deg)} 50%{transform:rotate(7deg)} }
+  @keyframes grassSwayB { 0%,100%{transform:rotate(6deg)} 50%{transform:rotate(-6deg)} }
+  @keyframes windStreak2 { 0%{transform:translateX(0);opacity:0} 12%{opacity:.7} 100%{transform:translateX(520px);opacity:0} }
+  @keyframes craftDrift { 0%{transform:translate(-170px,14px) rotate(-3deg)} 50%{transform:translate(150px,-12px) rotate(3deg)} 100%{transform:translate(-170px,14px) rotate(-3deg)} }
+  @keyframes craftBeam { 0%,100%{opacity:.35} 50%{opacity:.85} }
+</style>
+<script src="./bg-fx.js"></script>
+</helmet>
+
+<div ref="{{ rootRef }}" style="position:relative; background:var(--bg); color:var(--ink); font-family:'Manrope',system-ui,sans-serif; overflow-x:hidden; -webkit-font-smoothing:antialiased; min-height:100vh;">
+
+  <!-- ===== AMBIENT BACKGROUND ===== -->
+  <div style="position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;">
+    <canvas ref="{{ canvasRef }}" style="position:absolute; inset:0; width:100%; height:100%; display:block;"></canvas>
+    <div ref="{{ auroraRef }}" style="position:absolute; inset:0; transition:opacity .9s ease, filter .9s ease;">
+    <div style="position:absolute; top:-18%; left:-10%; width:60vw; height:60vw; border-radius:50%; filter:blur(90px); opacity:.55; background:radial-gradient(circle at 30% 30%, rgba(155,123,255,.55), rgba(155,123,255,0) 70%); animation:auroraA 22s ease-in-out infinite;"></div>
+    <div style="position:absolute; top:8%; right:-14%; width:55vw; height:55vw; border-radius:50%; filter:blur(100px); opacity:.45; background:radial-gradient(circle at 50% 50%, rgba(87,224,224,.42), rgba(87,224,224,0) 70%); animation:auroraB 26s ease-in-out infinite;"></div>
+    <div style="position:absolute; bottom:-22%; left:25%; width:55vw; height:55vw; border-radius:50%; filter:blur(110px); opacity:.4; background:radial-gradient(circle at 50% 50%, rgba(241,120,182,.35), rgba(241,120,182,0) 70%); animation:auroraC 30s ease-in-out infinite;"></div>
+    <div style="position:absolute; inset:0; opacity:.5; background:radial-gradient(ellipse 80% 60% at 50% -10%, rgba(91,141,239,.18), transparent 60%);"></div>
+    <div style="position:absolute; inset:0; opacity:.35; mix-blend-mode:screen; background-image:repeating-linear-gradient(115deg, transparent 0 38px, rgba(155,123,255,.05) 38px 39px);"></div>
+    </div>
+
+    <!-- ===== DECORATIVE DEEP-FIELD PLANETS + STARS (parallax, ambient) ===== -->
+    <div ref="{{ starsRef }}" style="position:absolute; inset:0;"></div>
+    <div style="position:absolute; inset:0; opacity:.9;">
+      <!-- distant violet giant, upper-left -->
+      <div style="position:absolute; top:11%; left:6%; width:120px; height:120px; border-radius:50%; filter:blur(.3px); background:radial-gradient(circle at 36% 30%, #c4b1ff, #7a55d6 52%, #3a2580 100%); box-shadow:0 0 60px 8px rgba(155,123,255,.4), inset -10px -8px 24px rgba(0,0,0,.45); animation:driftSlow 34s ease-in-out infinite;"></div>
+      <!-- ringed teal world, mid-right -->
+      <div style="position:absolute; top:30%; right:7%; width:86px; height:86px; animation:driftSlow 40s ease-in-out infinite reverse;">
+        <div style="position:absolute; inset:0; border-radius:50%; background:radial-gradient(circle at 38% 32%, #aef6ec, #38c8b4 54%, #155f63 100%); box-shadow:0 0 44px 6px rgba(87,224,224,.38), inset -8px -6px 18px rgba(0,0,0,.4);"></div>
+        <div style="position:absolute; top:50%; left:50%; width:160px; height:42px; transform:translate(-50%,-50%) rotate(-22deg); border-radius:50%; border:5px solid rgba(126,239,214,.4); border-bottom-color:transparent; border-left-color:rgba(126,239,214,.18);"></div>
+      </div>
+      <!-- small amber moon, lower-left -->
+      <div style="position:absolute; bottom:16%; left:13%; width:52px; height:52px; border-radius:50%; background:radial-gradient(circle at 36% 32%, #ffe0b0, #f5a85a 56%, #9a5520 100%); box-shadow:0 0 30px 4px rgba(245,168,90,.4), inset -6px -4px 12px rgba(0,0,0,.4); animation:planetBob 12s ease-in-out infinite;"></div>
+      <!-- comet -->
+      <div style="position:absolute; top:6%; right:-6%; width:170px; height:2px; border-radius:2px; background:linear-gradient(90deg, transparent, rgba(255,255,255,.9)); box-shadow:0 0 10px rgba(180,200,255,.8); animation:cometShoot 13s linear infinite 4s;"></div>
+    </div>
+  </div>
+
+  <!-- ===== SCROLL-DRIVEN ALIEN MOTHERSHIP ===== -->
+  <div ref="{{ shipRef }}" style="position:fixed; z-index:38; left:0; top:0; pointer-events:none; opacity:0; will-change:transform,opacity; filter:drop-shadow(0 24px 60px rgba(87,224,224,.45));">
+    <div style="position:relative; width:min(440px,64vw); aspect-ratio:440/210;">
+      <!-- abduction beam -->
+      <div style="position:absolute; left:50%; top:52%; transform:translateX(-50%); width:46%; height:280%; background:linear-gradient(180deg, rgba(120,224,224,.20), rgba(155,123,255,.05) 55%, transparent); clip-path:polygon(38% 0, 62% 0, 100% 100%, 0 100%); filter:blur(2px); animation:pulseGlow 3.4s ease-in-out infinite;"></div>
+      <!-- under glow -->
+      <div style="position:absolute; left:50%; top:60%; transform:translate(-50%,-50%); width:80%; height:34%; border-radius:50%; background:radial-gradient(ellipse, rgba(87,224,224,.55), transparent 70%); filter:blur(16px);"></div>
+      <!-- glassy dome (backdrop blur) -->
+      <div style="position:absolute; left:50%; top:20%; transform:translate(-50%,0); width:34%; height:42%; border-radius:50% 50% 46% 46%/70% 70% 30% 30%; background:linear-gradient(180deg, rgba(198,182,255,.28), rgba(87,224,224,.10)); backdrop-filter:blur(6px); border:1px solid rgba(255,255,255,.35); box-shadow:inset 0 6px 18px rgba(255,255,255,.4), inset 0 -10px 22px rgba(91,141,239,.4);"></div>
+      <svg viewBox="0 0 440 210" fill="none" style="position:absolute; inset:0; width:100%; height:100%;">
+        <defs>
+          <linearGradient id="shipBody" x1="0" y1="90" x2="0" y2="170"><stop offset="0" stop-color="#3a3766"/><stop offset="0.5" stop-color="#15132c"/><stop offset="1" stop-color="#0a0a1c"/></linearGradient>
+          <linearGradient id="shipRim" x1="0" y1="0" x2="440" y2="0"><stop offset="0" stop-color="#9B7BFF"/><stop offset="0.5" stop-color="#57E0E0"/><stop offset="1" stop-color="#F178B6"/></linearGradient>
+          <radialGradient id="shipSheen" cx="0.4" cy="0.2" r="0.8"><stop offset="0" stop-color="rgba(255,255,255,.5)"/><stop offset="1" stop-color="rgba(255,255,255,0)"/></radialGradient>
+        </defs>
+        <ellipse cx="220" cy="128" rx="210" ry="44" fill="url(#shipBody)" opacity="0.92"/>
+        <ellipse cx="220" cy="124" rx="210" ry="40" fill="url(#shipSheen)" opacity="0.5"/>
+        <ellipse cx="220" cy="120" rx="212" ry="10" fill="none" stroke="url(#shipRim)" stroke-width="2" opacity="0.85"/>
+        <g>
+          <circle cx="70" cy="130" r="4.5" fill="#57E0E0"><animate attributeName="opacity" values="1;.2;1" dur="1.4s" repeatCount="indefinite"/></circle>
+          <circle cx="130" cy="142" r="4.5" fill="#9B7BFF"><animate attributeName="opacity" values=".2;1;.2" dur="1.7s" repeatCount="indefinite"/></circle>
+          <circle cx="220" cy="148" r="5" fill="#F178B6"><animate attributeName="opacity" values="1;.2;1" dur="1.2s" repeatCount="indefinite"/></circle>
+          <circle cx="310" cy="142" r="4.5" fill="#5B8DEF"><animate attributeName="opacity" values=".2;1;.2" dur="1.9s" repeatCount="indefinite"/></circle>
+          <circle cx="370" cy="130" r="4.5" fill="#57E0E0"><animate attributeName="opacity" values="1;.2;1" dur="1.5s" repeatCount="indefinite"/></circle>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ===== SPACESHIP COCKPIT POV (alien mode) ===== -->
+  <div ref="{{ cockpitRef }}" data-cockpit="" style="position:fixed; inset:0; z-index:42; pointer-events:none; font-family:'JetBrains Mono',monospace;">
+    <div style="position:absolute; inset:0; animation:cockpitSway 14s ease-in-out infinite;">
+
+      <!-- warp speed streaks -->
+      <div style="position:absolute; top:18%; right:8%; width:160px; height:1px; background:linear-gradient(90deg, transparent, rgba(120,255,225,.8)); animation:warpStreak 1.8s linear infinite;"></div>
+      <div style="position:absolute; top:34%; right:14%; width:120px; height:1px; background:linear-gradient(90deg, transparent, rgba(150,170,255,.7)); animation:warpStreak 2.4s linear infinite .6s;"></div>
+      <div style="position:absolute; top:62%; right:5%; width:200px; height:1px; background:linear-gradient(90deg, transparent, rgba(241,150,200,.6)); animation:warpStreak 2.1s linear infinite 1.1s;"></div>
+      <div style="position:absolute; top:74%; right:18%; width:90px; height:1px; background:linear-gradient(90deg, transparent, rgba(120,255,225,.6)); animation:warpStreak 1.5s linear infinite .3s;"></div>
+
+      <!-- canopy frame: dark vignette + angled struts -->
+      <div style="position:absolute; inset:0; box-shadow:inset 0 0 220px 60px rgba(2,10,16,.85); pointer-events:none;"></div>
+      <!-- corner brackets -->
+      <div style="position:absolute; top:22px; left:22px; width:120px; height:120px; border-top:2px solid rgba(120,255,225,.55); border-left:2px solid rgba(120,255,225,.55); clip-path:polygon(0 0,100% 0,100% 14%,14% 14%,14% 100%,0 100%);"></div>
+      <div style="position:absolute; top:22px; right:22px; width:120px; height:120px; border-top:2px solid rgba(120,255,225,.55); border-right:2px solid rgba(120,255,225,.55); clip-path:polygon(0 0,100% 0,100% 100%,86% 100%,86% 14%,0 14%);"></div>
+      <div style="position:absolute; bottom:170px; left:22px; width:90px; height:90px; border-bottom:2px solid rgba(150,170,255,.45); border-left:2px solid rgba(150,170,255,.45);"></div>
+      <div style="position:absolute; bottom:170px; right:22px; width:90px; height:90px; border-bottom:2px solid rgba(150,170,255,.45); border-right:2px solid rgba(150,170,255,.45);"></div>
+
+      <!-- top HUD strip -->
+      <div style="position:absolute; top:30px; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:26px; padding:7px 22px; border:1px solid rgba(120,255,225,.28); border-radius:4px; background:rgba(4,18,24,.5); backdrop-filter:blur(4px); animation:hudFlick 7s linear infinite;">
+        <span style="font-size:10px; letter-spacing:.32em; color:rgba(120,255,225,.85);">◇ NAV-LINK</span>
+        <span style="font-size:10px; letter-spacing:.18em; color:rgba(180,230,240,.7);">VEL <b style="color:#7effe1;">0.41c</b></span>
+        <span style="font-size:10px; letter-spacing:.18em; color:rgba(180,230,240,.7);">EPOCH <b ref="{{ eraRef }}" style="color:#9aa6ff;">I</b></span>
+        <span ref="{{ hudGlyphRef }}" style="font-size:12px; letter-spacing:.22em; color:rgba(241,150,200,.8);">⏃⌖⟁⎔⌇</span>
+      </div>
+
+      <!-- targeting reticle (locked on the orbital ring, away from text) -->
+      <div style="position:absolute; top:40%; left:72%; transform:translate(-50%,-50%); width:120px; height:120px;">
+        <div style="position:absolute; inset:0; border:1px solid rgba(120,255,225,.3); border-radius:50%; animation:reticlePulse 3.4s ease-in-out infinite;"></div>
+        <div style="position:absolute; inset:24px; border:1px dashed rgba(120,255,225,.4); border-radius:50%; animation:reticleSpin 22s linear infinite;"></div>
+        <div style="position:absolute; top:50%; left:-14px; right:-14px; height:1px; background:rgba(120,255,225,.35);"></div>
+        <div style="position:absolute; left:50%; top:-14px; bottom:-14px; width:1px; background:rgba(120,255,225,.35);"></div>
+        <div style="position:absolute; top:50%; left:50%; width:5px; height:5px; transform:translate(-50%,-50%); background:#7effe1; border-radius:50%; box-shadow:0 0 10px #7effe1;"></div>
+      </div>
+
+      <!-- bottom console -->
+      <div style="position:absolute; left:0; right:0; bottom:0; height:172px;">
+        <!-- dashboard mass -->
+        <div style="position:absolute; inset:0; background:linear-gradient(180deg, rgba(4,16,22,0), rgba(4,16,22,.78) 36%, rgba(2,9,14,.96)); clip-path:polygon(0 38%, 16% 20%, 84% 20%, 100% 38%, 100% 100%, 0 100%); border-top:1px solid rgba(120,255,225,.22);"></div>
+
+        <!-- left gauge -->
+        <div style="position:absolute; bottom:30px; left:6%; width:96px; height:96px; border:1px solid rgba(120,255,225,.35); border-radius:50%; background:radial-gradient(circle at 50% 40%, rgba(14,40,48,.9), rgba(3,12,18,.95));">
+          <div style="position:absolute; bottom:8px; left:50%; width:2px; height:38px; background:#7effe1; transform-origin:bottom center; transform:translateX(-50%); animation:gaugeNeedle 5s ease-in-out infinite; box-shadow:0 0 8px #7effe1;"></div>
+          <div style="position:absolute; bottom:6px; left:50%; width:8px; height:8px; transform:translate(-50%,50%); background:#7effe1; border-radius:50%;"></div>
+          <span style="position:absolute; top:14px; left:50%; transform:translateX(-50%); font-size:8px; letter-spacing:.2em; color:rgba(120,255,225,.7);">THRUST</span>
+        </div>
+
+        <!-- right radar -->
+        <div style="position:absolute; bottom:30px; right:6%; width:96px; height:96px; border:1px solid rgba(150,170,255,.35); border-radius:50%; overflow:hidden; background:radial-gradient(circle, rgba(16,30,56,.9), rgba(3,10,20,.95));">
+          <div style="position:absolute; inset:0; background:conic-gradient(from 0deg, rgba(150,170,255,.45), transparent 28%); animation:radarSweep 3.6s linear infinite;"></div>
+          <div style="position:absolute; top:50%; left:0; right:0; height:1px; background:rgba(150,170,255,.25);"></div>
+          <div style="position:absolute; left:50%; top:0; bottom:0; width:1px; background:rgba(150,170,255,.25);"></div>
+          <span style="position:absolute; bottom:8px; left:50%; transform:translateX(-50%); font-size:8px; letter-spacing:.2em; color:rgba(150,170,255,.7);">SCAN</span>
+        </div>
+
+        <!-- center controller cluster -->
+        <div style="position:absolute; bottom:22px; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <!-- glyph readout -->
+          <div ref="{{ consoleGlyphRef }}" style="font-size:13px; letter-spacing:.34em; color:rgba(120,255,225,.7);">⟁⌬⏃⊹⟒⌇⎔⟡</div>
+          <!-- throttle + indicator bars -->
+          <div style="display:flex; align-items:flex-end; gap:7px; height:46px;">
+            <div style="width:8px; height:60%; background:#7effe1; border-radius:2px; animation:barPulse 1.3s ease-in-out infinite;"></div>
+            <div style="width:8px; height:90%; background:#9aa6ff; border-radius:2px; animation:barPulse 1.3s ease-in-out infinite .2s;"></div>
+            <div style="width:8px; height:45%; background:#f196c8; border-radius:2px; animation:barPulse 1.3s ease-in-out infinite .4s;"></div>
+            <!-- throttle lever -->
+            <div style="margin:0 6px; width:30px; height:46px; border:1px solid rgba(120,255,225,.4); border-radius:6px; position:relative; background:rgba(6,20,26,.8);">
+              <div style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:34px; height:12px; background:linear-gradient(180deg,#cfeee9,#5f8d8c); border-radius:3px; animation:throttleBob 4s ease-in-out infinite; box-shadow:0 2px 6px rgba(0,0,0,.5);"></div>
+            </div>
+            <div style="width:8px; height:70%; background:#7effe1; border-radius:2px; animation:barPulse 1.3s ease-in-out infinite .15s;"></div>
+            <div style="width:8px; height:55%; background:#9aa6ff; border-radius:2px; animation:barPulse 1.3s ease-in-out infinite .35s;"></div>
+            <div style="width:8px; height:85%; background:#f196c8; border-radius:2px; animation:barPulse 1.3s ease-in-out infinite .5s;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODE SWITCHER ===== -->
+  <div style="position:fixed; z-index:60; bottom:24px; left:50%; transform:translateX(-50%); display:flex; gap:4px; padding:5px; border-radius:999px; border:1px solid var(--hair-s); background:var(--panel-s); backdrop-filter:blur(18px); box-shadow:0 14px 44px rgba(0,0,0,.35);">
+    <button onClick="{{ setDark }}" title="Dark · deep cosmos" style="cursor:pointer; display:flex; align-items:center; gap:8px; font-family:'Manrope',sans-serif; font-size:13px; font-weight:600; padding:9px 15px; border-radius:999px; border:none; background:{{ darkBg }}; color:{{ darkColor }}; transition:all .3s;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" fill="currentColor"/></svg>Cosmos
+    </button>
+    <button onClick="{{ setLight }}" title="Light · daytime Earth" style="cursor:pointer; display:flex; align-items:center; gap:8px; font-family:'Manrope',sans-serif; font-size:13px; font-weight:600; padding:9px 15px; border-radius:999px; border:none; background:{{ lightBg }}; color:{{ lightColor }}; transition:all .3s;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/></g></svg>Earth
+    </button>
+    <button onClick="{{ setAlien }}" title="Alien · colonised world" style="cursor:pointer; display:flex; align-items:center; gap:8px; font-family:'Manrope',sans-serif; font-size:13px; font-weight:600; padding:9px 15px; border-radius:999px; border:none; background:{{ alienBg }}; color:{{ alienColor }}; transition:all .3s;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="14" rx="9" ry="3.2" fill="currentColor"/><path d="M7 12a5 5 0 0 1 10 0Z" fill="currentColor" opacity="0.7"/></svg>Alien
+    </button>
+  </div>
+
+  <!-- ===== NAV ===== -->
+  <nav style="position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between; padding:20px clamp(20px,5vw,56px); backdrop-filter:blur(18px); background:var(--nav-bg); border-bottom:1px solid var(--hair);">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none" style="display:block;">
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="30" y2="30"><stop offset="0" stop-color="#9B7BFF"></stop><stop offset="0.5" stop-color="#5B8DEF"></stop><stop offset="1" stop-color="#57E0E0"></stop></linearGradient></defs>
+        <line x1="6" y1="24" x2="18" y2="4" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round"></line>
+        <line x1="13" y1="26" x2="25" y2="6" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round"></line>
+      </svg>
+      <span style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:18px; letter-spacing:.14em;">PARALLED</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:34px; font-size:14.5px; color:var(--ink-soft);">
+      <a href="#flip" style="color:inherit; text-decoration:none;">How it works</a>
+      <a href="#platform" style="color:inherit; text-decoration:none;">Platform</a>
+      <a href="#transmissions" style="color:inherit; text-decoration:none;">Signals</a>
+      <a href="#landing" style="color:inherit; text-decoration:none;">Landing</a>
+      <a href="Commons.dc.html" style="color:inherit; text-decoration:none;">Nexus Q</a>
+    </div>
+    <a href="#cta" style="text-decoration:none; font-size:14px; font-weight:600; color:#06060f; padding:11px 22px; border-radius:999px; background:linear-gradient(120deg,#9B7BFF,#57E0E0); box-shadow:0 8px 28px rgba(91,141,239,.4);">Enter PARALLED</a>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <header style="position:relative; z-index:1; display:grid; grid-template-columns:1.05fr .95fr; gap:40px; align-items:center; max-width:1240px; margin:0 auto; padding:clamp(48px,9vh,110px) clamp(20px,5vw,56px) clamp(60px,8vh,90px);">
+    <div>
+      <div data-reveal="" style="display:inline-flex; align-items:center; gap:10px; padding:8px 16px; border-radius:999px; border:1px solid var(--hair-s); background:var(--panel); font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.16em; color:var(--ink-mute); margin-bottom:30px;">
+        <span style="width:7px; height:7px; border-radius:50%; background:#57E0E0; box-shadow:0 0 10px #57E0E0; animation:pulseGlow 2.4s ease-in-out infinite;"></span>
+        DEMAND-DRIVEN RESEARCH ECOSYSTEM
+      </div>
+      <h1 data-reveal="" data-reveal-delay="80" style="font-family: Playfair Display; font-weight: 700; font-size: clamp(44px,6.4vw,86px); line-height: .98; letter-spacing: -.03em; margin: 0 0 26px">
+        Demand comes first.<br>
+        <span style="background:linear-gradient(110deg,#9B7BFF 0%,#5B8DEF 38%,#57E0E0 70%,#F178B6 100%); background-size:220% auto; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; animation:shimmer 7s linear infinite;">Research answers.</span>
+      </h1>
+      <p data-reveal="" data-reveal-delay="160" style="font-size:clamp(16px,1.5vw,19px); line-height:1.62; color:var(--ink-soft); max-width:540px; margin:0 0 38px;">
+        PARALLED flips the order of science. Journals and boards declare exactly what they need — <em style="color:var(--ink); font-style:normal; font-weight:600;">before</em> the work begins. Researchers design against real, live demand, with visible reasoning at every step.
+      </p>
+      <div data-reveal="" data-reveal-delay="240" style="display:flex; gap:16px; flex-wrap:wrap; align-items:center;">
+        <a href="#cta" style="text-decoration:none; font-size:15px; font-weight:600; color:#06060f; padding:15px 30px; border-radius:999px; background:linear-gradient(120deg,#9B7BFF,#5B8DEF 55%,#57E0E0); box-shadow:0 14px 40px rgba(91,141,239,.45);">Enter the platform</a>
+        <a href="#flip" style="text-decoration:none; font-size:15px; font-weight:600; color:var(--ink); padding:15px 28px; border-radius:999px; border:1px solid var(--hair-s); background:var(--panel);">See how it works →</a>
+      </div>
+      <div data-reveal="" data-reveal-delay="320" style="display:flex; gap:clamp(20px,3vw,42px); flex-wrap:wrap; margin-top:52px; padding-top:30px; border-top:1px solid var(--hair);">
+        <div><div style="font-family:'Space Grotesk',sans-serif; font-size:30px; font-weight:700; background:linear-gradient(120deg,#9B7BFF,#57E0E0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">10</div><div style="font-size:12.5px; color:var(--ink-mute); margin-top:3px;">study-type templates</div></div>
+        <div><div style="font-family:'Space Grotesk',sans-serif; font-size:30px; font-weight:700; background:linear-gradient(120deg,#9B7BFF,#57E0E0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">4</div><div style="font-size:12.5px; color:var(--ink-mute); margin-top:3px;">rigor tiers</div></div>
+        <div><div style="font-family:'Space Grotesk',sans-serif; font-size:30px; font-weight:700; background:linear-gradient(120deg,#9B7BFF,#57E0E0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">20</div><div style="font-size:12.5px; color:var(--ink-mute); margin-top:3px;">platform areas</div></div>
+        <div><div style="font-family:'Space Grotesk',sans-serif; font-size:30px; font-weight:700; background:linear-gradient(120deg,#F178B6,#9B7BFF); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">0</div><div style="font-size:12.5px; color:var(--ink-mute); margin-top:3px;">black boxes</div></div>
+      </div>
+    </div>
+
+    <!-- Orbital parallel-worlds motif -->
+    <div data-reveal="" data-reveal-delay="120" style="position:relative; display:flex; align-items:center; justify-content:center; min-height:480px;">
+      <div ref="{{ orbitRef }}" style="position:relative; width:min(460px,80vw); height:min(460px,80vw); transition:transform .4s cubic-bezier(.16,1,.3,1);">
+        <div data-motif="orbit" style="position:absolute; inset:0;">
+        <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
+          <svg width="100%" height="100%" viewBox="0 0 460 460" fill="none" style="overflow:visible;">
+            <defs>
+              <linearGradient id="og1" x1="0" y1="0" x2="460" y2="460"><stop offset="0" stop-color="#9B7BFF"></stop><stop offset="1" stop-color="#5B8DEF"></stop></linearGradient>
+              <linearGradient id="og2" x1="0" y1="0" x2="460" y2="460"><stop offset="0" stop-color="#57E0E0"></stop><stop offset="1" stop-color="#5B8DEF"></stop></linearGradient>
+              <linearGradient id="og3" x1="0" y1="0" x2="460" y2="460"><stop offset="0" stop-color="#F178B6"></stop><stop offset="1" stop-color="#9B7BFF"></stop></linearGradient>
+            </defs>
+            <g style="transform-box:fill-box; transform-origin:center; animation:spinSlow 48s linear infinite;">
+              <ellipse cx="230" cy="230" rx="220" ry="92" stroke="url(#og1)" stroke-width="1.3" opacity=".55" transform="rotate(28 230 230)"></ellipse>
+              <circle r="6" cx="442" cy="280" fill="#9B7BFF" style="animation:orbitDot 3s ease-in-out infinite;"></circle>
+            </g>
+            <g style="transform-box:fill-box; transform-origin:center; animation:spinRev 60s linear infinite;">
+              <ellipse cx="230" cy="230" rx="220" ry="92" stroke="url(#og2)" stroke-width="1.3" opacity=".5" transform="rotate(-22 230 230)"></ellipse>
+              <circle r="5" cx="22" cy="190" fill="#57E0E0" style="animation:orbitDot 3.6s ease-in-out infinite;"></circle>
+            </g>
+            <g style="transform-box:fill-box; transform-origin:center; animation:spinSlow 72s linear infinite;">
+              <ellipse cx="230" cy="230" rx="210" ry="78" stroke="url(#og3)" stroke-width="1.2" opacity=".45" transform="rotate(82 230 230)"></ellipse>
+              <circle r="5" cx="230" cy="22" fill="#F178B6" style="animation:orbitDot 4.2s ease-in-out infinite;"></circle>
+            </g>
+            <circle cx="230" cy="230" r="150" stroke="var(--hair)" stroke-width="1" fill="none"></circle>
+          </svg>
+        </div>
+        <!-- core orb -->
+        <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
+          <div style="position:relative; width:150px; height:150px; animation:floatY 6s ease-in-out infinite;">
+            <div style="position:absolute; inset:0; border-radius:50%; background:radial-gradient(circle at 35% 30%, #C6B6FF, #5B8DEF 45%, #2A2150 100%); box-shadow:0 0 70px rgba(123,143,255,.6), inset -12px -18px 40px rgba(0,0,0,.45);"></div>
+            <div style="position:absolute; inset:-30px; border-radius:50%; background:radial-gradient(circle, rgba(155,123,255,.35), transparent 65%); animation:pulseGlow 4s ease-in-out infinite;"></div>
+            <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.2em; color:rgba(255,255,255,.85);">∥</div>
+          </div>
+        </div>
+        </div>
+
+        <!-- EARTH: windy grass -->
+        <div data-motif="grass" style="position:absolute; inset:0; overflow:hidden;">
+          <div style="position:absolute; left:-8%; right:-8%; bottom:0; height:42%; background:radial-gradient(120% 90% at 50% 100%, rgba(120,196,108,.45), rgba(120,196,108,0) 70%);"></div>
+          <div style="position:absolute; left:-6%; right:-6%; bottom:8%; height:54%; display:flex; align-items:flex-end; justify-content:center; gap:7px;">
+            <div style="width:7px; height:46%; border-radius:7px 7px 0 0; background:linear-gradient(180deg,#8fd479,#3f8f43); transform-origin:bottom center; animation:grassSway 3.4s ease-in-out infinite;"></div>
+            <div style="width:6px; height:62%; border-radius:6px 6px 0 0; background:linear-gradient(180deg,#7ec86a,#377f3c); transform-origin:bottom center; animation:grassSwayB 3.9s ease-in-out infinite .2s;"></div>
+            <div style="width:8px; height:54%; border-radius:8px 8px 0 0; background:linear-gradient(180deg,#94da7f,#418f45); transform-origin:bottom center; animation:grassSway 4.2s ease-in-out infinite .5s;"></div>
+            <div style="width:6px; height:74%; border-radius:6px 6px 0 0; background:linear-gradient(180deg,#7ec86a,#327838); transform-origin:bottom center; animation:grassSwayB 3.1s ease-in-out infinite .1s;"></div>
+            <div style="width:7px; height:58%; border-radius:7px 7px 0 0; background:linear-gradient(180deg,#8fd479,#3f8f43); transform-origin:bottom center; animation:grassSway 3.7s ease-in-out infinite .35s;"></div>
+            <div style="width:9px; height:88%; border-radius:9px 9px 0 0; background:linear-gradient(180deg,#9ee089,#3c8a41); transform-origin:bottom center; animation:grassSwayB 4.4s ease-in-out infinite .6s;"></div>
+            <div style="width:6px; height:66%; border-radius:6px 6px 0 0; background:linear-gradient(180deg,#7ec86a,#377f3c); transform-origin:bottom center; animation:grassSway 3.3s ease-in-out infinite .15s;"></div>
+            <div style="width:8px; height:80%; border-radius:8px 8px 0 0; background:linear-gradient(180deg,#94da7f,#418f45); transform-origin:bottom center; animation:grassSwayB 4.0s ease-in-out infinite .45s;"></div>
+            <div style="width:7px; height:60%; border-radius:7px 7px 0 0; background:linear-gradient(180deg,#8fd479,#3f8f43); transform-origin:bottom center; animation:grassSway 3.8s ease-in-out infinite .25s;"></div>
+            <div style="width:6px; height:72%; border-radius:6px 6px 0 0; background:linear-gradient(180deg,#7ec86a,#327838); transform-origin:bottom center; animation:grassSwayB 3.5s ease-in-out infinite .05s;"></div>
+            <div style="width:9px; height:50%; border-radius:9px 9px 0 0; background:linear-gradient(180deg,#9ee089,#3c8a41); transform-origin:bottom center; animation:grassSway 4.1s ease-in-out infinite .55s;"></div>
+            <div style="width:6px; height:64%; border-radius:6px 6px 0 0; background:linear-gradient(180deg,#7ec86a,#377f3c); transform-origin:bottom center; animation:grassSwayB 3.6s ease-in-out infinite .3s;"></div>
+            <div style="width:8px; height:78%; border-radius:8px 8px 0 0; background:linear-gradient(180deg,#94da7f,#418f45); transform-origin:bottom center; animation:grassSway 3.9s ease-in-out infinite .4s;"></div>
+            <div style="width:7px; height:56%; border-radius:7px 7px 0 0; background:linear-gradient(180deg,#8fd479,#3f8f43); transform-origin:bottom center; animation:grassSwayB 4.3s ease-in-out infinite .2s;"></div>
+            <div style="width:6px; height:68%; border-radius:6px 6px 0 0; background:linear-gradient(180deg,#7ec86a,#327838); transform-origin:bottom center; animation:grassSway 3.2s ease-in-out infinite .5s;"></div>
+          </div>
+          <!-- drifting wind streaks -->
+          <div style="position:absolute; top:34%; left:-60px; width:70px; height:2px; border-radius:2px; background:linear-gradient(90deg,transparent,rgba(255,255,255,.6)); animation:windStreak2 6s linear infinite;"></div>
+          <div style="position:absolute; top:48%; left:-60px; width:50px; height:2px; border-radius:2px; background:linear-gradient(90deg,transparent,rgba(255,255,255,.45)); animation:windStreak2 7.5s linear infinite 1.4s;"></div>
+        </div>
+
+        <!-- ALIEN: spacecraft drifting over -->
+        <div data-motif="craft" style="position:absolute; inset:0; overflow:visible;">
+          <div style="position:absolute; top:42%; left:50%; animation:craftDrift 11s ease-in-out infinite;">
+            <div style="position:relative; width:190px; height:96px; transform:translate(-50%,-50%); animation:floatY 4.5s ease-in-out infinite;">
+              <!-- abduction / engine beam -->
+              <div style="position:absolute; left:50%; top:56%; transform:translateX(-50%); width:38%; height:150%; background:linear-gradient(180deg, rgba(120,255,225,.28), rgba(150,170,255,.06) 60%, transparent); clip-path:polygon(36% 0,64% 0,100% 100%,0 100%); filter:blur(2px); animation:craftBeam 3.2s ease-in-out infinite;"></div>
+              <!-- underglow -->
+              <div style="position:absolute; left:50%; top:62%; transform:translate(-50%,-50%); width:78%; height:40%; border-radius:50%; background:radial-gradient(ellipse, rgba(120,255,225,.55), transparent 70%); filter:blur(12px);"></div>
+              <!-- dome -->
+              <div style="position:absolute; left:50%; top:14%; transform:translateX(-50%); width:36%; height:46%; border-radius:50% 50% 46% 46%/72% 72% 30% 30%; background:linear-gradient(180deg, rgba(198,240,255,.5), rgba(120,255,225,.14)); border:1px solid rgba(255,255,255,.4); box-shadow:inset 0 5px 14px rgba(255,255,255,.45), inset 0 -8px 18px rgba(91,141,239,.4);"></div>
+              <svg viewBox="0 0 190 96" fill="none" style="position:absolute; inset:0; width:100%; height:100%;">
+                <defs>
+                  <linearGradient id="craftBody" x1="0" y1="48" x2="0" y2="78"><stop offset="0" stop-color="#2c5a64"/><stop offset="1" stop-color="#08161c"/></linearGradient>
+                  <linearGradient id="craftRim" x1="0" y1="0" x2="190" y2="0"><stop offset="0" stop-color="#78ffe1"/><stop offset="0.5" stop-color="#9aa6ff"/><stop offset="1" stop-color="#f196c8"/></linearGradient>
+                </defs>
+                <ellipse cx="95" cy="58" rx="92" ry="20" fill="url(#craftBody)"/>
+                <ellipse cx="95" cy="54" rx="92" ry="6" fill="none" stroke="url(#craftRim)" stroke-width="1.6" opacity="0.9"/>
+                <circle cx="40" cy="58" r="3" fill="#78ffe1"><animate attributeName="opacity" values="1;.2;1" dur="1.4s" repeatCount="indefinite"/></circle>
+                <circle cx="72" cy="63" r="3" fill="#9aa6ff"><animate attributeName="opacity" values=".2;1;.2" dur="1.7s" repeatCount="indefinite"/></circle>
+                <circle cx="118" cy="63" r="3" fill="#f196c8"><animate attributeName="opacity" values="1;.2;1" dur="1.2s" repeatCount="indefinite"/></circle>
+                <circle cx="150" cy="58" r="3" fill="#78ffe1"><animate attributeName="opacity" values=".2;1;.2" dur="1.9s" repeatCount="indefinite"/></circle>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- scroll cue -->
+  <div style="position:relative; z-index:1; display:flex; justify-content:center; margin-top:-20px;">
+    <div style="width:24px; height:40px; border:1px solid rgba(255,255,255,.18); border-radius:14px; display:flex; justify-content:center; padding-top:8px;">
+      <div style="width:4px; height:8px; border-radius:2px; background:#57E0E0; animation:scrollDot 1.8s ease-in-out infinite;"></div>
+    </div>
+  </div>
+
+  <!-- ===== THE FLIP ===== -->
+  <section id="flip" style="position:relative; z-index:1; max-width:1100px; margin:0 auto; padding:clamp(70px,12vh,140px) clamp(20px,5vw,56px);">
+    <div data-reveal="" style="text-align:center; margin-bottom:48px;">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#7B8FFF; margin-bottom:16px;">01 — THE FLIP</div>
+      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(32px,4.4vw,56px); line-height:1.04; letter-spacing:-.02em; margin:0 0 18px;">We turned research around.</h2>
+      <p style="font-size:17px; line-height:1.6; color:var(--ink-soft); max-width:600px; margin:0 auto;">Today, research happens first and then hunts for somewhere to publish. PARALLED reverses it.</p>
+    </div>
+
+    <div data-reveal="" data-reveal-delay="120" style="display:flex; justify-content:center; gap:8px; margin-bottom:38px;">
+      <button onClick="{{ showToday }}" style="cursor:pointer; font-family:'Manrope',sans-serif; font-size:14px; font-weight:600; padding:11px 24px; border-radius:999px; border:1px solid {{ todayBorder }}; background:{{ todayBg }}; color:{{ todayColor }}; transition:all .3s;">The old way</button>
+      <button onClick="{{ showParalled }}" style="cursor:pointer; font-family:'Manrope',sans-serif; font-size:14px; font-weight:600; padding:11px 24px; border-radius:999px; border:1px solid {{ palledBorder }}; background:{{ palledBg }}; color:{{ palledColor }}; transition:all .3s;">PARALLED</button>
+    </div>
+
+    <div style="border:1px solid var(--hair); border-radius:24px; background:var(--panel); backdrop-filter:blur(12px); padding:clamp(28px,5vw,52px); overflow:hidden;">
+      <div style="display:flex; align-items:stretch; flex-wrap:wrap; gap:14px;">
+        <sc-for list="{{ flowSteps }}" as="step" hint-placeholder-count="4">
+          <div style="flex:1; min-width:150px; display:flex; align-items:center; gap:14px;">
+            <div style="flex:1; padding:22px 20px; border-radius:16px; background:{{ step.bg }}; border:1px solid {{ step.border }};">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; color:{{ step.num }}; margin-bottom:10px;">{{ step.idx }}</div>
+              <div style="font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; color:var(--ink); line-height:1.2;">{{ step.label }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <p style="margin:30px 0 0; font-size:15.5px; line-height:1.6; color:var(--ink-mute); max-width:680px;">{{ flowCaption }}</p>
+    </div>
+  </section>
+
+  <!-- ===== PRINCIPLE ===== -->
+  <section style="position:relative; z-index:1; max-width:1000px; margin:0 auto; padding:clamp(40px,7vh,90px) clamp(20px,5vw,56px); text-align:center;">
+    <div data-reveal="">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#57E0E0; margin-bottom:24px;">THE ORGANIZING PRINCIPLE</div>
+      <p style="font-family:'Space Grotesk',sans-serif; font-weight:500; font-size:clamp(26px,3.6vw,46px); line-height:1.22; letter-spacing:-.015em; margin:0;">
+        Visible, attributable, revisable reasoning<br>beats <span style="background:linear-gradient(110deg,#9B7BFF,#57E0E0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">silent authority</span> — everywhere.
+      </p>
+      <p style="font-size:16px; line-height:1.65; color:var(--ink-mute); max-width:560px; margin:28px auto 0;">Every decision — board, AI, funder, investigator — is explainable and recorded. Nothing operates as a black box.</p>
+    </div>
+  </section>
+
+  <!-- ===== QUOTE BAND ===== -->
+  <section style="position:relative; z-index:1; max-width:980px; margin:0 auto; padding:clamp(30px,6vh,70px) clamp(20px,5vw,56px);">
+    <div data-reveal="" data-surface="mid" style="position:relative; border-radius:26px; overflow:hidden; padding:clamp(40px,6vw,72px) clamp(28px,5vw,64px); border:1px solid var(--hair); background:linear-gradient(135deg, rgba(20,16,44,.7), rgba(8,10,26,.5));">
+      <div style="position:absolute; inset:0; background:radial-gradient(circle at 15% 20%, rgba(155,123,255,.22), transparent 55%), radial-gradient(circle at 85% 90%, rgba(87,224,224,.16), transparent 55%);"></div>
+      <div style="position:absolute; top:18px; left:30px; font-family:'Playfair Display',serif; font-size:120px; line-height:1; color:rgba(155,123,255,.16); pointer-events:none;">&ldquo;</div>
+      <div style="position:relative; min-height:150px; display:flex; flex-direction:column; justify-content:center;">
+        <blockquote ref="{{ quoteTextRef }}" style="margin:0; font-family:'Playfair Display',serif; font-style:italic; font-weight:500; font-size:clamp(22px,3vw,38px); line-height:1.3; letter-spacing:-.01em; color:var(--ink); transition:opacity .6s, transform .6s;">A civilization is measured by the questions it dares to make public.</blockquote>
+        <div ref="{{ quoteAuthorRef }}" style="margin-top:22px; font-family:'JetBrains Mono',monospace; font-size:12.5px; letter-spacing:.16em; color:#9B7BFF; transition:opacity .6s;">— TRANSMISSION FRAGMENT · ORIGIN UNKNOWN</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TWO PATHS ===== -->
+  <section style="position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:clamp(50px,9vh,110px) clamp(20px,5vw,56px);">
+    <div data-reveal="" style="margin-bottom:46px;">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#7B8FFF; margin-bottom:16px;">02 — TWO WAYS TO BEGIN</div>
+      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(30px,4vw,50px); line-height:1.05; letter-spacing:-.02em; margin:0; max-width:680px;">Start from demand, or start from an idea.</h2>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+      <div data-reveal="" style="position:relative; padding:38px; border-radius:24px; border:1px solid rgba(155,123,255,.22); background:linear-gradient(160deg, rgba(155,123,255,.12), rgba(155,123,255,.02));overflow:hidden;">
+        <div style="position:absolute; top:-40px; right:-40px; width:160px; height:160px; border-radius:50%; background:radial-gradient(circle,rgba(155,123,255,.4),transparent 70%); filter:blur(10px);"></div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.16em; color:#9B7BFF; margin-bottom:18px;">DEMAND-PULL</div>
+        <h3 style="font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:600; margin:0 0 14px;">A board posts a call.</h3>
+        <p style="font-size:15.5px; line-height:1.62; color:var(--ink-soft); margin:0;">A journal declares topic, scope and criteria. You claim it, work it, and the board reviews with visible reasoning — then publishes. Real, live demand, never scattershot.</p>
+      </div>
+      <div data-reveal="" data-reveal-delay="120" style="position:relative; padding:38px; border-radius:24px; border:1px solid rgba(87,224,224,.22); background:linear-gradient(160deg, rgba(87,224,224,.1), rgba(87,224,224,.02)); overflow:hidden;">
+        <div style="position:absolute; top:-40px; right:-40px; width:160px; height:160px; border-radius:50%; background:radial-gradient(circle,rgba(87,224,224,.35),transparent 70%); filter:blur(10px);"></div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.16em; color:#57E0E0; margin-bottom:18px;">SUPPLY-PUSH</div>
+        <h3 style="font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:600; margin:0 0 14px;">Start from a bare idea.</h3>
+        <p style="font-size:15.5px; line-height:1.62; color:var(--ink-soft); margin:0;">No call required. AI and global standards guide you to the same rigor. Once your study is strong, journals discover it and pull it in. Studies are the primary object — a call is optional.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PLATFORM CONSTELLATION ===== -->
+  <section id="platform" style="position:relative; z-index:1; max-width:1240px; margin:0 auto; padding:clamp(50px,9vh,110px) clamp(20px,5vw,56px);">
+    <div data-reveal="" style="margin-bottom:46px; display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:20px;">
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#7B8FFF; margin-bottom:16px;">03 — ONE ECOSYSTEM</div>
+        <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(30px,4vw,50px); line-height:1.05; letter-spacing:-.02em; margin:0; max-width:620px;">Every part of the research life, in one place.</h2>
+      </div>
+      <p style="font-size:15px; color:var(--ink-mute); max-width:300px; margin:0;">From the first idea to the published study — and the wellbeing in between.</p>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px;">
+      <a href="Studies.dc.html" data-reveal="" data-card="" style="display:block; text-decoration:none; color:inherit; padding:26px; border-radius:18px; border:1px solid var(--hair); background:var(--panel); transition:transform .4s cubic-bezier(.16,1,.3,1), border-color .4s, background .4s;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-faint);">01 / STUDIES</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.08em; color:#9B7BFF;">OPEN →</div>
+        </div>
+        <div style="font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:600; margin-bottom:8px;">Studies</div>
+        <div style="font-size:14px; line-height:1.55; color:var(--ink-mute);">The research workspace where every study lives, grows and is held accountable.</div>
+      </a>
+      <a href="Journal.dc.html" data-reveal="" data-card="" data-reveal-delay="60" style="display:block; text-decoration:none; color:inherit; padding:26px; border-radius:18px; border:1px solid var(--hair); background:var(--panel); transition:transform .4s cubic-bezier(.16,1,.3,1), border-color .4s, background .4s;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-faint);">02 / JOURNALS</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.08em; color:#9B7BFF;">OPEN →</div>
+        </div>
+        <div style="font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:600; margin-bottom:8px;">Journals</div>
+        <div style="font-size:14px; line-height:1.55; color:var(--ink-mute);">Verified boards declare exactly what they want — before the research happens. <span style="color:var(--ink-soft);">Read the open record.</span></div>
+      </a>
+      <a href="Neural Hub.dc.html" data-reveal="" data-card="" data-reveal-delay="120" style="display:block; text-decoration:none; color:inherit; padding:26px; border-radius:18px; border:1px solid var(--hair); background:var(--panel); transition:transform .4s cubic-bezier(.16,1,.3,1), border-color .4s, background .4s;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-faint);">03 / NEURAL HUB</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.08em; color:#9B7BFF;">OPEN →</div>
+        </div>
+        <div style="font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:600; margin-bottom:8px;">Neural Hub</div>
+        <div style="font-size:14px; line-height:1.55; color:var(--ink-mute);">A depth lens — surfaces gaps, insights and conflicts inside a single study.</div>
+      </a>
+      <a href="Synthesis.dc.html" data-reveal="" data-card="" style="display:block; text-decoration:none; color:inherit; padding:26px; border-radius:18px; border:1px solid var(--hair); background:var(--panel); transition:transform .4s cubic-bezier(.16,1,.3,1), border-color .4s, background .4s;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-faint);">04 / SYNTHESIS</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.08em; color:#9B7BFF;">OPEN →</div>
+        </div>
+        <div style="font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:600; margin-bottom:8px;">Synthesis</div>
+        <div style="font-size:14px; line-height:1.55; color:var(--ink-mute);">A breadth lens — compares many studies to spot what's still missing.</div>
+      </a>
+      <a href="Canvas.dc.html" data-reveal="" data-card="" data-reveal-delay="60" style="display:block; text-decoration:none; color:inherit; padding:26px; border-radius:18px; border:1px solid var(--hair); background:var(--panel); transition:transform .4s cubic-bezier(.16,1,.3,1), border-color .4s, background .4s;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-faint);">05 / CANVAS</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.08em; color:#9B7BFF;">OPEN →</div>
+        </div>
+        <div style="font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:600; margin-bottom:8px;">Canvas</div>
+        <div style="font-size:14px; line-height:1.55; color:var(--ink-mute);">Infinite-zoom space for flows, diagrams and concept visualization.</div>
+      </a>
+      <a href="Loom.dc.html" data-reveal="" data-card="" data-reveal-delay="120" style="display:block; text-decoration:none; color:inherit; padding:26px; border-radius:18px; border:1px solid var(--hair); background:var(--panel); transition:transform .4s cubic-bezier(.16,1,.3,1), border-color .4s, background .4s;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-faint);">06 / LOOM</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.08em; color:#9B7BFF;">OPEN →</div>
+        </div>
+        <div style="font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:600; margin-bottom:8px;">Loom</div>
+        <div style="font-size:14px; line-height:1.55; color:var(--ink-mute);">Personal scholarship — link ideas with reasoning, earn real credit.</div>
+      </a>
+      <a href="Discovery.dc.html" data-reveal="" data-card="" style="display:block; text-decoration:none; color:inherit; padding:26px; border-radius:18px; border:1px solid var(--hair); background:var(--panel); transition:transform .4s cubic-bezier(.16,1,.3,1), border-color .4s, background .4s;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-faint);">07 / DISCOVERY</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.08em; color:#9B7BFF;">OPEN →</div>
+        </div>
+        <div style="font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:600; margin-bottom:8px;">Discovery</div>
+        <div style="font-size:14px; line-height:1.55; color:var(--ink-mute);">Compare outcome directions across a whole cluster of related studies.</div>
+      </a>
+      <a href="Forge.dc.html" data-reveal="" data-card="" data-reveal-delay="60" style="display:block; text-decoration:none; color:inherit; padding:26px; border-radius:18px; border:1px solid var(--hair); background:var(--panel); transition:transform .4s cubic-bezier(.16,1,.3,1), border-color .4s, background .4s;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-faint);">08 / FORGE</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.08em; color:#9B7BFF;">OPEN →</div>
+        </div>
+        <div style="font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:600; margin-bottom:8px;">Forge</div>
+        <div style="font-size:14px; line-height:1.55; color:var(--ink-mute);">Community-built study templates, attributed and shared globally.</div>
+      </a>
+      <a href="Relax.dc.html" data-reveal="" data-card="" data-reveal-delay="120" style="display:block; text-decoration:none; color:inherit; padding:26px; border-radius:18px; border:1px solid var(--hair); background:var(--panel); transition:transform .4s cubic-bezier(.16,1,.3,1), border-color .4s, background .4s;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-faint);">09 / RELAX</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.08em; color:#57E0E0;">OPEN →</div>
+        </div>
+        <div style="font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:600; margin-bottom:8px;">Relax</div>
+        <div style="font-size:14px; line-height:1.55; color:var(--ink-mute);">A wellbeing space — beach radio &amp; ambient sounds. No bearing on research quality. Always free.</div>
+      </a>
+      <a href="Commons.dc.html" data-reveal="" data-card="" style="display:block; text-decoration:none; color:inherit; padding:26px; border-radius:18px; border:1px solid var(--hair); background:var(--panel); transition:transform .4s cubic-bezier(.16,1,.3,1), border-color .4s, background .4s;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-faint);">10 / NEXUS Q</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.08em; color:#57E0E0;">OPEN →</div>
+        </div>
+        <div style="font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:600; margin-bottom:8px;">Nexus Q</div>
+        <div style="font-size:14px; line-height:1.55; color:var(--ink-mute);">Where healthcare's trending questions become conversations — attach Drive docs, video &amp; data, then frame a research question.</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ===== PLANETARY SYSTEM (interactive orrery) ===== -->
+  <section id="orrery" style="position:relative; z-index:1; max-width:1240px; margin:0 auto; padding:clamp(40px,7vh,90px) clamp(20px,5vw,56px) clamp(20px,3vh,40px);">
+    <div data-reveal="" style="text-align:center; margin-bottom:18px;">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#7B8FFF; margin-bottom:14px;">03.5 — THE SYSTEM, AS A SYSTEM</div>
+      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(28px,4vw,50px); line-height:1.05; letter-spacing:-.02em; margin:0 auto 12px; max-width:680px;">Nine worlds, one orbit.</h2>
+      <p style="font-size:15px; color:var(--ink-mute); max-width:440px; margin:0 auto;">Each tool is a planet around the PARALLED core. Tap a world to travel to it.</p>
+    </div>
+    <div ref="{{ orreryRef }}" style="position:relative; width:100%; max-width:680px; margin:0 auto; aspect-ratio:1/1;">
+      <!-- orbit ring outlines -->
+      <div style="position:absolute; inset:24%; border-radius:50%; border:1px dashed rgba(155,123,255,.18); animation:orbitRot 60s linear infinite;"></div>
+      <div style="position:absolute; inset:13%; border-radius:50%; border:1px dashed rgba(87,224,224,.15); animation:orbitRev 90s linear infinite;"></div>
+      <div style="position:absolute; inset:2%; border-radius:50%; border:1px dashed rgba(241,120,182,.12); animation:orbitRot 120s linear infinite;"></div>
+      <!-- central sun -->
+      <a href="#platform" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:24%; height:24%; border-radius:50%; text-decoration:none; display:grid; place-items:center; background:radial-gradient(circle at 40% 36%, #fff3d6, #ffce9e 38%, #f59e5a 70%, #b8431f 100%); box-shadow:0 0 60px 12px rgba(245,158,90,.5), inset -8px -6px 22px rgba(120,40,10,.5); animation:pulseGlow 4s ease-in-out infinite;">
+        <span style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(9px,1.4vw,14px); letter-spacing:.12em; color:#3a1606; text-align:center;">PARALLED</span>
+      </a>
+      <!-- planets injected here -->
+      <div ref="{{ planetLayerRef }}" style="position:absolute; inset:0;"></div>
+    </div>
+  </section>
+
+  <!-- ===== INVESTIGATOR ===== -->
+  <section id="investigator" style="position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:clamp(50px,9vh,110px) clamp(20px,5vw,56px);">
+    <div data-reveal="" data-surface="deep" style="position:relative; border-radius:28px; overflow:hidden; border:1px solid var(--hair); background:linear-gradient(135deg, rgba(15,13,34,.9), rgba(8,8,20,.6));">
+      <div style="position:absolute; inset:0; background:radial-gradient(circle at 80% 20%, rgba(91,141,239,.22), transparent 55%);"></div>
+      <div style="position:relative; display:grid; grid-template-columns:1.2fr .8fr; gap:40px; align-items:center; padding:clamp(34px,5vw,64px);">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#7B8FFF; margin-bottom:18px;">04 — ANONYMOUS OVERSIGHT</div>
+          <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(28px,3.6vw,46px); line-height:1.06; letter-spacing:-.02em; margin:0 0 20px;">An investigator watches every study — from its first moment.</h2>
+          <p style="font-size:16px; line-height:1.65; color:var(--ink-soft); margin:0 0 22px; max-width:560px;">Human or AI, present from day one. Anonymous in <em style="font-style:normal; color:var(--ink); font-weight:600;">identity</em> until a study closes — so you do honest work, not work shaped toward a specific person.</p>
+          <p style="font-size:16px; line-height:1.65; color:var(--ink-soft); margin:0; max-width:560px;">Never anonymous in <em style="font-style:normal; color:#57E0E0; font-weight:600;">reasoning</em>. You always see what was raised and why. It can talk with you — never a hidden, unappealable veto.</p>
+        </div>
+        <div style="display:flex; justify-content:center;">
+          <div style="position:relative; width:200px; height:200px; display:flex; align-items:center; justify-content:center;">
+            <div style="position:absolute; inset:0; border-radius:50%; border:1px solid rgba(123,143,255,.4); animation:spinSlow 30s linear infinite;"></div>
+            <div style="position:absolute; inset:24px; border-radius:50%; border:1px dashed rgba(87,224,224,.4); animation:spinRev 24s linear infinite;"></div>
+            <div style="position:relative; width:96px; height:96px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #1c1a3a, #0c0b1e); border:1px solid var(--hair-s); display:flex; align-items:center; justify-content:center; box-shadow:0 0 40px rgba(91,141,239,.3);">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" stroke="#7B8FFF" stroke-width="1.4"></path><circle cx="12" cy="12" r="3" stroke="#57E0E0" stroke-width="1.4"></circle></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TIERS ===== -->
+  <section style="position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:clamp(50px,9vh,110px) clamp(20px,5vw,56px);">
+    <div data-reveal="" style="margin-bottom:42px;">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#7B8FFF; margin-bottom:16px;">05 — RIGOR, NOT RANKING</div>
+      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(30px,4vw,50px); line-height:1.05; letter-spacing:-.02em; margin:0 0 14px; max-width:680px;">Four tiers of depth — never tiers of worth.</h2>
+      <p style="font-size:16px; color:var(--ink-mute); max-width:600px; margin:0;">The gradient is structural depth and provability, not difficulty for its own sake. Easy is legitimate, not lesser.</p>
+    </div>
+    <div data-reveal="" data-reveal-delay="100" style="height:5px; border-radius:999px; background:linear-gradient(90deg,#57E0E0,#5B8DEF,#9B7BFF,#F178B6); margin-bottom:24px;"></div>
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px;">
+      <div data-reveal="" style="padding:26px; border-radius:18px; border:1px solid rgba(87,224,224,.2); background:rgba(87,224,224,.04);">
+        <div style="font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:600; color:#57E0E0; margin-bottom:10px;">Easy</div>
+        <div style="font-size:13.5px; line-height:1.55; color:var(--ink-mute);">A full, correct, standard-compliant baseline. Internal consistency.</div>
+      </div>
+      <div data-reveal="" data-reveal-delay="80" style="padding:26px; border-radius:18px; border:1px solid rgba(91,141,239,.22); background:rgba(91,141,239,.04);">
+        <div style="font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:600; color:#5B8DEF; margin-bottom:10px;">Moderate</div>
+        <div style="font-size:13.5px; line-height:1.55; color:var(--ink-mute);">More sections, required reasoning, external citations.</div>
+      </div>
+      <div data-reveal="" data-reveal-delay="160" style="padding:26px; border-radius:18px; border:1px solid rgba(155,123,255,.22); background:rgba(155,123,255,.05);">
+        <div style="font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:600; color:#9B7BFF; margin-bottom:10px;">Advanced</div>
+        <div style="font-size:13.5px; line-height:1.55; color:var(--ink-mute);">Elaborate design plus a falsification-reduction audit trail.</div>
+      </div>
+      <div data-reveal="" data-reveal-delay="240" style="padding:26px; border-radius:18px; border:1px solid rgba(241,120,182,.22); background:rgba(241,120,182,.05);">
+        <div style="font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:600; color:#F178B6; margin-bottom:10px;">Expertised</div>
+        <div style="font-size:13.5px; line-height:1.55; color:var(--ink-mute);">A full platform-wide audit trail. The deepest provability.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PRICING ===== -->
+  <section id="pricing" style="position:relative; z-index:1; max-width:900px; margin:0 auto; padding:clamp(50px,9vh,110px) clamp(20px,5vw,56px); text-align:center;">
+    <div data-reveal="">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#57E0E0; margin-bottom:20px;">06 — FREE WHERE IT MATTERS</div>
+      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(28px,3.8vw,48px); line-height:1.08; letter-spacing:-.02em; margin:0 0 18px;">Anything that decides whether real research gets done well stays free.</h2>
+      <p style="font-size:16px; line-height:1.65; color:var(--ink-mute); max-width:580px; margin:0 auto 30px;">Claiming and working any study, core AI guidance, the ethics gate, the pilot, credit and verification — all free. Premium only ever sits on top of a complete free experience, never in front of it.</p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+        <span style="font-size:13px; color:var(--ink-soft); padding:9px 16px; border-radius:999px; border:1px solid var(--hair-s); background:var(--panel);">Work any study, any tier</span>
+        <span style="font-size:13px; color:var(--ink-soft); padding:9px 16px; border-radius:999px; border:1px solid var(--hair-s); background:var(--panel);">Ethics gate &amp; pilot</span>
+        <span style="font-size:13px; color:var(--ink-soft); padding:9px 16px; border-radius:999px; border:1px solid var(--hair-s); background:var(--panel);">Credit &amp; verification</span>
+        <span style="font-size:13px; color:var(--ink-soft); padding:9px 16px; border-radius:999px; border:1px solid var(--hair-s); background:var(--panel);">Journal browsing &amp; calls</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== INTERCEPTED TRANSMISSIONS ===== -->
+  <section id="transmissions" style="position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:clamp(50px,9vh,110px) clamp(20px,5vw,56px);">
+    <div data-reveal="" style="margin-bottom:42px;">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#F178B6; margin-bottom:16px; display:flex; align-items:center; gap:10px;"><span style="width:7px;height:7px;border-radius:50%;background:#F178B6;box-shadow:0 0 10px #F178B6;animation:blink 1.4s infinite;"></span>07 — INTERCEPTED · LIVE FEED</div>
+      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(30px,4vw,50px); line-height:1.05; letter-spacing:-.02em; margin:0 0 14px; max-width:760px;">Transmissions from researchers who aren't from here.</h2>
+      <p style="font-size:16px; color:var(--ink-mute); max-width:600px; margin:0;">Decoded fragments of other civilizations doing open science. Press play to hear the raw signal — one is still encrypted.</p>
+    </div>
+
+    <div ref="{{ txRef }}" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:18px;">
+      <!-- clip 0 -->
+      <div data-tilt="" data-clip="0" style="position:relative; padding:22px; border-radius:20px; border:1px solid rgba(155,123,255,.22); background:linear-gradient(160deg, rgba(20,16,44,.7), rgba(8,8,20,.55)); overflow:hidden;">
+        <div style="position:relative; height:110px; border-radius:12px; overflow:hidden; background:radial-gradient(circle at 50% 50%, rgba(155,123,255,.14), rgba(6,6,17,.6)); border:1px solid var(--hair); margin-bottom:18px;">
+          <canvas data-osc="0" width="560" height="220" style="position:absolute; inset:0; width:100%; height:100%;"></canvas>
+          <div style="position:absolute; left:0; right:0; top:0; height:30%; background:linear-gradient(180deg, rgba(155,123,255,.18), transparent); animation:scan 3.2s linear infinite;"></div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.12em; color:var(--ink-mute); margin-bottom:8px;">FRAGMENT 0x1A · 0:14</div>
+        <div style="font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:600; margin-bottom:16px; line-height:1.25;">Field note: a star that forgets its own name</div>
+        <div style="display:flex; align-items:center; gap:14px;">
+          <button data-play="0" style="cursor:pointer; display:flex; align-items:center; gap:9px; font-family:'Manrope',sans-serif; font-size:13.5px; font-weight:600; color:#06060f; padding:10px 18px; border-radius:999px; border:none; background:linear-gradient(120deg,#9B7BFF,#5B8DEF);">
+            <span data-icon="0">▶</span><span data-txt="0">Play transmission</span>
+          </button>
+          <div data-wave="0" style="flex:1; display:flex; align-items:center; gap:3px; height:24px; opacity:.4;">
+            <span style="flex:1;height:100%;background:#9B7BFF;border-radius:2px;transform-origin:center;"></span><span style="flex:1;height:100%;background:#7B8FFF;border-radius:2px;"></span><span style="flex:1;height:100%;background:#5B8DEF;border-radius:2px;"></span><span style="flex:1;height:100%;background:#7B8FFF;border-radius:2px;"></span><span style="flex:1;height:100%;background:#9B7BFF;border-radius:2px;"></span><span style="flex:1;height:100%;background:#57E0E0;border-radius:2px;"></span><span style="flex:1;height:100%;background:#5B8DEF;border-radius:2px;"></span><span style="flex:1;height:100%;background:#9B7BFF;border-radius:2px;"></span>
+          </div>
+        </div>
+      </div>
+      <!-- clip 1 -->
+      <div data-tilt="" data-clip="1" style="position:relative; padding:22px; border-radius:20px; border:1px solid rgba(87,224,224,.22); background:linear-gradient(160deg, rgba(12,24,32,.7), rgba(8,8,20,.55)); overflow:hidden;">
+        <div style="position:relative; height:110px; border-radius:12px; overflow:hidden; background:radial-gradient(circle at 50% 50%, rgba(87,224,224,.14), rgba(6,6,17,.6)); border:1px solid var(--hair); margin-bottom:18px;">
+          <canvas data-osc="1" width="560" height="220" style="position:absolute; inset:0; width:100%; height:100%;"></canvas>
+          <div style="position:absolute; left:0; right:0; top:0; height:30%; background:linear-gradient(180deg, rgba(87,224,224,.18), transparent); animation:scan 3.8s linear infinite;"></div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.12em; color:var(--ink-mute); margin-bottom:8px;">FRAGMENT 0x2F · 0:11</div>
+        <div style="font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:600; margin-bottom:16px; line-height:1.25;">On building minds that show their work</div>
+        <div style="display:flex; align-items:center; gap:14px;">
+          <button data-play="1" style="cursor:pointer; display:flex; align-items:center; gap:9px; font-family:'Manrope',sans-serif; font-size:13.5px; font-weight:600; color:#06060f; padding:10px 18px; border-radius:999px; border:none; background:linear-gradient(120deg,#57E0E0,#5B8DEF);">
+            <span data-icon="1">▶</span><span data-txt="1">Play transmission</span>
+          </button>
+          <div data-wave="1" style="flex:1; display:flex; align-items:center; gap:3px; height:24px; opacity:.4;">
+            <span style="flex:1;height:100%;background:#57E0E0;border-radius:2px;"></span><span style="flex:1;height:100%;background:#5B8DEF;border-radius:2px;"></span><span style="flex:1;height:100%;background:#57E0E0;border-radius:2px;"></span><span style="flex:1;height:100%;background:#7B8FFF;border-radius:2px;"></span><span style="flex:1;height:100%;background:#57E0E0;border-radius:2px;"></span><span style="flex:1;height:100%;background:#5B8DEF;border-radius:2px;"></span><span style="flex:1;height:100%;background:#57E0E0;border-radius:2px;"></span><span style="flex:1;height:100%;background:#7B8FFF;border-radius:2px;"></span>
+          </div>
+        </div>
+      </div>
+      <!-- clip 2 — ENCRYPTED, hidden video -->
+      <div data-tilt="" data-clip="2" style="position:relative; padding:22px; border-radius:20px; border:1px solid rgba(241,120,182,.3); background:linear-gradient(160deg, rgba(30,12,26,.7), rgba(8,8,20,.55)); overflow:hidden;">
+        <div style="position:relative; height:110px; border-radius:12px; overflow:hidden; background:rgba(6,6,17,.7); border:1px solid var(--hair); margin-bottom:18px;">
+          <canvas data-video="2" width="560" height="220" style="position:absolute; inset:0; width:100%; height:100%; opacity:0; transition:opacity .8s;"></canvas>
+          <div data-lock="2" style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; background:repeating-linear-gradient(0deg, rgba(241,120,182,.05) 0 2px, transparent 2px 4px); backdrop-filter:blur(2px);">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" stroke="#F178B6" stroke-width="1.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="#F178B6" stroke-width="1.5"/></svg>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; color:#F6A8D0;">ENCRYPTED</span>
+          </div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.12em; color:var(--ink-mute); margin-bottom:8px;">FRAGMENT 0x??? · [REDACTED]</div>
+        <div data-vtitle="2" style="font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:600; margin-bottom:16px; line-height:1.25;">⟨ first-contact research protocol ⟩</div>
+        <div style="display:flex; align-items:center; gap:14px;">
+          <button data-decrypt="2" style="cursor:pointer; display:flex; align-items:center; gap:9px; font-family:'Manrope',sans-serif; font-size:13.5px; font-weight:600; color:#06060f; padding:10px 18px; border-radius:999px; border:none; background:linear-gradient(120deg,#F178B6,#9B7BFF);">
+            <span>🔓</span><span data-dtxt="2">Decrypt &amp; watch</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== LANDING TEASER / COUNTDOWN ===== -->
+  <section id="landing" style="position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:clamp(50px,9vh,110px) clamp(20px,5vw,56px);">
+    <div data-reveal="" data-surface="deep" style="position:relative; border-radius:30px; overflow:hidden; border:1px solid var(--hair-s); background:linear-gradient(135deg, rgba(12,10,30,.85), rgba(6,8,22,.7));">
+      <div style="position:absolute; inset:0; background:radial-gradient(circle at 78% 40%, rgba(91,141,239,.28), transparent 55%), radial-gradient(circle at 12% 80%, rgba(155,123,255,.2), transparent 55%);"></div>
+      <div style="position:relative; display:grid; grid-template-columns:1.1fr .9fr; gap:40px; align-items:center; padding:clamp(34px,5vw,64px);">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#57E0E0; margin-bottom:18px; display:flex; align-items:center; gap:10px;"><span style="width:7px;height:7px;border-radius:50%;background:#57E0E0;box-shadow:0 0 10px #57E0E0;animation:pulseGlow 2s infinite;"></span>INBOUND</div>
+          <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(32px,4.6vw,58px); line-height:1.02; letter-spacing:-.025em; margin:0 0 18px;">We're planning to<br>land soon.</h2>
+          <p style="font-size:16px; line-height:1.65; color:var(--ink-soft); max-width:480px; margin:0 0 30px;">A new civilization of open research is cultivating in orbit. When the lights below reach full bloom, PARALLED touches down. Be on the manifest.</p>
+          <div ref="{{ countRef }}" style="display:flex; gap:14px; flex-wrap:wrap; margin-bottom:32px;">
+            <div style="text-align:center;"><div data-cd="d" style="font-family:'Space Grotesk',sans-serif; font-size:clamp(30px,4vw,46px); font-weight:700; background:linear-gradient(120deg,#9B7BFF,#57E0E0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; min-width:62px;">00</div><div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; color:var(--ink-mute); margin-top:4px;">DAYS</div></div>
+            <div style="text-align:center;"><div data-cd="h" style="font-family:'Space Grotesk',sans-serif; font-size:clamp(30px,4vw,46px); font-weight:700; background:linear-gradient(120deg,#9B7BFF,#57E0E0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; min-width:62px;">00</div><div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; color:var(--ink-mute); margin-top:4px;">HRS</div></div>
+            <div style="text-align:center;"><div data-cd="m" style="font-family:'Space Grotesk',sans-serif; font-size:clamp(30px,4vw,46px); font-weight:700; background:linear-gradient(120deg,#9B7BFF,#57E0E0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; min-width:62px;">00</div><div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; color:var(--ink-mute); margin-top:4px;">MIN</div></div>
+            <div style="text-align:center;"><div data-cd="s" style="font-family:'Space Grotesk',sans-serif; font-size:clamp(30px,4vw,46px); font-weight:700; background:linear-gradient(120deg,#F178B6,#9B7BFF); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; min-width:62px;">00</div><div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; color:var(--ink-mute); margin-top:4px;">SEC</div></div>
+          </div>
+          <form data-notify="" style="display:flex; gap:10px; flex-wrap:wrap; max-width:440px;">
+            <input data-email="" type="email" required="" placeholder="your signal address" style="flex:1; min-width:200px; font-family:'Manrope',sans-serif; font-size:14px; color:var(--ink); padding:13px 18px; border-radius:999px; border:1px solid var(--hair-s); background:var(--panel-s); outline:none;">
+            <button type="submit" style="cursor:pointer; font-family:'Manrope',sans-serif; font-size:14px; font-weight:600; color:#06060f; padding:13px 26px; border-radius:999px; border:none; background:linear-gradient(120deg,#57E0E0,#5B8DEF);">Join the manifest</button>
+          </form>
+          <div data-notify-ok="" style="display:none; margin-top:14px; font-family:'JetBrains Mono',monospace; font-size:12.5px; letter-spacing:.08em; color:#57E0E0;">✓ You're on the manifest. Watch the sky.</div>
+        </div>
+        <div style="display:flex; justify-content:center;">
+          <div style="position:relative; width:min(300px,70vw); height:min(300px,70vw);">
+            <div style="position:absolute; inset:-6%; border-radius:50%; border:1px solid rgba(123,143,255,.25); animation:spinSlow 40s linear infinite;"></div>
+            <div style="position:absolute; inset:6%; border-radius:50%; box-shadow:0 0 60px rgba(91,141,239,.4); overflow:hidden;">
+              <canvas data-planet="" width="600" height="600" style="width:100%; height:100%; display:block;"></canvas>
+            </div>
+            <div style="position:absolute; inset:6%; border-radius:50%; pointer-events:none; box-shadow:inset -22px -26px 60px rgba(0,0,0,.6), inset 14px 16px 40px rgba(155,123,255,.25);"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== COMMUNITY / REVIEW WALL ===== -->
+  <section id="community" style="position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:clamp(50px,9vh,110px) clamp(20px,5vw,56px);">
+    <div data-reveal="" style="margin-bottom:40px; text-align:center;">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#7B8FFF; margin-bottom:16px;">08 — THE SIGNAL IS GETTING LOUDER</div>
+      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(30px,4vw,50px); line-height:1.05; letter-spacing:-.02em; margin:0 auto 14px; max-width:680px;">What the early civilization is saying.</h2>
+      <p style="font-size:16px; color:var(--ink-mute); max-width:560px; margin:0 auto;">Live reactions from researchers, boards and AI co-investigators waiting for the landing. Add yours — it appears instantly.</p>
+    </div>
+
+    <!-- composer -->
+    <div data-reveal="" data-reveal-delay="80" style="max-width:720px; margin:0 auto 34px;">
+      <form data-comment-form="" style="display:flex; gap:12px; align-items:center; padding:10px 10px 10px 20px; border-radius:18px; border:1px solid var(--hair-s); background:var(--panel); backdrop-filter:blur(10px);">
+        <div style="width:34px; height:34px; border-radius:50%; flex:none; background:linear-gradient(135deg,#9B7BFF,#57E0E0); display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:13px; color:#06060f;">YOU</div>
+        <input data-comment-input="" maxlength="140" placeholder="Send a transmission to the landing crew…" style="flex:1; font-family:'Manrope',sans-serif; font-size:14.5px; color:var(--ink); background:transparent; border:none; outline:none;">
+        <button type="submit" style="cursor:pointer; font-family:'Manrope',sans-serif; font-size:13.5px; font-weight:600; color:#06060f; padding:11px 22px; border-radius:12px; border:none; background:linear-gradient(120deg,#9B7BFF,#5B8DEF);">Post</button>
+      </form>
+    </div>
+
+    <!-- live posts (newest prepended here) -->
+    <div ref="{{ liveRef }}" style="max-width:720px; margin:0 auto 26px; display:flex; flex-direction:column; gap:12px;"></div>
+
+    <!-- auto-scrolling marquee wall -->
+    <div style="position:relative; height:360px; overflow:hidden; -webkit-mask-image:linear-gradient(180deg, transparent, #000 12%, #000 88%, transparent); mask-image:linear-gradient(180deg, transparent, #000 12%, #000 88%, transparent);">
+      <div style="position:absolute; inset:0; display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+        <div ref="{{ colARef }}" style="display:flex; flex-direction:column; gap:14px; animation:marqueeUp 34s linear infinite;"></div>
+        <div ref="{{ colBRef }}" style="display:flex; flex-direction:column; gap:14px; animation:marqueeUp 44s linear infinite reverse;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA ===== -->
+  <section id="cta" style="position:relative; z-index:1; max-width:1100px; margin:0 auto; padding:clamp(20px,4vh,40px) clamp(20px,5vw,56px) clamp(70px,11vh,130px);">
+    <div data-reveal="" data-surface="accent" style="position:relative; border-radius:32px; overflow:hidden; padding:clamp(44px,7vw,90px) clamp(28px,5vw,60px); text-align:center; border:1px solid var(--hair-s); background:linear-gradient(135deg, rgba(155,123,255,.16), rgba(87,224,224,.08));">
+      <div style="position:absolute; inset:0; background:radial-gradient(circle at 50% 120%, rgba(91,141,239,.4), transparent 60%);"></div>
+      <div style="position:relative;">
+        <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(32px,5vw,64px); line-height:1.02; letter-spacing:-.025em; margin:0 0 22px;">Build research<br>that's already wanted.</h2>
+        <p style="font-size:17px; line-height:1.6; color:var(--ink-soft); max-width:520px; margin:0 auto 36px;">Join the researchers and journals turning the order of science around — in the open, with reasoning at every step.</p>
+        <div style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center;">
+          <a href="#" style="text-decoration:none; font-size:15px; font-weight:600; color:#06060f; padding:16px 34px; border-radius:999px; background:linear-gradient(120deg,#fff,#D6E4FF); box-shadow:0 14px 40px rgba(255,255,255,.18);">Request early access</a>
+          <a href="#" style="text-decoration:none; font-size:15px; font-weight:600; color:var(--ink); padding:16px 32px; border-radius:999px; border:1px solid rgba(255,255,255,.22); background:var(--panel-s);">For journals &amp; boards</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer style="position:relative; z-index:1; border-top:1px solid var(--hair); padding:40px clamp(20px,5vw,56px); max-width:1240px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;">
+    <div style="display:flex; align-items:center; gap:11px;">
+      <svg width="24" height="24" viewBox="0 0 30 30" fill="none"><line x1="6" y1="24" x2="18" y2="4" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round"></line><line x1="13" y1="26" x2="25" y2="6" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round"></line></svg>
+      <span style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15px; letter-spacing:.14em;">PARALLED</span>
+    </div>
+    <div style="font-size:13px; color:var(--ink-faint); font-family:'JetBrains Mono',monospace;">A demand-driven research ecosystem · visible reasoning, everywhere</div>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280},&quot;animations&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;starfield&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;parallax&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { mode: 'paralled', theme: 'dark' };
+
+  showToday = () => this.setState({ mode: 'today' });
+  showParalled = () => this.setState({ mode: 'paralled' });
+
+  setDark = () => this.switchTheme('dark');
+  setLight = () => this.switchTheme('light');
+  setAlien = () => this.switchTheme('alien');
+  switchTheme(t) { if (this.state.theme === t) return; this.setState({ theme: t }); this.applyTheme(t); }
+
+  applyTheme(tArg) {
+    const t = tArg || this.state.theme;
+    this._theme = t;
+    if (this.root) this.root.dataset.theme = t;
+    try { document.documentElement.dataset.theme = t; } catch (e) {}
+    if (this.aurora) {
+      this.aurora.style.opacity = t === 'light' ? '0' : (t === 'alien' ? '0.4' : '1');
+      this.aurora.style.filter = t === 'alien' ? 'hue-rotate(125deg) saturate(1.25)' : 'none';
+    }
+    const surf = {
+      deep: { dark: 'linear-gradient(135deg, rgba(15,13,34,.9), rgba(8,8,20,.6))', light: 'linear-gradient(135deg, rgba(255,255,255,.84), rgba(214,233,255,.72))', alien: 'linear-gradient(135deg, rgba(14,40,54,.72), rgba(28,16,60,.62))' },
+      mid: { dark: 'linear-gradient(135deg, rgba(20,16,44,.7), rgba(8,10,26,.5))', light: 'linear-gradient(135deg, rgba(255,255,255,.74), rgba(206,228,255,.62))', alien: 'linear-gradient(135deg, rgba(18,48,60,.55), rgba(30,18,60,.52))' },
+      accent: { dark: 'linear-gradient(135deg, rgba(155,123,255,.16), rgba(87,224,224,.08))', light: 'linear-gradient(135deg, rgba(120,90,230,.14), rgba(40,140,200,.12))', alien: 'linear-gradient(135deg, rgba(110,255,225,.14), rgba(150,130,255,.16))' }
+    };
+    if (this.root) this.root.querySelectorAll('[data-surface]').forEach(el => { const k = el.getAttribute('data-surface'); if (surf[k]) el.style.background = surf[k][t]; });
+    if (this._rebuildScene) { this._rebuildScene(); if (!this.animOn && this._renderOnce) this._renderOnce(); }
+    if (this.ship) { this.ship.style.display = (t === 'light' || t === 'alien') ? 'none' : 'block'; }
+    if (this._onShipScroll) this._onShipScroll();
+  }
+
+  buildOrrery() {
+    const layer = this.planetLayer;
+    if (!layer || layer.dataset.built) return;
+    layer.dataset.built = '1';
+    // [angleDeg, radius% of stage half] per planet, color-matched to each page
+    const planets = [
+      { label: 'Studies',    href: 'Studies.dc.html',    c1: '#bcc4ff', c2: '#5b8def', glow: '124,140,255', a: -90,  r: 26, sz: 11 },
+      { label: 'Journals',   href: 'Journal.dc.html',    c1: '#d9c8ff', c2: '#7a4fd6', glow: '155,123,255', a: 150,  r: 26, sz: 10 },
+      { label: 'Discovery',  href: 'Discovery.dc.html',  c1: '#ffe0b0', c2: '#e8633a', glow: '245,168,90',  a: 30,   r: 26, sz: 10 },
+      { label: 'Neural Hub', href: 'Neural Hub.dc.html', c1: '#e3ccff', c2: '#7c5fd6', glow: '199,154,240', a: -28,  r: 37, sz: 13 },
+      { label: 'Canvas',     href: 'Canvas.dc.html',     c1: '#ffc8e6', c2: '#d44b96', glow: '241,120,182', a: 92,   r: 37, sz: 11 },
+      { label: 'Loom',       href: 'Loom.dc.html',       c1: '#c4f0cf', c2: '#3a8e5a', glow: '95,196,125',  a: 208,  r: 37, sz: 12 },
+      { label: 'Synthesis',  href: 'Synthesis.dc.html',  c1: '#aef6ec', c2: '#1f8a7e', glow: '56,200,180',  a: -64,  r: 48, sz: 12 },
+      { label: 'Forge',      href: 'Forge.dc.html',      c1: '#ffce9e', c2: '#c8431f', glow: '255,140,70',   a: 132,  r: 48, sz: 12 },
+      { label: 'Relax',      href: 'Relax.dc.html',      c1: '#bdf3ee', c2: '#2f9e9e', glow: '87,224,224',   a: 244,  r: 48, sz: 11 }
+    ];
+    planets.forEach((p, i) => {
+      const rad = p.a * Math.PI / 180;
+      const left = (50 + p.r * Math.cos(rad)).toFixed(2);
+      const top = (50 + p.r * Math.sin(rad)).toFixed(2);
+      const a = document.createElement('a');
+      a.href = p.href;
+      a.title = p.label;
+      a.style.cssText = 'position:absolute; left:' + left + '%; top:' + top + '%; transform:translate(-50%,-50%); width:' + p.sz + '%; aspect-ratio:1/1; border-radius:50%; text-decoration:none; display:grid; place-items:center; background:radial-gradient(circle at 36% 30%, ' + p.c1 + ', ' + p.c2 + ' 64%, rgba(0,0,0,.55)); box-shadow:0 0 26px 3px rgba(' + p.glow + ',.5), inset -5px -4px 12px rgba(0,0,0,.45); animation:planetBob ' + (7 + i * 0.7).toFixed(1) + 's ease-in-out ' + (i * 0.4).toFixed(1) + 's infinite; transition:box-shadow .3s, transform .3s; z-index:2;';
+      // label chip
+      const lab = document.createElement('span');
+      lab.textContent = p.label;
+      lab.style.cssText = 'position:absolute; top:106%; left:50%; transform:translateX(-50%); white-space:nowrap; font-family:\'JetBrains Mono\',monospace; font-size:10px; letter-spacing:.08em; color:rgba(236,234,245,.55); pointer-events:none; transition:color .3s, opacity .3s;';
+      a.appendChild(lab);
+      a.addEventListener('mouseenter', () => {
+        a.style.boxShadow = '0 0 40px 8px rgba(' + p.glow + ',.85), inset -5px -4px 12px rgba(0,0,0,.45)';
+        a.style.transform = 'translate(-50%,-50%) scale(1.18)';
+        lab.style.color = '#fff';
+      });
+      a.addEventListener('mouseleave', () => {
+        a.style.boxShadow = '0 0 26px 3px rgba(' + p.glow + ',.5), inset -5px -4px 12px rgba(0,0,0,.45)';
+        a.style.transform = 'translate(-50%,-50%) scale(1)';
+        lab.style.color = 'rgba(236,234,245,.55)';
+      });
+      layer.appendChild(a);
+    });
+  }
+
+  buildDeepField() {
+    const el = this.starsEl;
+    if (!el || el.dataset.built) return;
+    el.dataset.built = '1';
+    let html = '';
+    for (let i = 0; i < 60; i++) {
+      const x = (Math.random() * 100).toFixed(2);
+      const y = (Math.random() * 100).toFixed(2);
+      const s = (Math.random() * 1.6 + 0.5).toFixed(2);
+      const dur = (2 + Math.random() * 4).toFixed(2);
+      const del = (Math.random() * 4).toFixed(2);
+      const c = Math.random() < 0.8 ? '255,255,255' : '180,200,255';
+      html += '<span style="position:absolute; left:' + x + '%; top:' + y + '%; width:' + s + 'px; height:' + s + 'px; border-radius:50%; background:rgba(' + c + ',.9); box-shadow:0 0 5px rgba(' + c + ',.7); animation:twinkleStar ' + dur + 's ease-in-out ' + del + 's infinite;"></span>';
+    }
+    el.innerHTML = html;
+  }
+
+  componentDidMount() {
+    this._timers = [];
+    this._rafs = [];
+    this.setupReveals();
+    if (this.props.starfield !== false) this.setupStarfield();
+    if (this.props.parallax !== false) this.setupParallax();
+    this.setupShip();
+    this.setupAlien();
+    this.buildOrrery();
+    this.buildDeepField();
+    this.setupQuotes();
+    this.setupTransmissions();
+    this.setupLanding();
+    this.setupCommunity();
+    this.setupTilt();
+    this.applyTheme();
+  }
+
+  componentWillUnmount() {
+    if (this._raf) cancelAnimationFrame(this._raf);
+    (this._rafs || []).forEach(r => cancelAnimationFrame(r));
+    (this._timers || []).forEach(t => clearInterval(t));
+    if (this._io) this._io.disconnect();
+    if (this._onScroll) window.removeEventListener('scroll', this._onScroll);
+    if (this._safety) clearTimeout(this._safety);
+    if (this._onMove) window.removeEventListener('mousemove', this._onMove);
+    if (this._onResize) window.removeEventListener('resize', this._onResize);
+    if (this._onShipScroll) { window.removeEventListener('scroll', this._onShipScroll); window.removeEventListener('resize', this._onShipScroll); }
+    if (this._glyphT) clearTimeout(this._glyphT);
+    if (this._actx) { try { this._actx.close(); } catch (e) {} }
+  }
+
+  get animOn() {
+    return this.props.animations !== false && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  // ===== ROTATING QUOTES =====
+  setupQuotes() {
+    const t = this.quoteText, a = this.quoteAuthor;
+    if (!t || !a) return;
+    const quotes = [
+      ['A civilization is measured by the questions it dares to make public.', '— TRANSMISSION FRAGMENT · ORIGIN UNKNOWN'],
+      ['Reasoning left in the open cannot be quietly overruled.', '— DRIFT-7 · OPEN BOARD OF NINE STARS'],
+      ['Demand declared is a promise. We only build what was asked, in the light.', '— THE CULTIVATORS · ORBIT 04'],
+      ['Easy work, done honestly, is not lesser work. Depth is a choice, not a verdict.', '— ARCHIVE OF THE PATIENT MINDS'],
+      ['When the investigator shows its reasoning, fear stops shaping the science.', '— FIRST-CONTACT ETHICS GATE']
+    ];
+    let i = 0;
+    const tick = () => {
+      i = (i + 1) % quotes.length;
+      t.style.opacity = '0'; t.style.transform = 'translateY(12px)'; a.style.opacity = '0';
+      setTimeout(() => {
+        t.textContent = quotes[i][0];
+        a.textContent = quotes[i][1];
+        t.style.opacity = '1'; t.style.transform = 'translateY(0)'; a.style.opacity = '1';
+      }, 600);
+    };
+    if (this.animOn) this._timers.push(setInterval(tick, 6000));
+  }
+
+  // ===== ALIEN VOICE SYNTH =====
+  ensureAudio() {
+    if (!this._actx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      this._actx = new AC();
+    }
+    if (this._actx.state === 'suspended') this._actx.resume();
+    return this._actx;
+  }
+
+  alienSpeak(voice) {
+    const ctx = this.ensureAudio();
+    if (!ctx) return 2.5;
+    const now = ctx.currentTime;
+    const master = ctx.createGain();
+    master.gain.value = 0.0001;
+    master.connect(ctx.destination);
+    master.gain.setValueAtTime(0.18, now);
+    const profiles = [
+      { wave: 'sawtooth', base: 200, spread: 240, syl: 9, rate: 0.16, fcen: 900 },
+      { wave: 'square', base: 150, spread: 180, syl: 7, rate: 0.18, fcen: 1300 },
+      { wave: 'triangle', base: 280, spread: 320, syl: 11, rate: 0.13, fcen: 1700 }
+    ];
+    const p = profiles[voice % profiles.length];
+    let t = now;
+    for (let s = 0; s < p.syl; s++) {
+      const dur = p.rate * (0.7 + Math.random() * 0.8);
+      const osc = ctx.createOscillator();
+      osc.type = p.wave;
+      const f0 = p.base + Math.random() * p.spread;
+      const f1 = f0 * (0.6 + Math.random() * 0.9);
+      osc.frequency.setValueAtTime(f0, t);
+      osc.frequency.exponentialRampToValueAtTime(Math.max(60, f1), t + dur);
+      // vibrato
+      const lfo = ctx.createOscillator();
+      const lfoG = ctx.createGain();
+      lfo.frequency.value = 14 + Math.random() * 22;
+      lfoG.gain.value = f0 * 0.18;
+      lfo.connect(lfoG); lfoG.connect(osc.frequency);
+      // formant filter
+      const bp = ctx.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.value = p.fcen + Math.random() * 600;
+      bp.Q.value = 6;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.9, t + dur * 0.25);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      osc.connect(bp); bp.connect(g); g.connect(master);
+      osc.start(t); lfo.start(t);
+      osc.stop(t + dur + 0.02); lfo.stop(t + dur + 0.02);
+      t += dur + Math.random() * 0.05;
+    }
+    master.gain.setValueAtTime(0.18, t - 0.1);
+    master.gain.exponentialRampToValueAtTime(0.0001, t + 0.1);
+    return t - now;
+  }
+
+  // ===== TRANSMISSIONS (oscilloscope + play + decrypt) =====
+  setupTransmissions() {
+    const tx = this.tx;
+    if (!tx) return;
+    const colorOf = (i) => ['155,123,255', '87,224,224', '241,120,182'][i] || '155,123,255';
+    // idle oscilloscope draw for non-encrypted
+    tx.querySelectorAll('canvas[data-osc]').forEach(cv => {
+      const i = +cv.getAttribute('data-osc');
+      this.drawScope(cv, colorOf(i), () => this._playing === i, () => this._playStart);
+    });
+    tx.querySelectorAll('button[data-play]').forEach(btn => {
+      const i = +btn.getAttribute('data-play');
+      btn.addEventListener('click', () => {
+        if (this._playing === i) return;
+        this._playing = i;
+        this._playStart = performance.now();
+        const dur = this.alienSpeak(i);
+        const icon = tx.querySelector('[data-icon="' + i + '"]');
+        const txt = tx.querySelector('[data-txt="' + i + '"]');
+        const wave = tx.querySelector('[data-wave="' + i + '"]');
+        if (icon) icon.textContent = '⏸';
+        if (txt) txt.textContent = 'Receiving…';
+        if (wave) { wave.style.opacity = '1'; Array.from(wave.children).forEach((b, k) => { b.style.animation = 'waveBar ' + (0.5 + k * 0.07) + 's ease-in-out infinite ' + (k * 0.05) + 's'; }); }
+        clearTimeout(this._playEnd);
+        this._playEnd = setTimeout(() => {
+          this._playing = -1;
+          if (icon) icon.textContent = '▶';
+          if (txt) txt.textContent = 'Play transmission';
+          if (wave) { wave.style.opacity = '.4'; Array.from(wave.children).forEach(b => b.style.animation = 'none'); }
+        }, dur * 1000 + 120);
+      });
+    });
+    // decrypt -> reveal hidden video canvas loop
+    tx.querySelectorAll('button[data-decrypt]').forEach(btn => {
+      const i = +btn.getAttribute('data-decrypt');
+      btn.addEventListener('click', () => {
+        const lock = tx.querySelector('[data-lock="' + i + '"]');
+        const cv = tx.querySelector('canvas[data-video="' + i + '"]');
+        const dtxt = tx.querySelector('[data-dtxt="' + i + '"]');
+        const vtitle = tx.querySelector('[data-vtitle="' + i + '"]');
+        if (lock) { lock.style.transition = 'opacity .6s'; lock.style.opacity = '0'; setTimeout(() => lock.style.display = 'none', 600); }
+        if (cv) { cv.style.opacity = '1'; this.drawAlienVideo(cv); }
+        if (vtitle) vtitle.textContent = 'Researcher #0 logs a falsification it could not rule out';
+        if (dtxt) dtxt.textContent = 'Decrypted ✓';
+        btn.style.background = 'var(--hair)';
+        btn.style.color = 'var(--ink)';
+        // a short alien murmur on decrypt
+        this.alienSpeak(2);
+      });
+    });
+  }
+
+  drawScope(cv, rgb, isActive, getStart) {
+    const ctx = cv.getContext('2d');
+    const W = cv.width, H = cv.height;
+    const loop = () => {
+      ctx.clearRect(0, 0, W, H);
+      const active = isActive();
+      const tNow = performance.now() / 1000;
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(' + rgb + ',' + (active ? 0.95 : 0.3) + ')';
+      ctx.shadowBlur = active ? 12 : 0;
+      ctx.shadowColor = 'rgba(' + rgb + ',.8)';
+      ctx.beginPath();
+      for (let x = 0; x <= W; x += 4) {
+        const ph = x / W * Math.PI * (active ? 10 : 6) + tNow * (active ? 7 : 2);
+        const amp = active ? (0.30 + Math.random() * 0.12) : 0.12;
+        const env = active ? (0.6 + 0.4 * Math.sin(x / W * Math.PI)) : 1;
+        const y = H / 2 + Math.sin(ph) * H * amp * env + (active ? (Math.random() - 0.5) * 6 : 0);
+        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      const r = requestAnimationFrame(loop);
+      this._rafs.push(r);
+      if (this._rafs.length > 400) this._rafs.splice(0, 200);
+    };
+    if (this.animOn) loop(); else { ctx.strokeStyle = 'rgba(' + rgb + ',.4)'; ctx.beginPath(); ctx.moveTo(0, H / 2); ctx.lineTo(W, H / 2); ctx.stroke(); }
+  }
+
+  drawAlienVideo(cv) {
+    const ctx = cv.getContext('2d');
+    const W = cv.width, H = cv.height;
+    const glyphs = '∮⟁⟟⌖⏚⎔◌⟁⊹∷⋔⌬';
+    const cols = Math.floor(W / 14);
+    const drops = Array.from({ length: cols }, () => Math.random() * H);
+    const loop = () => {
+      ctx.fillStyle = 'rgba(6,6,17,.35)';
+      ctx.fillRect(0, 0, W, H);
+      // falling glyph rain
+      ctx.font = '14px monospace';
+      for (let i = 0; i < cols; i++) {
+        ctx.fillStyle = 'rgba(241,120,182,' + (0.25 + Math.random() * 0.5) + ')';
+        ctx.fillText(glyphs[(Math.random() * glyphs.length) | 0], i * 14, drops[i]);
+        drops[i] += 6 + Math.random() * 6;
+        if (drops[i] > H) drops[i] = -10;
+      }
+      // alien silhouette at console
+      const t = performance.now() / 1000;
+      ctx.save();
+      ctx.translate(W / 2, H * 0.62);
+      ctx.fillStyle = 'rgba(10,8,22,.9)';
+      ctx.beginPath(); ctx.ellipse(0, -38 + Math.sin(t * 1.5) * 2, 26, 32, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(-34, 36); ctx.quadraticCurveTo(0, -14, 34, 36); ctx.fill();
+      ctx.fillStyle = 'rgba(87,224,224,.9)';
+      ctx.beginPath(); ctx.ellipse(-9, -42, 5, 8, 0.5, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(9, -42, 5, 8, -0.5, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+      const r = requestAnimationFrame(loop);
+      this._rafs.push(r);
+      if (this._rafs.length > 400) this._rafs.splice(0, 200);
+    };
+    if (this.animOn) loop(); else { ctx.fillStyle = '#0a0816'; ctx.fillRect(0, 0, W, H); }
+  }
+
+  // ===== TILT 3D =====
+  setupTilt() {
+    if (!this.animOn) return;
+    (this.root ? this.root.querySelectorAll('[data-tilt]') : []).forEach(el => {
+      el.addEventListener('mousemove', (e) => {
+        const r = el.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5;
+        const py = (e.clientY - r.top) / r.height - 0.5;
+        el.style.transform = 'perspective(900px) rotateX(' + (-py * 9) + 'deg) rotateY(' + (px * 11) + 'deg) translateZ(8px)';
+      });
+      el.addEventListener('mouseleave', () => { el.style.transform = 'perspective(900px) rotateX(0) rotateY(0)'; });
+    });
+  }
+
+  // ===== LANDING: countdown + planet + notify =====
+  setupLanding() {
+    const root = this.root;
+    if (!root) return;
+    const target = Date.parse('2026-08-15T12:00:00Z');
+    const cd = {
+      d: root.querySelector('[data-cd="d"]'),
+      h: root.querySelector('[data-cd="h"]'),
+      m: root.querySelector('[data-cd="m"]'),
+      s: root.querySelector('[data-cd="s"]')
+    };
+    const pad = (n) => String(n).padStart(2, '0');
+    const tick = () => {
+      let diff = Math.max(0, target - Date.now());
+      const d = Math.floor(diff / 86400000); diff -= d * 86400000;
+      const h = Math.floor(diff / 3600000); diff -= h * 3600000;
+      const m = Math.floor(diff / 60000); diff -= m * 60000;
+      const s = Math.floor(diff / 1000);
+      if (cd.d) cd.d.textContent = pad(d);
+      if (cd.h) cd.h.textContent = pad(h);
+      if (cd.m) cd.m.textContent = pad(m);
+      if (cd.s) cd.s.textContent = pad(s);
+    };
+    tick();
+    this._timers.push(setInterval(tick, 1000));
+
+    // notify form
+    const form = root.querySelector('form[data-notify]');
+    if (form) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const ok = root.querySelector('[data-notify-ok]');
+        const input = root.querySelector('[data-email]');
+        if (input && !input.value) return;
+        form.style.display = 'none';
+        if (ok) ok.style.display = 'block';
+      });
+    }
+
+    // planet civilization canvas
+    const cv = root.querySelector('canvas[data-planet]');
+    if (cv) this.drawPlanet(cv);
+  }
+
+  drawPlanet(cv) {
+    const ctx = cv.getContext('2d');
+    const W = cv.width, H = cv.height, R = W * 0.42, cx = W / 2, cy = H / 2;
+    // generate lights on sphere
+    const N = 520;
+    const lights = [];
+    for (let i = 0; i < N; i++) {
+      const u = Math.random(), v = Math.random();
+      const theta = 2 * Math.PI * u;
+      const phi = Math.acos(2 * v - 1);
+      const palette = ['255,214,160', '120,224,224', '198,182,255', '241,170,210'];
+      lights.push({ theta, phi, born: Math.random(), c: palette[(Math.random() * palette.length) | 0], tw: Math.random() * 6.28 });
+    }
+    const start = performance.now();
+    const loop = () => {
+      const elapsed = (performance.now() - start) / 1000;
+      const grown = Math.min(1, elapsed / 22); // civilization blooms over ~22s
+      const rot = elapsed * 0.18;
+      ctx.clearRect(0, 0, W, H);
+      // ocean base
+      const grad = ctx.createRadialGradient(cx - R * 0.3, cy - R * 0.3, R * 0.2, cx, cy, R);
+      grad.addColorStop(0, '#1a2350');
+      grad.addColorStop(0.6, '#0e1330');
+      grad.addColorStop(1, '#070a1c');
+      ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fillStyle = grad; ctx.fill();
+      // lights
+      for (const L of lights) {
+        if (L.born > grown) continue;
+        const x3 = Math.sin(L.phi) * Math.cos(L.theta + rot);
+        const y3 = Math.cos(L.phi);
+        const z3 = Math.sin(L.phi) * Math.sin(L.theta + rot);
+        if (z3 < 0) continue; // back hemisphere
+        const px = cx + x3 * R;
+        const py = cy + y3 * R;
+        L.tw += 0.05;
+        const a = (0.4 + 0.6 * z3) * (0.6 + 0.4 * Math.sin(L.tw));
+        const sz = 1 + z3 * 1.6;
+        ctx.beginPath(); ctx.arc(px, py, sz, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(' + L.c + ',' + a.toFixed(2) + ')';
+        ctx.shadowBlur = 6; ctx.shadowColor = 'rgba(' + L.c + ',.9)';
+        ctx.fill();
+      }
+      ctx.shadowBlur = 0;
+      // atmosphere rim
+      ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(123,143,255,.5)'; ctx.lineWidth = 2; ctx.stroke();
+      const r = requestAnimationFrame(loop);
+      this._rafs.push(r);
+      if (this._rafs.length > 400) this._rafs.splice(0, 200);
+    };
+    if (this.animOn) loop(); else { ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fillStyle = '#0e1330'; ctx.fill(); }
+  }
+
+  // ===== COMMUNITY WALL =====
+  setupCommunity() {
+    const seed = [
+      { who: 'Dr. Imani O.', role: 'Neuroscience · open board', tag: '155,123,255', text: 'Demand-first means I stop guessing what reviewers want. They just say it. Revolutionary.' },
+      { who: 'Kepler-AI', role: 'co-investigator', tag: '87,224,224', text: 'Every veto I issue must carry its reasoning. As it should be.' },
+      { who: 'Prof. L. Vance', role: 'Journal of Open Methods', tag: '91,141,239', text: 'We posted a call Tuesday. Three rigorous claims by Friday. The order really does matter.' },
+      { who: 'Sora N.', role: 'PhD candidate', tag: '241,120,182', text: 'Easy tier let me publish a clean baseline without shame. Depth is a choice here.' },
+      { who: 'The Cultivators', role: 'orbit 04', tag: '120,224,224', text: 'We have been watching. Open reasoning is how a civilization earns trust. Land soon.' },
+      { who: 'R. Mendez', role: 'Reproducibility lead', tag: '198,182,255', text: 'Anonymous in identity, never in reasoning — finally an oversight model I trust.' },
+      { who: 'Aiko T.', role: 'Synthesis editor', tag: '87,224,224', text: 'The breadth lens flagged three missing studies before we even opened a call.' },
+      { who: 'Field Unit 9', role: 'recon', tag: '241,170,210', text: 'Signal strength rising. The manifest is filling. We are nearly ready to descend.' }
+    ];
+    const colA = this.colA, colB = this.colB, live = this.live;
+    const card = (c) => {
+      const el = document.createElement('div');
+      el.style.cssText = 'padding:16px 18px; border-radius:16px; border:1px solid rgba(' + c.tag + ',.22); background:linear-gradient(160deg, rgba(' + c.tag + ',.08), var(--panel)); backdrop-filter:blur(6px);';
+      el.innerHTML =
+        '<div style="display:flex; align-items:center; gap:10px; margin-bottom:9px;">' +
+          '<div style="width:30px;height:30px;border-radius:50%;flex:none;background:linear-gradient(135deg,rgba(' + c.tag + ',1),rgba(255,255,255,.4));display:flex;align-items:center;justify-content:center;font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:11px;color:#06060f;">' + c.who.replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase() + '</div>' +
+          '<div><div style="font-family:\'Space Grotesk\',sans-serif;font-size:13.5px;font-weight:600;color:var(--ink);">' + c.who + '</div>' +
+          '<div style="font-family:\'JetBrains Mono\',monospace;font-size:10px;letter-spacing:.06em;color:rgba(' + c.tag + ',.9);">' + c.role + '</div></div>' +
+        '</div>' +
+        '<div style="font-size:13.5px;line-height:1.5;color:var(--ink-soft);">' + c.text + '</div>';
+      return el;
+    };
+    // fill marquee columns (doubled for seamless loop)
+    const half = seed.slice(0, 4), other = seed.slice(4);
+    const fill = (col, items) => {
+      if (!col) return;
+      [...items, ...items].forEach(c => col.appendChild(card(c)));
+    };
+    fill(colA, half);
+    fill(colB, other);
+    if (!this.animOn) {
+      [colA, colB].forEach(c => { if (c) c.style.animation = 'none'; });
+    }
+
+    // composer -> prepend to live
+    const form = this.root && this.root.querySelector('form[data-comment-form]');
+    const input = this.root && this.root.querySelector('[data-comment-input]');
+    if (form && input && live) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const val = input.value.trim();
+        if (!val) return;
+        const el = card({ who: 'You', role: 'just now · live', tag: '155,123,255', text: val });
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(-10px)';
+        el.style.transition = 'opacity .5s, transform .5s';
+        live.insertBefore(el, live.firstChild);
+        requestAnimationFrame(() => { el.style.opacity = '1'; el.style.transform = 'translateY(0)'; });
+        input.value = '';
+      });
+    }
+  }
+
+  setupReveals() {
+    const root = this.root;
+    if (!root) return;
+    const els = Array.from(root.querySelectorAll('[data-reveal]'));
+    const animate = this.props.animations !== false && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!animate || !('IntersectionObserver' in window)) {
+      els.forEach(el => { el.style.opacity = '1'; el.style.transform = 'none'; });
+      return;
+    }
+    els.forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(30px)';
+      el.style.transition = 'opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1)';
+    });
+    const reveal = (el) => {
+      if (el.dataset.revealed) return;
+      el.dataset.revealed = '1';
+      const d = parseInt(el.getAttribute('data-reveal-delay') || '0', 10);
+      setTimeout(() => { el.style.opacity = '1'; el.style.transform = 'none'; }, d);
+    };
+    const inView = (el) => {
+      const r = el.getBoundingClientRect();
+      return r.top < (window.innerHeight || document.documentElement.clientHeight) * 0.94 && r.bottom > 0;
+    };
+    // Reveal anything already in the initial viewport right away.
+    els.forEach(el => { if (inView(el)) reveal(el); });
+    this._io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { reveal(e.target); this._io.unobserve(e.target); } });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    els.forEach(el => this._io.observe(el));
+    // Fallback: scroll-driven check in case IO callbacks don't fire in this context.
+    this._onScroll = () => { els.forEach(el => { if (!el.dataset.revealed && inView(el)) reveal(el); }); };
+    window.addEventListener('scroll', this._onScroll, { passive: true });
+    // Safety net: hard-snap anything still hidden (no transition dependency).
+    this._safety = setTimeout(() => {
+      els.forEach(el => {
+        el.dataset.revealed = '1';
+        el.style.transition = 'none';
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+      });
+    }, 1400);
+
+    // card hover glow
+    root.querySelectorAll('[data-card]').forEach(c => {
+      c.addEventListener('mouseenter', () => { c.style.transform = 'translateY(-6px)'; c.style.borderColor = 'rgba(155,123,255,.45)'; c.style.background = 'rgba(155,123,255,.06)'; });
+      c.addEventListener('mouseleave', () => { c.style.transform = 'none'; c.style.borderColor = 'var(--hair)'; c.style.background = 'var(--panel)'; });
+    });
+  }
+
+  setupParallax() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const orbit = this.orbit;
+    if (!orbit) return;
+    this._onMove = (e) => {
+      const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+      const dx = (e.clientX - cx) / cx, dy = (e.clientY - cy) / cy;
+      orbit.style.transform = 'translate(' + (dx * 18) + 'px,' + (dy * 18) + 'px) rotateX(' + (-dy * 6) + 'deg) rotateY(' + (dx * 6) + 'deg)';
+    };
+    window.addEventListener('mousemove', this._onMove);
+  }
+
+  setupStarfield() {
+    const canvas = this.canvas;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    this._theme = this.state.theme || 'dark';
+    const COLS = ['255,255,255','198,182,255','120,224,224','241,170,210','130,160,255'];
+    let w = 0, h = 0;
+    const A = this._scene = {};
+
+    const mkShip = () => { const dir = Math.random()<.5?1:-1; return { x: dir>0?-40:w+40, y: h*(0.12+Math.random()*0.76), dir, v: 1.6+Math.random()*2.4, c: COLS[1+(Math.random()*4|0)], len: 32+Math.random()*44 }; };
+    const mkShoot = () => { const a = Math.PI*(0.13+Math.random()*0.22); return { x: Math.random()*w, y: Math.random()*h*0.5, vx: Math.cos(a)*9, vy: Math.sin(a)*9, life: 1 }; };
+    const mkCloud = (rand) => { const depth=0.4+Math.random()*0.8; const cw=130+Math.random()*240; return { x: rand?Math.random()*w:-cw, y: h*(0.06+Math.random()*0.52), w: cw, h: cw*0.5, v:(0.18+Math.random()*0.4)*depth, depth, a: Math.min(1,0.55*depth+0.25) }; };
+    const mkFleet = () => { const dir=Math.random()<.5?1:-1; return { x: dir>0?-60:w+60, y: h*(0.1+Math.random()*0.42), dir, v:0.6+Math.random()*1.6, s:0.6+Math.random()*0.9, c: Math.random()<.5?'120,255,225':'150,130,255' }; };
+
+    const buildCosmos = () => {
+      A.layers = [0.2,0.5,1].map((depth,li) => {
+        const div = li===0?7000:li===1?12000:20000;
+        const n = Math.min(li===2?70:240, Math.round(w*h/div));
+        const arr = [];
+        for (let i=0;i<n;i++) arr.push({ x:Math.random()*w, y:Math.random()*h, r:Math.random()*(li===2?1.9:1.0)+0.3, tw:Math.random()*6.28, ts:Math.random()*0.03+0.004, c:COLS[Math.random()<0.8?0:1+(Math.random()*4|0)] });
+        return { depth, stars:arr };
+      });
+      const gpal = [['155,123,255','87,224,224'],['91,141,239','241,120,182'],['87,224,224','198,182,255']];
+      A.galaxies = [];
+      const gc = w<700?2:3;
+      for (let g=0;g<gc;g++){ const p=gpal[g%gpal.length]; const R=80+Math.random()*130; const arms=2+(Math.random()*2|0); const parts=[]; for(let i=0;i<150;i++){ const arm=i%arms; const rad=Math.pow(Math.random(),0.6)*R; const ang=arm*(6.28/arms)+rad*0.05+(Math.random()-0.5)*0.5; parts.push({rad,ang,sz:Math.random()*1.4+0.4,mix:Math.random()}); } A.galaxies.push({x:Math.random()*w,y:Math.random()*h,R,rot:Math.random()*6.28,vr:(Math.random()*0.0008+0.0003)*(Math.random()<.5?-1:1),tilt:0.35+Math.random()*0.3,c1:p[0],c2:p[1],parts}); }
+      const npal=['155,123,255','87,224,224','91,141,239','241,120,182'];
+      A.neb=[]; for(let i=0;i<4;i++) A.neb.push({x:Math.random()*w,y:Math.random()*h,R:180+Math.random()*240,c:npal[i%npal.length],ph:Math.random()*6.28,sp:0.0002+Math.random()*0.0003});
+      A.ships=[]; A.shoots=[];
+    };
+
+    const buildDay = () => {
+      A.clouds=[]; const nc=Math.max(6,Math.round(w/180)); for(let i=0;i<nc;i++) A.clouds.push(mkCloud(true));
+      A.birds=[]; for(let i=0;i<5;i++) A.birds.push({x:Math.random()*w,y:h*(0.12+Math.random()*0.26),v:0.3+Math.random()*0.6,ph:Math.random()*6.28,s:0.7+Math.random()*0.6});
+      A.pollen=[]; for(let i=0;i<70;i++) A.pollen.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.6+0.4,vx:(Math.random()-0.5)*0.25,vy:-(Math.random()*0.2+0.05),tw:Math.random()*6.28});
+    };
+
+    const buildAlien = () => {
+      // deep parallax starfield (drifts right -> left as we travel)
+      A.aStars=[]; const ns=Math.round(w*h/6500);
+      for(let i=0;i<ns;i++) A.aStars.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.4+0.3,tw:Math.random()*6.28,ts:Math.random()*0.04+0.01,d:0.25+Math.random()*1.1,c:Math.random()<0.7?'180,255,240':'190,170,255'});
+      // streaking fleet that flies past
+      A.fleet=[]; for(let i=0;i<5;i++) A.fleet.push(mkFleet());
+      // travel state
+      this._alienGrow=0; this._driftX=0; this._era=0; this._flash=0; this._eraShown=-1;
+    };
+
+    const build = () => {
+      w=canvas.clientWidth; h=canvas.clientHeight; canvas.width=w*dpr; canvas.height=h*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+      if(this._theme==='light') buildDay(); else if(this._theme==='alien') buildAlien(); else buildCosmos();
+    };
+    this._rebuildScene = build;
+
+    // ---------- COSMOS ----------
+    const drawCosmos = (now,dt,sc) => {
+      ctx.globalCompositeOperation='lighter';
+      for(const nb of A.neb){ nb.ph+=nb.sp*dt; const ny=((nb.y-sc*0.05)%(h+400)+(h+400))%(h+400)-200; const a=0.045+0.03*Math.sin(nb.ph); const gr=ctx.createRadialGradient(nb.x,ny,0,nb.x,ny,nb.R); gr.addColorStop(0,'rgba('+nb.c+','+a.toFixed(3)+')'); gr.addColorStop(1,'rgba('+nb.c+',0)'); ctx.fillStyle=gr; ctx.beginPath(); ctx.arc(nb.x,ny,nb.R,0,6.28); ctx.fill(); }
+      for(const G of A.galaxies){ if(this.animOn) G.rot+=G.vr*dt; const gy=((G.y-sc*0.12)%(h+600)+(h+600))%(h+600)-300; const cg=ctx.createRadialGradient(G.x,gy,0,G.x,gy,G.R*0.5); cg.addColorStop(0,'rgba(255,255,255,.45)'); cg.addColorStop(0.3,'rgba('+G.c1+',.3)'); cg.addColorStop(1,'rgba('+G.c1+',0)'); ctx.fillStyle=cg; ctx.beginPath(); ctx.arc(G.x,gy,G.R*0.5,0,6.28); ctx.fill(); for(const pt of G.parts){ const a=pt.ang+G.rot; const px=G.x+Math.cos(a)*pt.rad; const py=gy+Math.sin(a)*pt.rad*G.tilt; const col=pt.mix<0.5?G.c1:G.c2; const tw=0.5+0.5*Math.sin(now*0.003+pt.rad); ctx.fillStyle='rgba('+col+','+(0.5*tw).toFixed(2)+')'; ctx.beginPath(); ctx.arc(px,py,pt.sz,0,6.28); ctx.fill(); } }
+      for(const L of A.layers){ const off=sc*L.depth*0.25; for(const st of L.stars){ if(this.animOn) st.tw+=st.ts; const y=((st.y-off)%h+h)%h; const a=Math.max(0.05,Math.min(1,0.55+Math.sin(st.tw)*0.4)); ctx.fillStyle='rgba('+st.c+','+a.toFixed(2)+')'; ctx.beginPath(); ctx.arc(st.x,y,st.r,0,6.28); ctx.fill(); } }
+      if(this.animOn){ if(Math.random()<0.03) A.ships.push(mkShip()); if(Math.random()<0.012) A.shoots.push(mkShoot()); }
+      for(let i=A.ships.length-1;i>=0;i--){ const sp=A.ships[i]; if(this.animOn) sp.x+=sp.dir*sp.v*(dt/16); const tg=ctx.createLinearGradient(sp.x,sp.y,sp.x-sp.dir*sp.len,sp.y); tg.addColorStop(0,'rgba('+sp.c+',.9)'); tg.addColorStop(1,'rgba('+sp.c+',0)'); ctx.strokeStyle=tg; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(sp.x,sp.y); ctx.lineTo(sp.x-sp.dir*sp.len,sp.y); ctx.stroke(); ctx.fillStyle='rgba(255,255,255,.95)'; ctx.beginPath(); ctx.arc(sp.x,sp.y,1.8,0,6.28); ctx.fill(); if(sp.x<-70||sp.x>w+70) A.ships.splice(i,1); }
+      for(let i=A.shoots.length-1;i>=0;i--){ const st=A.shoots[i]; if(this.animOn){ st.x+=st.vx; st.y+=st.vy; st.life-=0.02; } const tg=ctx.createLinearGradient(st.x,st.y,st.x-st.vx*4,st.y-st.vy*4); tg.addColorStop(0,'rgba(255,255,255,'+Math.max(0,st.life).toFixed(2)+')'); tg.addColorStop(1,'rgba(120,224,224,0)'); ctx.strokeStyle=tg; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(st.x,st.y); ctx.lineTo(st.x-st.vx*4,st.y-st.vy*4); ctx.stroke(); if(st.life<=0) A.shoots.splice(i,1); }
+      ctx.globalCompositeOperation='source-over';
+    };
+
+    // ---------- DAYTIME EARTH ----------
+    const drawCloud = (c,sc) => { const y=c.y-sc*0.04*c.depth; const puffs=[[0,0,1],[-0.3,0.08,0.72],[0.3,0.06,0.76],[-0.15,-0.13,0.6],[0.17,-0.1,0.64]]; for(const pf of puffs){ const px=c.x+pf[0]*c.w, py=y+pf[1]*c.h, r=c.w*0.32*pf[2]; const g=ctx.createRadialGradient(px,py,0,px,py,r); g.addColorStop(0,'rgba(255,255,255,'+(0.92*c.a).toFixed(2)+')'); g.addColorStop(1,'rgba(255,255,255,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(px,py,r,0,6.28); ctx.fill(); } };
+    const drawDay = (now,dt,sc) => {
+      const g=ctx.createLinearGradient(0,0,0,h); g.addColorStop(0,'#6fb0f0'); g.addColorStop(0.5,'#a6d2fb'); g.addColorStop(1,'#e9f5ff'); ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+      const sx=w*0.82, sy=h*0.18-sc*0.03;
+      ctx.save(); ctx.translate(sx,sy); ctx.rotate(now*0.0001); for(let i=0;i<12;i++){ ctx.rotate(6.28/12); ctx.fillStyle='rgba(255,240,190,'+(0.05+0.04*Math.sin(now*0.002+i)).toFixed(3)+')'; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(70,-15); ctx.lineTo(380,0); ctx.lineTo(70,15); ctx.closePath(); ctx.fill(); } ctx.restore();
+      const sg=ctx.createRadialGradient(sx,sy,0,sx,sy,180); sg.addColorStop(0,'rgba(255,252,235,1)'); sg.addColorStop(0.3,'rgba(255,240,185,.85)'); sg.addColorStop(1,'rgba(255,240,185,0)'); ctx.fillStyle=sg; ctx.beginPath(); ctx.arc(sx,sy,180,0,6.28); ctx.fill();
+      ctx.fillStyle='rgba(255,253,244,1)'; ctx.beginPath(); ctx.arc(sx,sy,46,0,6.28); ctx.fill();
+      for(const c of A.clouds){ if(this.animOn) c.x+=c.v*(dt/16); if(c.x-c.w>w) Object.assign(c,mkCloud(false)); drawCloud(c,sc); }
+      ctx.strokeStyle='rgba(40,60,90,.45)'; ctx.lineWidth=1.6; for(const b of A.birds){ if(this.animOn){ b.x+=b.v*(dt/16); b.ph+=0.15; if(b.x>w+20){b.x=-20;b.y=h*(0.12+Math.random()*0.35);} } const fl=Math.sin(b.ph)*5*b.s; ctx.beginPath(); ctx.moveTo(b.x-7*b.s,b.y+fl); ctx.lineTo(b.x,b.y); ctx.lineTo(b.x+7*b.s,b.y+fl); ctx.stroke(); }
+      for(const p of A.pollen){ if(this.animOn){ p.x+=p.vx; p.y+=p.vy; p.tw+=0.05; if(p.y<-4){p.y=h+4;p.x=Math.random()*w;} } ctx.fillStyle='rgba(255,248,200,'+(0.25+0.3*Math.sin(p.tw)).toFixed(2)+')'; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,6.28); ctx.fill(); }
+      const hz=ctx.createLinearGradient(0,h*0.78,0,h); hz.addColorStop(0,'rgba(170,222,196,0)'); hz.addColorStop(1,'rgba(140,205,176,.55)'); ctx.fillStyle=hz; ctx.fillRect(0,h*0.78,w,h*0.22);
+    };
+
+    // ---------- ALIEN CIVILIZATION ----------
+    const ALIEN_BMP=['0011100','0111110','1111111','1211121','1111111','0111110','0101010','1100011'];
+    const drawPixelAlien = (x,y,s,color) => { const cols=7, rows=ALIEN_BMP.length; const ox=x-(cols*s)/2, oy=y-(rows*s); ctx.fillStyle='rgba('+color+',.16)'; ctx.fillRect(ox-2,oy-2,cols*s+4,rows*s+4); for(let r=0;r<rows;r++){ const line=ALIEN_BMP[r]; for(let c=0;c<cols;c++){ const v=line[c]; if(v==='0')continue; ctx.fillStyle = v==='2' ? 'rgba(8,16,16,.95)' : 'rgba('+color+',.95)'; ctx.fillRect(ox+c*s,oy+r*s,s,s); } } };
+    const drawFleet = (f,dt) => { const x=f.x,y=f.y,s=f.s; const tg=ctx.createLinearGradient(x,y,x-f.dir*42*s,y); tg.addColorStop(0,'rgba('+f.c+',.7)'); tg.addColorStop(1,'rgba('+f.c+',0)'); ctx.strokeStyle=tg; ctx.lineWidth=2*s; ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x-f.dir*42*s,y); ctx.stroke(); ctx.fillStyle='rgba(18,28,38,.95)'; ctx.beginPath(); ctx.ellipse(x,y,16*s,5*s,0,0,6.28); ctx.fill(); ctx.fillStyle='rgba('+f.c+',.85)'; ctx.beginPath(); ctx.ellipse(x,y-3*s,7*s,4*s,0,Math.PI,0); ctx.fill(); ctx.fillStyle='rgba(255,255,255,.9)'; ctx.beginPath(); ctx.arc(x-6*s,y,1.2*s,0,6.28); ctx.arc(x+6*s,y,1.2*s,0,6.28); ctx.fill(); };
+    const drawAlien = (now,dt,sc) => {
+      // ---- travel + auto "time-travel" growth ----
+      if(this.animOn){
+        this._driftX=(this._driftX||0)+dt*0.05;
+        this._alienGrow=(this._alienGrow||0)+dt*0.000075;
+        if(this._alienGrow>=1){ this._alienGrow=0.5; this._era=(this._era||0)+1; this._flash=1; }
+        if(this._flash>0) this._flash=Math.max(0,this._flash-dt*0.0016);
+      }
+      const grow=this._alienGrow||0, era=this._era||0, drift=this._driftX||0, flash=this._flash||0;
+      const dev=Math.min(1, grow*0.6 + era*0.16);          // civilization development 0..1
+      const zoom=1+Math.min(0.55, sc*0.00042);             // scroll = zoom-in travel
+      if(this.eraEl && this._eraShown!==era){ this._eraShown=era; const R=['I','II','III','IV','V','VI','VII','VIII','IX','X']; this.eraEl.textContent=R[era%R.length]; }
+
+      // backdrop
+      const g=ctx.createLinearGradient(0,0,0,h); g.addColorStop(0,'#04111c'); g.addColorStop(0.5,'#061b27'); g.addColorStop(1,'#020a12'); ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+      const neb=ctx.createRadialGradient(w*0.66,h*0.4,20,w*0.66,h*0.4,Math.max(w,h)*0.62); neb.addColorStop(0,'rgba(50,110,140,.16)'); neb.addColorStop(0.55,'rgba(60,40,120,.08)'); neb.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=neb; ctx.fillRect(0,0,w,h);
+
+      // parallax starfield (right -> left)
+      ctx.globalCompositeOperation='lighter';
+      for(const st of A.aStars){ if(this.animOn) st.tw+=st.ts; const x=((st.x-drift*st.d)%w+w)%w; const a=0.2+0.55*Math.max(0,Math.sin(st.tw)); ctx.fillStyle='rgba('+st.c+','+a.toFixed(2)+')'; ctx.beginPath(); ctx.arc(x,st.y,st.r,0,6.28); ctx.fill(); }
+      ctx.globalCompositeOperation='source-over';
+
+      // ---- PLANET + ORBITAL-RING MEGASTRUCTURE ----
+      const cx=w*0.6, cy=h*0.4;
+      ctx.save(); ctx.translate(cx,cy); ctx.scale(zoom,zoom);
+      const pr=Math.min(w,h)*0.24;
+      const rx=pr*2.7, ry=pr*0.66, tilt=-0.34;
+      const rot=drift*0.0011;                              // ring rotates as we travel past
+      const ringPt=(th)=>{ const ex=Math.cos(th)*rx, ey=Math.sin(th)*ry; return [ex*Math.cos(tilt)-ey*Math.sin(tilt), ex*Math.sin(tilt)+ey*Math.cos(tilt)]; };
+      const N=132;
+      const drawSeg=(front)=>{
+        for(let i=0;i<N;i++){
+          const th=(i/N)*6.2832+rot; const p=ringPt(th); if((p[1]>0)!==front) continue;
+          const depth=(p[1]/ry+1)/2;
+          const nl=Math.hypot(p[0],p[1])||1, ex=p[0]/nl, ey=p[1]/nl;
+          const phi=(i*0.61803)%1, built=phi < (0.18+dev*0.78);
+          const hue=(i%3===0)?'120,255,225':(i%3===1)?'150,170,255':'241,150,200';
+          const baseA=front?(0.45+0.5*depth):(0.16+0.16*depth);
+          const ns=0.9+depth*1.6;
+          ctx.fillStyle='rgba('+hue+','+baseA.toFixed(2)+')'; ctx.beginPath(); ctx.arc(p[0],p[1],ns,0,6.28); ctx.fill();
+          if(built){
+            const seed=((i*7)%11)/11; const hgt=pr*(0.07+0.20*depth)*(0.5+0.9*seed)*(0.6+0.5*dev);
+            ctx.strokeStyle='rgba('+hue+','+(baseA*0.8).toFixed(2)+')'; ctx.lineWidth=0.8+depth*1.3;
+            ctx.beginPath(); ctx.moveTo(p[0],p[1]); ctx.lineTo(p[0]+ex*hgt,p[1]+ey*hgt); ctx.stroke();
+            if(front && Math.sin(i*3.1+now*0.004)>0.1){ ctx.fillStyle='rgba(255,255,255,'+(0.4+0.5*depth).toFixed(2)+')'; ctx.beginPath(); ctx.arc(p[0]+ex*hgt,p[1]+ey*hgt,ns*0.7,0,6.28); ctx.fill(); }
+          }
+        }
+      };
+      const band=(front,col,lw,al)=>{ ctx.strokeStyle='rgba('+col+','+al+')'; ctx.lineWidth=lw; ctx.beginPath(); ctx.ellipse(0,0,rx,ry,tilt, front?0:Math.PI, front?Math.PI:6.2832); ctx.stroke(); };
+
+      band(false,'120,255,225',2.5,0.18); drawSeg(false);  // back of ring (behind planet)
+      // planet
+      const pg=ctx.createRadialGradient(-pr*0.45,-pr*0.45,pr*0.15,0,0,pr); pg.addColorStop(0,'rgba(80,170,170,1)'); pg.addColorStop(0.5,'rgba(26,82,104,1)'); pg.addColorStop(1,'rgba(6,24,36,1)'); ctx.fillStyle=pg; ctx.beginPath(); ctx.arc(0,0,pr,0,6.28); ctx.fill();
+      // city lights on the dark crescent (grow with development)
+      ctx.save(); ctx.beginPath(); ctx.arc(0,0,pr,0,6.28); ctx.clip(); ctx.globalCompositeOperation='lighter';
+      for(let i=0;i<44;i++){ const a=i*2.39963+rot*3; const rr=pr*(0.25+0.7*((i*0.123)%1)); const lx=Math.cos(a)*rr, ly=Math.sin(a)*rr; if(lx<-pr*0.08){ ctx.fillStyle='rgba(120,255,225,'+(0.05+0.22*dev).toFixed(2)+')'; ctx.fillRect(lx,ly,1.5,1.5); } }
+      ctx.restore();
+      // atmosphere
+      ctx.strokeStyle='rgba(120,255,225,.45)'; ctx.lineWidth=2.5; ctx.beginPath(); ctx.arc(0,0,pr+1.5,0,6.28); ctx.stroke();
+      const atm=ctx.createRadialGradient(0,0,pr,0,0,pr*1.25); atm.addColorStop(0,'rgba(120,255,225,.16)'); atm.addColorStop(1,'rgba(120,255,225,0)'); ctx.fillStyle=atm; ctx.beginPath(); ctx.arc(0,0,pr*1.25,0,6.28); ctx.fill();
+      // front of ring (over planet)
+      band(true,'150,255,235',3.5,0.5); drawSeg(true);
+      ctx.restore();
+
+      // time-jump flash
+      if(flash>0){ ctx.fillStyle='rgba(170,255,240,'+(flash*0.26).toFixed(3)+')'; ctx.fillRect(0,0,w,h); }
+
+      // fleet streaks flying past
+      for(let i=A.fleet.length-1;i>=0;i--){ const f=A.fleet[i]; if(this.animOn) f.x+=f.dir*f.v*(dt/16); drawFleet(f,dt); if(f.x<-90||f.x>w+90) A.fleet[i]=mkFleet(); }
+    };
+
+    let last = performance.now();
+    const renderFrame = (now) => { const dt=Math.min(40,now-last); last=now; const sc=window.scrollY||window.pageYOffset||0; ctx.clearRect(0,0,w,h); if(this._theme==='light') drawDay(now,dt,sc); else if(this._theme==='alien') drawAlien(now,dt,sc); else drawCosmos(now,dt,sc); };
+    this._renderOnce = () => renderFrame(performance.now());
+    const loop = (now) => { renderFrame(now); if(this.animOn) this._raf=requestAnimationFrame(loop); };
+    build();
+    if(this.animOn) loop(performance.now()); else renderFrame(performance.now());
+    this._onResize = () => { build(); if(!this.animOn) this._renderOnce(); };
+    window.addEventListener('resize', this._onResize);
+  }
+
+  // ===== SCROLL-DRIVEN ALIEN MOTHERSHIP =====
+  setupShip() {
+    const ship = this.ship;
+    if (!ship) return;
+    if (!this.animOn) { ship.style.display = 'none'; return; }
+    const update = () => {
+      if (this.state.theme === 'light') { ship.style.opacity = '0'; this._shipTick = false; return; }
+      const doc = document.documentElement;
+      const max = (doc.scrollHeight - window.innerHeight) || 1;
+      const p = Math.min(1, Math.max(0, (window.scrollY || window.pageYOffset || 0) / max));
+      const a = 0.30, b = 0.80;
+      const t = (p - a) / (b - a);
+      const vw = window.innerWidth, vh = window.innerHeight;
+      const shipW = ship.offsetWidth || vw * 0.5;
+      if (t < 0 || t > 1) {
+        ship.style.opacity = '0';
+      } else {
+        const x = -shipW * 0.7 + t * (vw + shipW * 1.4);
+        const y = vh * 0.14 + Math.sin(t * Math.PI) * vh * 0.34 + Math.sin(t * 11) * 7;
+        const fade = Math.sin(Math.max(0, Math.min(1, t)) * Math.PI);
+        ship.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) rotate(' + ((t - 0.5) * 8).toFixed(2) + 'deg)';
+        ship.style.opacity = (0.9 * fade).toFixed(2);
+      }
+      this._shipTick = false;
+    };
+    this._onShipScroll = () => {
+      if (this._shipTick) return;
+      this._shipTick = true;
+      requestAnimationFrame(update);
+    };
+    window.addEventListener('scroll', this._onShipScroll, { passive: true });
+    window.addEventListener('resize', this._onShipScroll);
+    update();
+  }
+
+  // ===== ALIEN-MODE TRAVEL FX: glyph readouts + random language prompts =====
+  setupAlien() {
+    const GL = '⟁⌖⎔⏃⌇⊹⋔⟒⟡⌬⍉⟓⟐◈◇⬡⬢⌁⏚⟟⍫⎒';
+    const word = (n) => { let s = ''; for (let i = 0; i < n; i++) s += GL[(Math.random() * GL.length) | 0]; return s; };
+    if (this.animOn) this._timers.push(setInterval(() => {
+      if (this.state.theme !== 'alien') return;
+      if (this.hudGlyph) this.hudGlyph.textContent = word(5);
+      if (this.consoleGlyph) this.consoleGlyph.textContent = word(8);
+    }, 1600));
+    const tags = ['SIGNAL ◇ ', 'ORBIT ', 'EPOCH ', 'TRANSMIT ', 'GROWTH ', 'DRIFT ', 'OPEN BOARD ', 'COLONY '];
+    const spawn = () => {
+      if (this.state.theme === 'alien' && this.root && this.animOn) {
+        const el = document.createElement('div');
+        const top = Math.random() < 0.5 ? (8 + Math.random() * 24) : (60 + Math.random() * 28);
+        const hue = ['120,255,225', '150,170,255', '241,150,200'][(Math.random() * 3) | 0];
+        el.textContent = tags[(Math.random() * tags.length) | 0] + word(3 + ((Math.random() * 4) | 0));
+        el.style.cssText = 'position:fixed; z-index:41; pointer-events:none; left:' + (46 + Math.random() * 42).toFixed(1) + 'vw; top:' + top.toFixed(1) + 'vh; font-family:\'JetBrains Mono\',monospace; font-size:' + (11 + Math.random() * 5).toFixed(0) + 'px; letter-spacing:.26em; color:rgba(' + hue + ',.85); text-shadow:0 0 12px rgba(' + hue + ',.5); white-space:nowrap; animation:glyphTravel 5.5s ease-in-out forwards;';
+        this.root.appendChild(el);
+        setTimeout(() => el.remove(), 5600);
+      }
+      this._glyphT = setTimeout(spawn, 2400 + Math.random() * 2600);
+    };
+    this._glyphT = setTimeout(spawn, 1800);
+  }
+
+  renderVals() {
+    const mode = this.state.mode;
+    const active = (m) => mode === m;
+    const palette = {
+      today: [
+        { idx: '01', label: 'Research happens', c: '90,140,239' },
+        { idx: '02', label: 'Hunts for a venue', c: '90,140,239' },
+        { idx: '03', label: 'Maybe it is published', c: '90,140,239' }
+      ],
+      paralled: [
+        { idx: '01', label: 'Demand is declared', c: '155,123,255' },
+        { idx: '02', label: 'A researcher claims it', c: '91,141,239' },
+        { idx: '03', label: 'Reviewed in the open', c: '87,224,224' },
+        { idx: '04', label: 'Published', c: '241,120,182' }
+      ]
+    };
+    const flowSteps = palette[mode].map(s => ({
+      idx: s.idx,
+      label: s.label,
+      num: 'rgba(' + s.c + ',1)',
+      bg: 'rgba(' + s.c + ',0.08)',
+      border: 'rgba(' + s.c + ',0.28)'
+    }));
+    const sel = '#06060f', selBg = 'linear-gradient(120deg,#9B7BFF,#57E0E0)', selBorder = 'transparent';
+    const idle = 'var(--ink-soft)', idleBg = 'var(--panel)', idleBorder = 'var(--hair-s)';
+    const th = this.state.theme;
+    const offBg = 'transparent', offCol = 'var(--ink-soft)';
+    return {
+      rootRef: (el) => { this.root = el; },
+      canvasRef: (el) => { this.canvas = el; },
+      auroraRef: (el) => { this.aurora = el; },
+      starsRef: (el) => { this.starsEl = el; this.buildDeepField(); },
+      orreryRef: (el) => { this.orrery = el; },
+      planetLayerRef: (el) => { this.planetLayer = el; this.buildOrrery(); },
+      orbitRef: (el) => { this.orbit = el; },
+      shipRef: (el) => { this.ship = el; },
+      cockpitRef: (el) => { this.cockpit = el; },
+      eraRef: (el) => { this.eraEl = el; },
+      hudGlyphRef: (el) => { this.hudGlyph = el; },
+      consoleGlyphRef: (el) => { this.consoleGlyph = el; },
+      setDark: this.setDark, setLight: this.setLight, setAlien: this.setAlien,
+      darkBg: th === 'dark' ? 'linear-gradient(120deg,#9B7BFF,#57E0E0)' : offBg,
+      darkColor: th === 'dark' ? '#06060f' : offCol,
+      lightBg: th === 'light' ? 'linear-gradient(120deg,#ffd27a,#62b6ff)' : offBg,
+      lightColor: th === 'light' ? '#16243a' : offCol,
+      alienBg: th === 'alien' ? 'linear-gradient(120deg,#78ffe1,#9a82ff)' : offBg,
+      alienColor: th === 'alien' ? '#06181a' : offCol,
+      quoteTextRef: (el) => { this.quoteText = el; },
+      quoteAuthorRef: (el) => { this.quoteAuthor = el; },
+      txRef: (el) => { this.tx = el; },
+      countRef: (el) => { this.count = el; },
+      liveRef: (el) => { this.live = el; },
+      colARef: (el) => { this.colA = el; },
+      colBRef: (el) => { this.colB = el; },
+      showToday: this.showToday,
+      showParalled: this.showParalled,
+      flowSteps,
+      flowCaption: active('today')
+        ? 'Supply-push, the old way: the work finishes, then goes looking for a home. Effort is spent before anyone knows it is wanted.'
+        : 'Demand-pull: the board says what it needs, then the work begins against real, live demand — reviewed in the open, with visible reasoning.',
+      todayColor: active('today') ? sel : idle,
+      todayBg: active('today') ? selBg : idleBg,
+      todayBorder: active('today') ? selBorder : idleBorder,
+      palledColor: active('paralled') ? sel : idle,
+      palledBg: active('paralled') ? selBg : idleBg,
+      palledBorder: active('paralled') ? selBorder : idleBorder
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Playfair+Display:ital,wght@0,500;0,600;1,500&amp;display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  :root, [data-theme="dark"] {
+    --bg:#060611; --ink:#ECEAF5; --ink-soft:#B6B3CC; --ink-mute:#9D9AB5; --ink-faint:#6E6B86;
+    --hair:rgba(255,255,255,.08); --hair-s:rgba(255,255,255,.14);
+    --panel:rgba(255,255,255,.03); --panel-s:rgba(255,255,255,.05); --nav-bg:linear-gradient(180deg, rgba(6,6,17,.82), rgba(6,6,17,.35));
+  }
+  [data-theme="light"] {
+    --bg:#bfe0fb; --ink:#15263f; --ink-soft:#39506e; --ink-mute:#5d7189; --ink-faint:#8aa0b8;
+    --hair:rgba(20,45,80,.14); --hair-s:rgba(20,45,80,.26);
+    --panel:rgba(255,255,255,.6); --panel-s:rgba(255,255,255,.8); --nav-bg:linear-gradient(180deg, rgba(244,250,255,.85), rgba(244,250,255,.45));
+  }
+  [data-theme="alien"] {
+    --bg:#060f1a; --ink:#E6FCFF; --ink-soft:#9fdce8; --ink-mute:#74c0d2; --ink-faint:#4a8498;
+    --hair:rgba(110,255,225,.16); --hair-s:rgba(110,255,225,.3);
+    --panel:rgba(18,52,62,.34); --panel-s:rgba(22,70,82,.46); --nav-bg:linear-gradient(180deg, rgba(6,15,26,.85), rgba(6,15,26,.4));
+  }
+  html, body { margin: 0; padding: 0; background: var(--bg); transition: background .9s ease; }
+  ::selection { background: rgba(155,123,255,0.35); color: #fff; }
+  @keyframes auroraA { 0%{transform:translate(0,0) scale(1)} 50%{transform:translate(7%,-5%) scale(1.18)} 100%{transform:translate(0,0) scale(1)} }
+  @keyframes auroraB { 0%{transform:translate(0,0) scale(1.1)} 50%{transform:translate(-9%,6%) scale(1.3)} 100%{transform:translate(0,0) scale(1.1)} }
+  @keyframes auroraC { 0%{transform:translate(0,0) scale(1)} 50%{transform:translate(5%,8%) scale(1.22)} 100%{transform:translate(0,0) scale(1)} }
+  @keyframes pulseGlow { 0%,100%{opacity:.45} 50%{opacity:1} }
+  @keyframes shimmer { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
+  @keyframes spinSlow { to{transform:rotate(360deg)} }
+  @keyframes starDrift { from{transform:translateY(0)} to{transform:translateY(-60px)} }
+  @keyframes starTwinkle { 0%,100%{opacity:.25} 50%{opacity:.9} }
+  @keyframes sunRays { to{transform:rotate(360deg)} }
+  @keyframes cloudFloat { 0%{transform:translateX(-8%)} 50%{transform:translateX(8%)} 100%{transform:translateX(-8%)} }
+  @keyframes motePulse { 0%,100%{transform:translateY(0); opacity:.4} 50%{transform:translateY(-26px); opacity:.9} }
+  @keyframes gridPan { from{background-position:0 0} to{background-position:0 60px} }
+  @keyframes scanV { 0%{transform:translateY(-20%); opacity:0} 12%{opacity:.8} 88%{opacity:.8} 100%{transform:translateY(120vh); opacity:0} }
+  @keyframes glyphRise { 0%{transform:translateY(20px); opacity:0} 14%{opacity:.7} 80%{opacity:.7} 100%{transform:translateY(-60px); opacity:0} }
+  /* per-theme unique ambient layers */
+  [data-bg]{ display:none; }
+  [data-theme="dark"] [data-bg="cosmos"]{ display:block; }
+  [data-theme="light"] [data-bg="earth"]{ display:block; }
+  [data-theme="alien"] [data-bg="alien"]{ display:block; }
+</style>
+<script src="./bg-fx.js"></script>
+</helmet>
+
+<div ref="{{ rootRef }}" style="position:relative; background:var(--bg); color:var(--ink); font-family:'Manrope',system-ui,sans-serif; overflow-x:hidden; -webkit-font-smoothing:antialiased; min-height:100vh;">
+
+  <!-- ===== AMBIENT BACKGROUND ===== -->
+  <div ref="{{ auroraRef }}" style="position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; transition:opacity .9s ease, filter .9s ease;">
+    <div style="position:absolute; top:-18%; left:-10%; width:60vw; height:60vw; border-radius:50%; filter:blur(90px); opacity:.5; background:radial-gradient(circle at 30% 30%, rgba(155,123,255,.5), rgba(155,123,255,0) 70%); animation:auroraA 22s ease-in-out infinite;"></div>
+    <div style="position:absolute; top:8%; right:-14%; width:55vw; height:55vw; border-radius:50%; filter:blur(100px); opacity:.42; background:radial-gradient(circle at 50% 50%, rgba(87,224,224,.4), rgba(87,224,224,0) 70%); animation:auroraB 26s ease-in-out infinite;"></div>
+    <div style="position:absolute; bottom:-22%; left:25%; width:55vw; height:55vw; border-radius:50%; filter:blur(110px); opacity:.38; background:radial-gradient(circle at 50% 50%, rgba(241,120,182,.32), rgba(241,120,182,0) 70%); animation:auroraC 30s ease-in-out infinite;"></div>
+    <div style="position:absolute; inset:0; opacity:.35; mix-blend-mode:screen; background-image:repeating-linear-gradient(115deg, transparent 0 38px, rgba(155,123,255,.05) 38px 39px);"></div>
+
+    <!-- COSMOS: drifting starfield + diagonal streaks -->
+    <div data-bg="cosmos" style="position:absolute; inset:-60px 0; opacity:.9;">
+      <div ref="{{ starsRef }}" style="position:absolute; inset:0; animation:starDrift 14s linear infinite;"></div>
+      <div style="position:absolute; inset:0; mix-blend-mode:screen; opacity:.5; background-image:repeating-linear-gradient(60deg, transparent 0 120px, rgba(123,143,255,.06) 120px 122px);"></div>
+    </div>
+
+    <!-- EARTH (light): daytime sun rays + soft clouds + rising motes -->
+    <div data-bg="earth" style="position:absolute; inset:0;">
+      <div style="position:absolute; top:-30%; left:50%; width:140vw; height:140vw; transform:translateX(-50%); opacity:.5; mix-blend-mode:screen; background:conic-gradient(from 0deg, rgba(255,255,255,.0) 0deg, rgba(255,243,200,.5) 12deg, rgba(255,255,255,0) 24deg, rgba(255,243,200,.4) 36deg, rgba(255,255,255,0) 48deg); animation:sunRays 90s linear infinite;"></div>
+      <div style="position:absolute; top:14%; left:0; width:60vw; height:24vw; border-radius:50%; filter:blur(50px); background:rgba(255,255,255,.6); animation:cloudFloat 28s ease-in-out infinite;"></div>
+      <div style="position:absolute; top:40%; right:-6%; width:50vw; height:20vw; border-radius:50%; filter:blur(55px); background:rgba(255,255,255,.5); animation:cloudFloat 34s ease-in-out infinite reverse;"></div>
+      <div style="position:absolute; bottom:0; left:0; right:0; height:30%; background:linear-gradient(180deg, transparent, rgba(120,196,108,.18));"></div>
+      <div ref="{{ motesRef }}" style="position:absolute; inset:0;"></div>
+    </div>
+
+    <!-- ALIEN: scanning grid + vertical sweep + rising glyphs -->
+    <div data-bg="alien" style="position:absolute; inset:0;">
+      <div style="position:absolute; inset:0; opacity:.5; background-image:linear-gradient(rgba(110,255,225,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(110,255,225,.08) 1px, transparent 1px); background-size:60px 60px; animation:gridPan 6s linear infinite; mask-image:radial-gradient(circle at 60% 40%, #000 10%, transparent 78%); -webkit-mask-image:radial-gradient(circle at 60% 40%, #000 10%, transparent 78%);"></div>
+      <div style="position:absolute; left:0; right:0; top:0; height:42vh; background:linear-gradient(180deg, rgba(110,255,225,.14), transparent); animation:scanV 7s linear infinite;"></div>
+      <div ref="{{ glyphsRef }}" style="position:absolute; inset:0; font-family:'JetBrains Mono',monospace;"></div>
+    </div>
+  </div>
+
+  <!-- ===== MODE SWITCHER ===== -->
+  <div style="position:fixed; z-index:60; bottom:24px; left:50%; transform:translateX(-50%); display:flex; gap:4px; padding:5px; border-radius:999px; border:1px solid var(--hair-s); background:var(--panel-s); backdrop-filter:blur(18px); box-shadow:0 10px 40px rgba(0,0,0,.3);">
+    <button onClick="{{ setDark }}" title="Cosmos" style="cursor:pointer; display:flex; align-items:center; gap:8px; font-family:'Manrope',sans-serif; font-size:13px; font-weight:600; padding:9px 15px; border-radius:999px; border:none; background:{{ darkBg }}; color:{{ darkColor }}; transition:all .3s;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" fill="currentColor"/></svg>Cosmos
+    </button>
+    <button onClick="{{ setLight }}" title="Light" style="cursor:pointer; display:flex; align-items:center; gap:8px; font-family:'Manrope',sans-serif; font-size:13px; font-weight:600; padding:9px 15px; border-radius:999px; border:none; background:{{ lightBg }}; color:{{ lightColor }}; transition:all .3s;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 2v3"/><path d="M12 19v3"/><path d="M2 12h3"/><path d="M19 12h3"/><path d="M5 5l2 2"/><path d="M17 17l2 2"/><path d="M19 5l-2 2"/><path d="M7 17l-2 2"/></g></svg>Light
+    </button>
+    <button onClick="{{ setAlien }}" title="Alien" style="cursor:pointer; display:flex; align-items:center; gap:8px; font-family:'Manrope',sans-serif; font-size:13px; font-weight:600; padding:9px 15px; border-radius:999px; border:none; background:{{ alienBg }}; color:{{ alienColor }}; transition:all .3s;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="14" rx="9" ry="3.2" fill="currentColor"/><path d="M7 12a5 5 0 0 1 10 0Z" fill="currentColor" opacity="0.7"/></svg>Alien
+    </button>
+  </div>
+
+  <!-- ===== NAV ===== -->
+  <nav style="position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between; padding:20px clamp(20px,5vw,56px); backdrop-filter:blur(18px); background:var(--nav-bg); border-bottom:1px solid var(--hair);">
+    <a href="PARALLED Landing.dc.html" style="display:flex; align-items:center; gap:12px; text-decoration:none; color:inherit;">
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none" style="display:block;">
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="30" y2="30"><stop offset="0" stop-color="#9B7BFF"></stop><stop offset="0.5" stop-color="#5B8DEF"></stop><stop offset="1" stop-color="#57E0E0"></stop></linearGradient></defs>
+        <line x1="6" y1="24" x2="18" y2="4" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round"></line>
+        <line x1="13" y1="26" x2="25" y2="6" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round"></line>
+      </svg>
+      <span style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:18px; letter-spacing:.14em;">PARALLED</span>
+    </a>
+    <div style="display:flex; align-items:center; gap:34px; font-size:14.5px; color:var(--ink-soft);">
+      <a href="PARALLED Landing.dc.html#platform" style="color:inherit; text-decoration:none;">Platform</a>
+      <a href="Journal.dc.html" style="color:var(--ink); text-decoration:none; font-weight:600;">Journal</a>
+      <a href="PARALLED Landing.dc.html#transmissions" style="color:inherit; text-decoration:none;">Signals</a>
+      <a href="PARALLED Landing.dc.html#community" style="color:inherit; text-decoration:none;">Community</a>
+    </div>
+    <a href="PARALLED Landing.dc.html#cta" style="text-decoration:none; font-size:14px; font-weight:600; color:#06060f; padding:11px 22px; border-radius:999px; background:linear-gradient(120deg,#9B7BFF,#57E0E0); box-shadow:0 8px 28px rgba(91,141,239,.4);">Enter PARALLED</a>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <header style="position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:clamp(54px,9vh,110px) clamp(20px,5vw,56px) clamp(34px,5vh,56px);">
+    <div data-reveal="" style="display:inline-flex; align-items:center; gap:10px; padding:8px 16px; border-radius:999px; border:1px solid var(--hair-s); background:var(--panel); font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.16em; color:var(--ink-mute); margin-bottom:28px;">
+      <span style="width:7px; height:7px; border-radius:50%; background:#57E0E0; box-shadow:0 0 10px #57E0E0; animation:pulseGlow 2.4s ease-in-out infinite;"></span>
+      THE PARALLEL RECORD · OPEN JOURNAL
+    </div>
+    <h1 data-reveal="" data-reveal-delay="80" style="font-family:'Playfair Display',serif; font-weight:700; font-size:clamp(40px,6.2vw,82px); line-height:1; letter-spacing:-.03em; margin:0 0 24px; max-width:880px;">
+      Dispatches from a science<br><span style="background:linear-gradient(110deg,#9B7BFF 0%,#5B8DEF 40%,#57E0E0 72%,#F178B6 100%); background-size:220% auto; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; animation:shimmer 7s linear infinite;">turned around.</span>
+    </h1>
+    <p data-reveal="" data-reveal-delay="160" style="font-size:clamp(16px,1.5vw,19px); line-height:1.62; color:var(--ink-soft); max-width:600px; margin:0 0 36px;">
+      Field notes, reasoning logs and board calls from the demand-first frontier — every decision left in the open, every trail revisable. Published as it happens.
+    </p>
+    <div data-reveal="" data-reveal-delay="240" style="display:flex; gap:clamp(20px,3vw,42px); flex-wrap:wrap; padding-top:28px; border-top:1px solid var(--hair);">
+      <div><div style="font-family:'Space Grotesk',sans-serif; font-size:28px; font-weight:700; background:linear-gradient(120deg,#9B7BFF,#57E0E0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">ISSUE 07</div><div style="font-size:12.5px; color:var(--ink-mute); margin-top:3px;">current edition</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif; font-size:28px; font-weight:700; background:linear-gradient(120deg,#9B7BFF,#57E0E0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">Weekly</div><div style="font-size:12.5px; color:var(--ink-mute); margin-top:3px;">cadence</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif; font-size:28px; font-weight:700; background:linear-gradient(120deg,#F178B6,#9B7BFF); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">Open</div><div style="font-size:12.5px; color:var(--ink-mute); margin-top:3px;">reasoning, always</div></div>
+    </div>
+  </header>
+
+  <!-- ===== FEATURED DISPATCH ===== -->
+  <section style="position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:clamp(20px,3vh,40px) clamp(20px,5vw,56px);">
+    <div data-reveal="" data-card-featured="" style="position:relative; display:grid; grid-template-columns:1.35fr .65fr; gap:0; border-radius:26px; overflow:hidden; border:1px solid var(--hair-s); background:var(--panel); backdrop-filter:blur(12px); cursor:pointer; transition:transform .4s cubic-bezier(.16,1,.3,1), border-color .4s;">
+      <div style="padding:clamp(30px,4vw,52px); display:flex; flex-direction:column; justify-content:center;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+          <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; color:#06060f; padding:5px 11px; border-radius:999px; background:linear-gradient(120deg,#9B7BFF,#57E0E0);">FEATURED</span>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:.14em; color:#9B7BFF;">REASONING LOGS</span>
+        </div>
+        <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(26px,3.2vw,42px); line-height:1.08; letter-spacing:-.02em; margin:0 0 18px;">What a study looks like when the demand is declared first</h2>
+        <p style="font-size:16px; line-height:1.62; color:var(--ink-soft); margin:0 0 26px; max-width:560px;">We followed one claim from an open board call to a verified result — every veto, every revision, every reasoning step left in the light. Here is the whole trail, unedited.</p>
+        <div style="display:flex; align-items:center; gap:14px; font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.08em; color:var(--ink-mute);">
+          <span>DR. IMANI O.</span><span style="opacity:.5;">·</span><span>JUN 18 · 2026</span><span style="opacity:.5;">·</span><span>12 MIN</span>
+        </div>
+      </div>
+      <div style="position:relative; min-height:280px; background:linear-gradient(150deg, rgba(155,123,255,.22), rgba(87,224,224,.12)); border-left:1px solid var(--hair); overflow:hidden;">
+        <div style="position:absolute; inset:0; background:radial-gradient(circle at 70% 30%, rgba(155,123,255,.35), transparent 60%), radial-gradient(circle at 30% 80%, rgba(87,224,224,.25), transparent 60%);"></div>
+        <svg width="100%" height="100%" viewBox="0 0 300 300" fill="none" style="position:absolute; inset:0; opacity:.6;">
+          <g style="transform-box:fill-box; transform-origin:center; animation:spinSlow 60s linear infinite;">
+            <ellipse cx="150" cy="150" rx="130" ry="52" stroke="#9B7BFF" stroke-width="1" opacity=".6" transform="rotate(24 150 150)"></ellipse>
+            <ellipse cx="150" cy="150" rx="130" ry="52" stroke="#57E0E0" stroke-width="1" opacity=".5" transform="rotate(-30 150 150)"></ellipse>
+            <ellipse cx="150" cy="150" rx="120" ry="44" stroke="#F178B6" stroke-width="1" opacity=".45" transform="rotate(82 150 150)"></ellipse>
+          </g>
+          <circle cx="150" cy="150" r="6" fill="#fff" opacity=".9"></circle>
+        </svg>
+        <div style="position:absolute; bottom:22px; right:24px; font-family:'Playfair Display',serif; font-style:italic; font-size:64px; line-height:.8; color:rgba(255,255,255,.16);">07</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FILTER + GRID ===== -->
+  <section style="position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:clamp(36px,6vh,72px) clamp(20px,5vw,56px) clamp(50px,8vh,90px);">
+    <div data-reveal="" style="display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:20px; margin-bottom:30px;">
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#7B8FFF; margin-bottom:14px;">THE FEED</div>
+        <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(26px,3.4vw,44px); line-height:1.04; letter-spacing:-.02em; margin:0;">Everything, in the open.</h2>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:8px;">
+        <sc-for list="{{ cats }}" as="c" hint-placeholder-count="6">
+          <button onClick="{{ c.onClick }}" style="cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.08em; padding:9px 16px; border-radius:999px; border:1px solid {{ c.border }}; background:{{ c.bg }}; color:{{ c.color }}; transition:all .25s;">{{ c.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:18px;">
+      <sc-for list="{{ articles }}" as="a" hint-placeholder-count="6">
+        <article data-feed-card="" style="display:flex; flex-direction:column; padding:28px; border-radius:20px; border:1px solid var(--hair); background:var(--panel); backdrop-filter:blur(10px); cursor:pointer; transition:transform .4s cubic-bezier(.16,1,.3,1), border-color .4s, background .4s; min-height:248px;">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:18px;">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.12em; padding:4px 10px; border-radius:999px; background:rgba({{ a.color }},.14); border:1px solid rgba({{ a.color }},.3); color:rgb({{ a.color }});">{{ a.catLabel }}</span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.08em; color:var(--ink-faint);">{{ a.date }}</span>
+          </div>
+          <h3 style="font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:21px; line-height:1.18; letter-spacing:-.01em; margin:0 0 12px;">{{ a.title }}</h3>
+          <p style="font-size:14.5px; line-height:1.6; color:var(--ink-mute); margin:0 0 22px; flex:1;">{{ a.excerpt }}</p>
+          <div style="display:flex; align-items:center; gap:12px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.06em; color:var(--ink-faint); padding-top:16px; border-top:1px solid var(--hair);">
+            <span style="color:var(--ink-soft);">{{ a.author }}</span><span style="opacity:.5;">·</span><span>{{ a.read }}</span>
+          </div>
+        </article>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{ empty }}" hint-placeholder-val="{{ false }}">
+      <div style="text-align:center; padding:60px 20px; font-family:'JetBrains Mono',monospace; font-size:13px; letter-spacing:.1em; color:var(--ink-faint);">NO DISPATCHES IN THIS CHANNEL YET.</div>
+    </sc-if>
+  </section>
+
+  <!-- ===== PARTNER JOURNALS DIRECTORY (column format) ===== -->
+  <section id="journals" style="position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:clamp(36px,6vh,80px) clamp(20px,5vw,56px);">
+    <div data-reveal="" style="margin-bottom:32px;">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#7B8FFF; margin-bottom:14px;">THE REGISTRY · TRIAL RUN</div>
+      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(26px,3.6vw,46px); line-height:1.04; letter-spacing:-.02em; margin:0 0 12px;">Journals on the record</h2>
+      <p style="font-size:16px; line-height:1.6; color:var(--ink-soft); max-width:620px; margin:0;">The boards publishing demand-first calls this cycle — each with its field, rigor tier and the cadence it delivers issues on. One trial issue, free, per journal.</p>
+    </div>
+
+    <div data-reveal="" data-reveal-delay="80" style="border:1px solid var(--hair-s); border-radius:20px; overflow:hidden; background:var(--panel); backdrop-filter:blur(10px);">
+      <!-- header row -->
+      <div style="display:grid; grid-template-columns:1.6fr 1.1fr .9fr 1fr .7fr; gap:16px; padding:16px clamp(18px,2.5vw,28px); border-bottom:1px solid var(--hair-s); font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.12em; color:var(--ink-faint); text-transform:uppercase;">
+        <div>Journal</div><div>Field</div><div>Rigor tier</div><div>Issue delivery</div><div style="text-align:right;">Trial</div>
+      </div>
+      <sc-for list="{{ journals }}" as="j" hint-placeholder-count="6">
+        <div data-journal-row="" style="display:grid; grid-template-columns:1.6fr 1.1fr .9fr 1fr .7fr; gap:16px; align-items:center; padding:18px clamp(18px,2.5vw,28px); border-bottom:1px solid var(--hair); transition:background .3s;">
+          <div style="display:flex; align-items:center; gap:13px;">
+            <span style="flex:none; width:34px; height:34px; border-radius:9px; display:grid; place-items:center; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:14px; color:#06060f; background:linear-gradient({{ j.angle }},{{ j.c1 }},{{ j.c2 }});">{{ j.mark }}</span>
+            <div>
+              <div style="font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:16px;">{{ j.name }}</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--ink-faint); letter-spacing:.05em;">{{ j.code }}</div>
+            </div>
+          </div>
+          <div style="font-size:13.5px; color:var(--ink-soft);">{{ j.field }}</div>
+          <div><span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.06em; padding:4px 10px; border-radius:999px; background:rgba({{ j.tierC }},.14); border:1px solid rgba({{ j.tierC }},.32); color:rgb({{ j.tierC }});">{{ j.tier }}</span></div>
+          <div style="font-size:13.5px; color:var(--ink-soft);">{{ j.cadence }}<div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--ink-faint);">{{ j.next }}</div></div>
+          <div style="text-align:right;"><span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.06em; color:#57E0E0;">{{ j.trial }}</span></div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ===== ABOUT: WHAT WE DO + QUALITY + SERVICES (columns) ===== -->
+  <section style="position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:clamp(20px,3vh,40px) clamp(20px,5vw,56px);">
+    <div data-reveal="" style="margin-bottom:30px;">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#57E0E0; margin-bottom:14px;">WHAT THE JOURNAL DOES</div>
+      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(26px,3.4vw,44px); line-height:1.04; letter-spacing:-.02em; margin:0; max-width:680px;">A journal is a public promise of what science is needed next.</h2>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:18px;">
+      <div data-reveal="" data-reveal-delay="40" style="padding:30px; border-radius:20px; border:1px solid rgba(155,123,255,.22); background:linear-gradient(160deg, rgba(155,123,255,.08), transparent);">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; color:#9B7BFF; margin-bottom:16px;">WHAT WE DO</div>
+        <h3 style="font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:600; margin:0 0 12px;">Turn demand into a call</h3>
+        <p style="font-size:14.5px; line-height:1.62; color:var(--ink-soft); margin:0 0 16px;">Each journal declares topic, scope and acceptance criteria before any result exists — then reviews submissions with fully visible reasoning.</p>
+        <ul style="margin:0; padding-left:18px; font-size:13.5px; line-height:1.7; color:var(--ink-mute);">
+          <li>Publish open, demand-first calls</li>
+          <li>Match supply to declared need</li>
+          <li>Review with a revisable, open log</li>
+          <li>Credit and verify every accepted study</li>
+        </ul>
+      </div>
+      <div data-reveal="" data-reveal-delay="100" style="padding:30px; border-radius:20px; border:1px solid rgba(87,224,224,.22); background:linear-gradient(160deg, rgba(87,224,224,.08), transparent);">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; color:#57E0E0; margin-bottom:16px;">QUALITY WE SERVE</div>
+        <h3 style="font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:600; margin:0 0 12px;">Four tiers, one standard of honesty</h3>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <sc-for list="{{ tiers }}" as="t" hint-placeholder-count="4">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <span style="flex:none; width:8px; height:8px; border-radius:50%; background:rgb({{ t.c }}); box-shadow:0 0 8px rgb({{ t.c }});"></span>
+              <span style="font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14.5px; min-width:96px;">{{ t.name }}</span>
+              <span style="font-size:13px; color:var(--ink-mute);">{{ t.desc }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div data-reveal="" data-reveal-delay="160" style="padding:30px; border-radius:20px; border:1px solid rgba(241,120,182,.22); background:linear-gradient(160deg, rgba(241,120,182,.08), transparent);">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; color:#F178B6; margin-bottom:16px;">SERVICES</div>
+        <h3 style="font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:600; margin:0 0 12px;">Everything a board needs</h3>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <sc-for list="{{ services }}" as="s" hint-placeholder-count="6">
+            <span style="font-size:13px; color:var(--ink-soft); padding:8px 14px; border-radius:999px; border:1px solid var(--hair-s); background:var(--panel-s);">{{ s }}</span>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== HOW TO CREATE A JOURNAL (rules) ===== -->
+  <section style="position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:clamp(36px,6vh,80px) clamp(20px,5vw,56px);">
+    <div data-reveal="" style="display:grid; grid-template-columns:1fr 1.3fr; gap:clamp(28px,5vw,64px); align-items:start;">
+      <div style="position:sticky; top:96px;">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#7B8FFF; margin-bottom:14px;">THE RULES</div>
+        <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(26px,3.4vw,44px); line-height:1.04; letter-spacing:-.02em; margin:0 0 18px;">How to create a journal</h2>
+        <p style="font-size:15.5px; line-height:1.62; color:var(--ink-soft); margin:0 0 26px;">Five rules separate a board from a noticeboard. Meet them and your journal can post live calls on the network.</p>
+        <a href="PARALLED Landing.dc.html#cta" style="display:inline-flex; align-items:center; gap:10px; text-decoration:none; font-size:14px; font-weight:600; color:#06060f; padding:13px 24px; border-radius:999px; background:linear-gradient(120deg,#9B7BFF,#57E0E0); box-shadow:0 10px 30px rgba(91,141,239,.36);">Apply to charter a journal →</a>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <sc-for list="{{ rules }}" as="r" hint-placeholder-count="5">
+          <div data-reveal="" data-card="" style="display:flex; gap:20px; padding:26px; border-radius:18px; border:1px solid var(--hair); background:var(--panel); backdrop-filter:blur(10px); transition:transform .4s cubic-bezier(.16,1,.3,1), border-color .4s, background .4s;">
+            <div style="flex:none; font-family:'Playfair Display',serif; font-style:italic; font-size:34px; line-height:1; background:linear-gradient(120deg,#9B7BFF,#57E0E0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">{{ r.n }}</div>
+            <div>
+              <h3 style="font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:600; margin:0 0 7px;">{{ r.title }}</h3>
+              <p style="font-size:14px; line-height:1.6; color:var(--ink-mute); margin:0;">{{ r.body }}</p>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SUBSCRIBE BAND ===== -->
+  <section style="position:relative; z-index:1; max-width:980px; margin:0 auto; padding:clamp(20px,4vh,50px) clamp(20px,5vw,56px) clamp(60px,10vh,120px);">
+    <div data-reveal="" style="position:relative; border-radius:26px; overflow:hidden; padding:clamp(40px,6vw,68px) clamp(28px,5vw,64px); border:1px solid var(--hair); background:linear-gradient(135deg, rgba(20,16,44,.7), rgba(8,10,26,.5)); text-align:center;">
+      <div style="position:absolute; inset:0; background:radial-gradient(circle at 15% 20%, rgba(155,123,255,.22), transparent 55%), radial-gradient(circle at 85% 90%, rgba(87,224,224,.16), transparent 55%);"></div>
+      <div style="position:relative;">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#57E0E0; margin-bottom:18px;">SUBSCRIBE TO THE RECORD</div>
+        <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(26px,3.6vw,44px); line-height:1.08; letter-spacing:-.02em; margin:0 0 16px;">Every dispatch, the moment it lands.</h2>
+        <p style="font-size:16px; line-height:1.6; color:var(--ink-soft); max-width:480px; margin:0 auto 30px;">One transmission a week. Reasoning logs, board calls and field notes — no noise.</p>
+        <form data-subscribe="" style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; max-width:480px; margin:0 auto;">
+          <input type="email" placeholder="you@institution.org" style="flex:1; min-width:220px; font-family:'Manrope',sans-serif; font-size:15px; padding:14px 20px; border-radius:999px; border:1px solid var(--hair-s); background:var(--panel-s); color:var(--ink); outline:none;">
+          <button type="submit" style="cursor:pointer; font-family:'Manrope',sans-serif; font-size:15px; font-weight:600; color:#06060f; padding:14px 28px; border-radius:999px; border:none; background:linear-gradient(120deg,#9B7BFF,#5B8DEF 55%,#57E0E0); box-shadow:0 12px 36px rgba(91,141,239,.4);">Subscribe</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer style="position:relative; z-index:1; border-top:1px solid var(--hair); padding:36px clamp(20px,5vw,56px); max-width:1240px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:18px;">
+    <div style="display:flex; align-items:center; gap:11px;">
+      <svg width="24" height="24" viewBox="0 0 30 30" fill="none"><line x1="6" y1="24" x2="18" y2="4" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round"></line><line x1="13" y1="26" x2="25" y2="6" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round"></line></svg>
+      <span style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.14em; color:var(--ink-mute);">THE PARALLEL RECORD · ISSUE 07</span>
+    </div>
+    <a href="PARALLED Landing.dc.html" style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.1em; color:var(--ink-soft); text-decoration:none;">← BACK TO LANDING</a>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280},&quot;animations&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { theme: 'dark', cat: 'all' };
+
+  CATS = [
+    { key: 'all', label: 'All', color: '155,123,255' },
+    { key: 'field', label: 'Field Notes', color: '87,224,224' },
+    { key: 'reasoning', label: 'Reasoning Logs', color: '155,123,255' },
+    { key: 'calls', label: 'Board Calls', color: '91,141,239' },
+    { key: 'transmissions', label: 'Transmissions', color: '241,120,182' },
+    { key: 'methods', label: 'Methods', color: '120,224,224' }
+  ];
+
+  ARTICLES = [
+    { cat: 'field', catLabel: 'FIELD NOTES', color: '87,224,224', title: 'Three rigorous claims by Friday: anatomy of a 72-hour call', excerpt: 'A journal posted a call Tuesday. We logged what happened when supply finally met live, declared demand.', author: 'PROF. L. VANCE', date: 'JUN 14', read: '8 MIN' },
+    { cat: 'calls', catLabel: 'BOARD CALLS', color: '91,141,239', title: 'The Open Board of Nine Stars posts its first call', excerpt: 'Topic, scope and acceptance criteria — declared before a single result exists. Read the full call.', author: 'EDITORIAL', date: 'JUN 11', read: '4 MIN' },
+    { cat: 'transmissions', catLabel: 'TRANSMISSIONS', color: '241,120,182', title: 'Transmission fragment, origin unknown', excerpt: 'Decrypted from the relay: a civilization is measured by the questions it dares to make public.', author: 'SIGNALS DESK', date: 'JUN 09', read: '3 MIN' },
+    { cat: 'methods', catLabel: 'METHODS', color: '120,224,224', title: 'Four tiers of depth, not a ladder of worth', excerpt: 'Why Easy, done honestly, is not lesser work — and how the gradient actually maps to provability.', author: 'METHODS GROUP', date: 'JUN 05', read: '6 MIN' },
+    { cat: 'reasoning', catLabel: 'REASONING LOGS', color: '155,123,255', title: 'Every veto must carry its reasoning', excerpt: 'How the investigator\u2019s open reasoning log keeps fear from quietly shaping the science.', author: 'KEPLER-AI', date: 'JUN 02', read: '5 MIN' },
+    { cat: 'field', catLabel: 'FIELD NOTES', color: '87,224,224', title: 'Publishing a clean baseline without shame', excerpt: 'A PhD candidate on why the Easy tier let her ship honest work — and then move on to depth.', author: 'SORA N.', date: 'MAY 28', read: '4 MIN' },
+    { cat: 'calls', catLabel: 'BOARD CALLS', color: '91,141,239', title: 'What boards are asking for this cycle', excerpt: 'A digest of every live call across the network, with scope and rigor tier, refreshed weekly.', author: 'EDITORIAL', date: 'MAY 24', read: '5 MIN' },
+    { cat: 'reasoning', catLabel: 'REASONING LOGS', color: '155,123,255', title: 'When the model and the board disagree', excerpt: 'A worked example of a conflict surfaced in the open — and the revisable trail that resolved it.', author: 'DR. A. ORúE', date: 'MAY 20', read: '9 MIN' },
+    { cat: 'transmissions', catLabel: 'TRANSMISSIONS', color: '241,120,182', title: 'The Cultivators have been watching', excerpt: 'Orbit 04 sends word: open reasoning is how a civilization earns trust. They intend to land soon.', author: 'SIGNALS DESK', date: 'MAY 16', read: '3 MIN' }
+  ];
+
+  JOURNALS = [
+    { name: 'Nine Stars Review', code: 'PRL-NSR-01', mark: 'N', field: 'Astrophysics', tier: 'EXPERTISED', tierC: '241,120,182', cadence: 'Monthly', next: 'NEXT JUL 02', trial: 'FREE ×1', c1: '#9B7BFF', c2: '#5B8DEF', angle: '120deg' },
+    { name: 'Helix Letters', code: 'PRL-HLX-04', mark: 'H', field: 'Genomics', tier: 'COMPLEX', tierC: '155,123,255', cadence: 'Biweekly', next: 'NEXT JUN 28', trial: 'FREE ×1', c1: '#57E0E0', c2: '#5B8DEF', angle: '135deg' },
+    { name: 'Terra Methods', code: 'PRL-TRA-02', mark: 'T', field: 'Climate', tier: 'MEDIUM', tierC: '91,141,239', cadence: 'Weekly', next: 'NEXT JUN 25', trial: 'FREE ×1', c1: '#9B7BFF', c2: '#57E0E0', angle: '120deg' },
+    { name: 'Quanta Open', code: 'PRL-QNT-07', mark: 'Q', field: 'Quantum', tier: 'EXPERTISED', tierC: '241,120,182', cadence: 'Monthly', next: 'NEXT JUL 09', trial: 'FREE ×1', c1: '#F178B6', c2: '#9B7BFF', angle: '120deg' },
+    { name: 'Cortex Notes', code: 'PRL-CTX-03', mark: 'C', field: 'Neuroscience', tier: 'MEDIUM', tierC: '91,141,239', cadence: 'Biweekly', next: 'NEXT JUN 30', trial: 'FREE ×1', c1: '#57E0E0', c2: '#9B7BFF', angle: '135deg' },
+    { name: 'Baseline', code: 'PRL-BSL-09', mark: 'B', field: 'Open Methods', tier: 'EASY', tierC: '120,224,224', cadence: 'Weekly', next: 'NEXT JUN 24', trial: 'FREE ×1', c1: '#57E0E0', c2: '#5B8DEF', angle: '120deg' }
+  ];
+
+  TIERS = [
+    { name: 'Easy', c: '120,224,224', desc: 'An honest baseline, cleanly shown.' },
+    { name: 'Medium', c: '91,141,239', desc: 'Method and controls held to standard.' },
+    { name: 'Complex', c: '155,123,255', desc: 'Multi-stage work, open reasoning log.' },
+    { name: 'Expertised', c: '241,120,182', desc: 'Full platform-wide audit trail.' }
+  ];
+
+  SERVICES = ['Open call publishing', 'Demand–supply matching', 'Visible-reasoning review', 'Ethics gate & pilot', 'Credit & verification', 'Reviewer assignment', 'Issue delivery & archive', 'Revisable decision logs'];
+
+  RULES = [
+    { n: '01', title: 'Declare demand before supply', body: 'Post topic, scope and acceptance criteria as a public call — before any result exists. No retro-fitting.' },
+    { n: '02', title: 'Charter a verified board', body: 'At least three verified reviewers with declared expertise. Identities and conflicts are on the record.' },
+    { n: '03', title: 'Publish acceptance criteria', body: 'State the rigor tier and what "accepted" means up front, so any researcher can self-assess fit.' },
+    { n: '04', title: 'Keep every decision revisable', body: 'Each veto and acceptance carries its reasoning in an open log that can be challenged and revised.' },
+    { n: '05', title: 'Commit to a delivery cadence', body: 'Choose a weekly, biweekly or monthly issue rhythm — and ship the trial issue to prove it.' }
+  ];
+
+  setDark = () => this.switchTheme('dark');
+  setLight = () => this.switchTheme('light');
+  setAlien = () => this.switchTheme('alien');
+  switchTheme(t) { if (this.state.theme === t) return; this.setState({ theme: t }); this.applyTheme(t); }
+
+  applyTheme(tArg) {
+    const t = tArg || this.state.theme;
+    if (this.root) this.root.dataset.theme = t;
+    try { document.documentElement.dataset.theme = t; } catch (e) {}
+    if (this.aurora) {
+      this.aurora.style.opacity = t === 'light' ? '0.25' : (t === 'alien' ? '0.5' : '1');
+      this.aurora.style.filter = t === 'alien' ? 'hue-rotate(125deg) saturate(1.25)' : 'none';
+    }
+  }
+
+  buildAmbient() {
+    const on = this.animOn;
+    if (this.stars && !this.stars.dataset.built) {
+      this.stars.dataset.built = '1';
+      let html = '';
+      for (let i = 0; i < 90; i++) {
+        const x = (Math.random() * 100).toFixed(2), y = (Math.random() * 130).toFixed(2);
+        const r = (Math.random() * 1.6 + 0.4).toFixed(2);
+        const dur = (2 + Math.random() * 4).toFixed(2), del = (Math.random() * 4).toFixed(2);
+        const c = Math.random() < 0.75 ? '255,255,255' : '155,123,255';
+        html += '<span style="position:absolute; left:' + x + '%; top:' + y + '%; width:' + r + 'px; height:' + r + 'px; border-radius:50%; background:rgba(' + c + ',.9); box-shadow:0 0 6px rgba(' + c + ',.7);' + (on ? ' animation:starTwinkle ' + dur + 's ease-in-out ' + del + 's infinite;' : '') + '"></span>';
+      }
+      this.stars.innerHTML = html;
+    }
+    if (this.motes && !this.motes.dataset.built) {
+      this.motes.dataset.built = '1';
+      let html = '';
+      for (let i = 0; i < 26; i++) {
+        const x = (Math.random() * 100).toFixed(2), y = (60 + Math.random() * 40).toFixed(2);
+        const s = (Math.random() * 4 + 2).toFixed(2);
+        const dur = (5 + Math.random() * 6).toFixed(2), del = (Math.random() * 5).toFixed(2);
+        html += '<span style="position:absolute; left:' + x + '%; top:' + y + '%; width:' + s + 'px; height:' + s + 'px; border-radius:50%; background:rgba(255,255,255,.85);' + (on ? ' animation:motePulse ' + dur + 's ease-in-out ' + del + 's infinite;' : '') + '"></span>';
+      }
+      this.motes.innerHTML = html;
+    }
+    if (this.glyphs && !this.glyphs.dataset.built) {
+      this.glyphs.dataset.built = '1';
+      const GL = '⟁⌖⎔⏃⌇⊹⋔⟒⟡⌬⍉⟓⟐◈◇⬡';
+      let html = '';
+      for (let i = 0; i < 16; i++) {
+        const x = (Math.random() * 100).toFixed(2), y = (Math.random() * 100).toFixed(2);
+        const sz = (12 + Math.random() * 10).toFixed(0);
+        const dur = (6 + Math.random() * 6).toFixed(2), del = (Math.random() * 8).toFixed(2);
+        const g = GL[(Math.random() * GL.length) | 0] + GL[(Math.random() * GL.length) | 0];
+        html += '<span style="position:absolute; left:' + x + '%; top:' + y + '%; font-size:' + sz + 'px; letter-spacing:.2em; color:rgba(110,255,225,.55);' + (on ? ' animation:glyphRise ' + dur + 's ease-in-out ' + del + 's infinite;' : ' opacity:.4;') + '">' + g + '</span>';
+      }
+      this.glyphs.innerHTML = html;
+    }
+  }
+
+  componentDidMount() {
+    this.setupReveals();
+    this.buildAmbient();
+    this.applyTheme();
+    if (this.root) {
+      const sub = this.root.querySelector('[data-subscribe]');
+      if (sub) sub.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const btn = sub.querySelector('button');
+        if (btn) { btn.textContent = 'Subscribed \u2713'; btn.style.background = 'linear-gradient(120deg,#57E0E0,#9B7BFF)'; }
+      });
+    }
+  }
+
+  componentWillUnmount() {
+    if (this._io) this._io.disconnect();
+    if (this._onScroll) window.removeEventListener('scroll', this._onScroll);
+    if (this._safety) clearTimeout(this._safety);
+  }
+
+  get animOn() {
+    return this.props.animations !== false && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  setupReveals() {
+    const root = this.root;
+    if (!root) return;
+    const els = Array.from(root.querySelectorAll('[data-reveal]'));
+    const animate = this.animOn && ('IntersectionObserver' in window);
+    if (!animate) { els.forEach(el => { el.style.opacity = '1'; el.style.transform = 'none'; }); this.bindHover(); return; }
+    els.forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(30px)';
+      el.style.transition = 'opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1)';
+    });
+    const reveal = (el) => {
+      if (el.dataset.revealed) return;
+      el.dataset.revealed = '1';
+      const d = parseInt(el.getAttribute('data-reveal-delay') || '0', 10);
+      setTimeout(() => { el.style.opacity = '1'; el.style.transform = 'none'; }, d);
+    };
+    const inView = (el) => {
+      const r = el.getBoundingClientRect();
+      return r.top < (window.innerHeight || 800) * 0.94 && r.bottom > 0;
+    };
+    els.forEach(el => { if (inView(el)) reveal(el); });
+    this._io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { reveal(e.target); this._io.unobserve(e.target); } });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    els.forEach(el => this._io.observe(el));
+    this._onScroll = () => { els.forEach(el => { if (!el.dataset.revealed && inView(el)) reveal(el); }); };
+    window.addEventListener('scroll', this._onScroll, { passive: true });
+    this._safety = setTimeout(() => { els.forEach(el => { el.dataset.revealed = '1'; el.style.transition = 'none'; el.style.opacity = '1'; el.style.transform = 'none'; }); }, 1400);
+    this.bindHover();
+  }
+
+  bindHover() {
+    const root = this.root;
+    if (!root) return;
+    root.querySelectorAll('[data-feed-card]').forEach(c => {
+      if (c.dataset.bound) return; c.dataset.bound = '1';
+      c.addEventListener('mouseenter', () => { c.style.transform = 'translateY(-6px)'; c.style.borderColor = 'rgba(155,123,255,.45)'; c.style.background = 'rgba(155,123,255,.06)'; });
+      c.addEventListener('mouseleave', () => { c.style.transform = 'none'; c.style.borderColor = 'var(--hair)'; c.style.background = 'var(--panel)'; });
+    });
+    const feat = root.querySelector('[data-card-featured]');
+    if (feat && !feat.dataset.bound) {
+      feat.dataset.bound = '1';
+      feat.addEventListener('mouseenter', () => { feat.style.transform = 'translateY(-5px)'; feat.style.borderColor = 'rgba(155,123,255,.5)'; });
+      feat.addEventListener('mouseleave', () => { feat.style.transform = 'none'; feat.style.borderColor = 'var(--hair-s)'; });
+    }
+    root.querySelectorAll('[data-journal-row]').forEach(rw => {
+      if (rw.dataset.bound) return; rw.dataset.bound = '1';
+      rw.addEventListener('mouseenter', () => { rw.style.background = 'rgba(155,123,255,.07)'; });
+      rw.addEventListener('mouseleave', () => { rw.style.background = 'transparent'; });
+    });
+  }
+
+  componentDidUpdate() { this.bindHover(); }
+
+  renderVals() {
+    const theme = this.state.theme;
+    const cat = this.state.cat;
+    const sw = (k) => theme === k
+      ? { bg: 'linear-gradient(120deg,#9B7BFF,#57E0E0)', color: '#06060f' }
+      : { bg: 'transparent', color: 'var(--ink-soft)' };
+    const d = sw('dark'), l = sw('light'), a = sw('alien');
+
+    const cats = this.CATS.map(c => {
+      const active = c.key === cat;
+      return {
+        label: c.label,
+        onClick: () => this.setState({ cat: c.key }),
+        bg: active ? 'rgba(' + c.color + ',.16)' : 'var(--panel)',
+        color: active ? 'rgb(' + c.color + ')' : 'var(--ink-mute)',
+        border: active ? 'rgba(' + c.color + ',.5)' : 'var(--hair)'
+      };
+    });
+
+    const articles = this.ARTICLES.filter(x => cat === 'all' || x.cat === cat);
+
+    return {
+      rootRef: (el) => { this.root = el; },
+      auroraRef: (el) => { this.aurora = el; },
+      starsRef: (el) => { this.stars = el; this.buildAmbient(); },
+      motesRef: (el) => { this.motes = el; this.buildAmbient(); },
+      glyphsRef: (el) => { this.glyphs = el; this.buildAmbient(); },
+      setDark: this.setDark, setLight: this.setLight, setAlien: this.setAlien,
+      darkBg: d.bg, darkColor: d.color,
+      lightBg: l.bg, lightColor: l.color,
+      alienBg: a.bg, alienColor: a.color,
+      cats,
+      articles,
+      journals: this.JOURNALS,
+      tiers: this.TIERS,
+      services: this.SERVICES,
+      rules: this.RULES,
+      empty: articles.length === 0
+    };
+  }
+}
+</script>
+</body>
+</html>

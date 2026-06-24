@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Playfair+Display:ital,wght@0,500;0,600;1,500&amp;display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  :root, [data-theme="dark"] {
+    --bg:#060611; --ink:#ECEAF5; --ink-soft:#B6B3CC; --ink-mute:#9D9AB5; --ink-faint:#6E6B86;
+    --hair:rgba(255,255,255,.08); --hair-s:rgba(255,255,255,.14);
+    --panel:rgba(255,255,255,.03); --panel-s:rgba(255,255,255,.05); --nav-bg:linear-gradient(180deg, rgba(6,6,17,.82), rgba(6,6,17,.35));
+    --drawer-bg:rgba(11,11,24,.92);
+  }
+  [data-theme="light"] {
+    --bg:#bfe0fb; --ink:#15263f; --ink-soft:#39506e; --ink-mute:#5d7189; --ink-faint:#8aa0b8;
+    --hair:rgba(20,45,80,.14); --hair-s:rgba(20,45,80,.26);
+    --panel:rgba(255,255,255,.6); --panel-s:rgba(255,255,255,.8); --nav-bg:linear-gradient(180deg, rgba(244,250,255,.85), rgba(244,250,255,.45));
+    --drawer-bg:rgba(238,246,255,.94);
+  }
+  [data-theme="alien"] {
+    --bg:#060f1a; --ink:#E6FCFF; --ink-soft:#9fdce8; --ink-mute:#74c0d2; --ink-faint:#4a8498;
+    --hair:rgba(110,255,225,.16); --hair-s:rgba(110,255,225,.3);
+    --panel:rgba(18,52,62,.34); --panel-s:rgba(22,70,82,.46); --nav-bg:linear-gradient(180deg, rgba(6,15,26,.85), rgba(6,15,26,.4));
+    --drawer-bg:rgba(7,18,30,.93);
+  }
+  html, body { margin:0; padding:0; background:var(--bg); transition:background .9s ease; }
+  ::selection { background:rgba(155,123,255,0.35); color:#fff; }
+  ::-webkit-scrollbar { width:10px; height:10px; }
+  ::-webkit-scrollbar-thumb { background:rgba(155,123,255,.3); border-radius:10px; }
+  @keyframes auroraA { 0%{transform:translate(0,0) scale(1)} 50%{transform:translate(7%,-5%) scale(1.18)} 100%{transform:translate(0,0) scale(1)} }
+  @keyframes auroraB { 0%{transform:translate(0,0) scale(1.1)} 50%{transform:translate(-9%,6%) scale(1.3)} 100%{transform:translate(0,0) scale(1.1)} }
+  @keyframes auroraC { 0%{transform:translate(0,0) scale(1)} 50%{transform:translate(5%,8%) scale(1.22)} 100%{transform:translate(0,0) scale(1)} }
+  @keyframes pulseGlow { 0%,100%{opacity:.45} 50%{opacity:1} }
+  @keyframes shimmer { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
+  @keyframes spinSlow { to{transform:rotate(360deg)} }
+  @keyframes momentumRise { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+  @keyframes drawerIn { 0%{transform:translateX(40px); opacity:0} 100%{transform:translateX(0); opacity:1} }
+  @keyframes backdropIn { 0%{opacity:0} 100%{opacity:1} }
+  @keyframes msgIn { 0%{transform:translateY(14px); opacity:0} 100%{transform:translateY(0); opacity:1} }
+  @keyframes ringPulse { 0%{transform:scale(.7); opacity:.7} 100%{transform:scale(2.1); opacity:0} }
+  @keyframes typingDot { 0%,60%,100%{transform:translateY(0); opacity:.4} 30%{transform:translateY(-4px); opacity:1} }
+  [data-reveal]{ will-change:opacity, transform; }
+  [data-topic-card]{ transition:transform .4s cubic-bezier(.16,1,.3,1), border-color .4s, background .4s; }
+  [data-domain-chip]{ transition:all .25s; }
+</style>
+<script src="./bg-fx.js"></script>
+</helmet>
+
+<div ref="{{ rootRef }}" data-screen-label="Commons" style="position:relative; background:var(--bg); color:var(--ink); font-family:'Manrope',system-ui,sans-serif; overflow-x:hidden; -webkit-font-smoothing:antialiased; min-height:100vh;">
+
+  <!-- ===== AMBIENT BACKGROUND : CONVERSATION NETWORK ===== -->
+  <div ref="{{ auroraRef }}" style="position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; transition:opacity .9s ease, filter .9s ease;">
+    <canvas ref="{{ netRef }}" style="position:absolute; inset:0; width:100%; height:100%; display:block;"></canvas>
+    <div style="position:absolute; top:-20%; left:-12%; width:62vw; height:62vw; border-radius:50%; filter:blur(95px); opacity:.5; background:radial-gradient(circle at 30% 30%, rgba(155,123,255,.5), rgba(155,123,255,0) 70%); animation:auroraA 24s ease-in-out infinite;"></div>
+    <div style="position:absolute; top:6%; right:-16%; width:56vw; height:56vw; border-radius:50%; filter:blur(105px); opacity:.42; background:radial-gradient(circle at 50% 50%, rgba(87,224,224,.4), rgba(87,224,224,0) 70%); animation:auroraB 28s ease-in-out infinite;"></div>
+    <div style="position:absolute; bottom:-24%; left:22%; width:56vw; height:56vw; border-radius:50%; filter:blur(115px); opacity:.36; background:radial-gradient(circle at 50% 50%, rgba(241,120,182,.32), rgba(241,120,182,0) 70%); animation:auroraC 32s ease-in-out infinite;"></div>
+    <div style="position:absolute; inset:0; opacity:.3; mix-blend-mode:screen; background-image:repeating-linear-gradient(118deg, transparent 0 40px, rgba(155,123,255,.05) 40px 41px);"></div>
+  </div>
+
+  <!-- ===== THEME SWITCHER ===== -->
+  <div style="position:fixed; z-index:60; bottom:24px; left:50%; transform:translateX(-50%); display:flex; gap:4px; padding:5px; border-radius:999px; border:1px solid var(--hair-s); background:var(--panel-s); backdrop-filter:blur(18px); box-shadow:0 10px 40px rgba(0,0,0,.3);">
+    <button onClick="{{ setDark }}" title="Cosmos" style="cursor:pointer; display:flex; align-items:center; gap:8px; font-family:'Manrope',sans-serif; font-size:13px; font-weight:600; padding:9px 15px; border-radius:999px; border:none; background:{{ darkBg }}; color:{{ darkColor }}; transition:all .3s;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" fill="currentColor"></path></svg>Cosmos
+    </button>
+    <button onClick="{{ setLight }}" title="Light" style="cursor:pointer; display:flex; align-items:center; gap:8px; font-family:'Manrope',sans-serif; font-size:13px; font-weight:600; padding:9px 15px; border-radius:999px; border:none; background:{{ lightBg }}; color:{{ lightColor }}; transition:all .3s;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.5" fill="currentColor"></circle><g stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 2v3"></path><path d="M12 19v3"></path><path d="M2 12h3"></path><path d="M19 12h3"></path><path d="M5 5l2 2"></path><path d="M17 17l2 2"></path><path d="M19 5l-2 2"></path><path d="M7 17l-2 2"></path></g></svg>Light
+    </button>
+    <button onClick="{{ setAlien }}" title="Alien" style="cursor:pointer; display:flex; align-items:center; gap:8px; font-family:'Manrope',sans-serif; font-size:13px; font-weight:600; padding:9px 15px; border-radius:999px; border:none; background:{{ alienBg }}; color:{{ alienColor }}; transition:all .3s;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="14" rx="9" ry="3.2" fill="currentColor"></ellipse><path d="M7 12a5 5 0 0 1 10 0Z" fill="currentColor" opacity="0.7"></path></svg>Alien
+    </button>
+  </div>
+
+  <!-- ===== NAV ===== -->
+  <nav style="position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between; padding:20px clamp(20px,5vw,56px); backdrop-filter:blur(18px); background:var(--nav-bg); border-bottom:1px solid var(--hair);">
+    <a href="PARALLED Landing.dc.html" style="display:flex; align-items:center; gap:12px; text-decoration:none; color:inherit;">
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none" style="display:block;">
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="30" y2="30"><stop offset="0" stop-color="#9B7BFF"></stop><stop offset="0.5" stop-color="#5B8DEF"></stop><stop offset="1" stop-color="#57E0E0"></stop></linearGradient></defs>
+        <line x1="6" y1="24" x2="18" y2="4" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round"></line>
+        <line x1="13" y1="26" x2="25" y2="6" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round"></line>
+      </svg>
+      <span style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:18px; letter-spacing:.14em;">PARALLED</span>
+    </a>
+    <div style="display:flex; align-items:center; gap:34px; font-size:14.5px; color:var(--ink-soft);">
+      <a href="PARALLED Landing.dc.html#platform" style="color:inherit; text-decoration:none;">Platform</a>
+      <a href="Journal.dc.html" style="color:inherit; text-decoration:none;">Journal</a>
+      <a href="PARALLED Landing.dc.html#transmissions" style="color:inherit; text-decoration:none;">Signals</a>
+      <a href="Commons.dc.html" style="color:var(--ink); text-decoration:none; font-weight:600;">Nexus Q</a>
+    </div>
+    <a href="#ask" style="text-decoration:none; font-size:14px; font-weight:600; color:#06060f; padding:11px 22px; border-radius:999px; background:linear-gradient(120deg,#9B7BFF,#57E0E0); box-shadow:0 8px 28px rgba(91,141,239,.4);">Ask a question</a>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <header style="position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:clamp(52px,9vh,104px) clamp(20px,5vw,56px) clamp(30px,5vh,52px);">
+    <div data-reveal="" style="display:inline-flex; align-items:center; gap:10px; padding:8px 16px; border-radius:999px; border:1px solid var(--hair-s); background:var(--panel); font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.16em; color:var(--ink-mute); margin-bottom:28px;">
+      <span style="width:7px; height:7px; border-radius:50%; background:#57E0E0; box-shadow:0 0 10px #57E0E0; animation:pulseGlow 2.4s ease-in-out infinite;"></span>
+      NEXUS Q · HEALTHCARE · LIVE NOW
+    </div>
+    <h1 data-reveal="" data-reveal-delay="80" style="font-family:'Playfair Display',serif; font-weight:700; font-size:clamp(40px,6.2vw,84px); line-height:1; letter-spacing:-.03em; margin:0 0 24px; max-width:900px;">
+      Where the hardest healthcare<br><span style="background:linear-gradient(110deg,#9B7BFF 0%,#5B8DEF 40%,#57E0E0 72%,#F178B6 100%); background-size:220% auto; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; animation:shimmer 7s linear infinite;">questions find their people.</span>
+    </h1>
+    <p data-reveal="" data-reveal-delay="160" style="font-size:clamp(16px,1.5vw,19px); line-height:1.62; color:var(--ink-soft); max-width:640px; margin:0 0 36px;">
+      Follow what every clinical domain is debating right now. Open a question, read the newcomer summary, and join a real conversation — with documents, videos and datasets pulled straight from Drive. When a thread gets serious, turn it into a research question in one click.
+    </p>
+    <div data-reveal="" data-reveal-delay="220" style="display:flex; gap:14px; flex-wrap:wrap; align-items:center; margin-bottom:50px;">
+      <a href="#trending" style="text-decoration:none; font-size:15px; font-weight:600; color:#06060f; padding:14px 28px; border-radius:999px; background:linear-gradient(120deg,#9B7BFF,#5B8DEF 55%,#57E0E0); box-shadow:0 10px 30px rgba(91,141,239,.4);">Browse trending</a>
+      <a href="#ask" style="text-decoration:none; font-size:15px; font-weight:600; color:var(--ink); padding:14px 26px; border-radius:999px; border:1px solid var(--hair-s); background:var(--panel); backdrop-filter:blur(8px);">Ask a question</a>
+    </div>
+    <div data-reveal="" data-reveal-delay="300" style="display:flex; gap:clamp(20px,3vw,46px); flex-wrap:wrap; padding-top:30px; border-top:1px solid var(--hair);">
+      <div><div style="font-family:'Space Grotesk',sans-serif; font-size:30px; font-weight:700; background:linear-gradient(120deg,#9B7BFF,#57E0E0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">{{ stat.topics }}</div><div style="font-size:12.5px; color:var(--ink-mute); margin-top:3px;">trending questions</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif; font-size:30px; font-weight:700; background:linear-gradient(120deg,#9B7BFF,#57E0E0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">{{ stat.replies }}</div><div style="font-size:12.5px; color:var(--ink-mute); margin-top:3px;">posts this week</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif; font-size:30px; font-weight:700; background:linear-gradient(120deg,#9B7BFF,#57E0E0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">{{ stat.people }}</div><div style="font-size:12.5px; color:var(--ink-mute); margin-top:3px;">clinicians &amp; researchers</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif; font-size:30px; font-weight:700; background:linear-gradient(120deg,#F178B6,#9B7BFF); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">{{ stat.resources }}</div><div style="font-size:12.5px; color:var(--ink-mute); margin-top:3px;">resources shared</div></div>
+    </div>
+  </header>
+
+  <!-- ===== TRENDING + DOMAIN FILTER ===== -->
+  <section id="trending" style="position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:clamp(30px,5vh,60px) clamp(20px,5vw,56px) clamp(40px,7vh,80px);">
+    <div data-reveal="" style="display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:20px; margin-bottom:26px;">
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#7B8FFF; margin-bottom:14px;">TRENDING NOW · BY DOMAIN</div>
+        <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(26px,3.6vw,46px); line-height:1.04; letter-spacing:-.02em; margin:0;">What healthcare is arguing about today</h2>
+      </div>
+    </div>
+
+    <div data-reveal="" data-reveal-delay="60" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:26px;">
+      <sc-for list="{{ domains }}" as="d" hint-placeholder-count="8">
+        <button data-domain-chip="" onClick="{{ d.onClick }}" style="cursor:pointer; display:inline-flex; align-items:center; gap:8px; font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.06em; padding:9px 15px; border-radius:999px; border:1px solid {{ d.border }}; background:{{ d.bg }}; color:{{ d.color }};">
+          <span style="width:7px; height:7px; border-radius:50%; background:{{ d.dot }};"></span>{{ d.label }}
+        </button>
+      </sc-for>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(360px,1fr)); gap:16px;">
+      <sc-for list="{{ topics }}" as="t" hint-placeholder-count="6">
+        <article data-topic-card="" style="position:relative; display:flex; flex-direction:column; padding:26px; border-radius:20px; border:1px solid var(--hair); background:var(--panel); backdrop-filter:blur(10px); min-height:268px; overflow:hidden;">
+          <div style="position:absolute; top:-30px; right:-30px; width:120px; height:120px; border-radius:50%; background:radial-gradient(circle, rgba({{ t.color }},.28), transparent 70%); filter:blur(8px); pointer-events:none;"></div>
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px; position:relative;">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.1em; padding:4px 10px; border-radius:999px; background:rgba({{ t.color }},.14); border:1px solid rgba({{ t.color }},.3); color:rgb({{ t.color }});">{{ t.domainLabel }}</span>
+            <span style="display:inline-flex; align-items:center; gap:5px; font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.08em; color:{{ t.momColor }};">
+              <span style="display:inline-block; animation:momentumRise 1.8s ease-in-out infinite;">{{ t.momArrow }}</span>{{ t.momLabel }}
+            </span>
+            <span style="margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.08em; padding:3px 9px; border-radius:999px; border:1px solid {{ t.kindBorder }}; color:{{ t.kindColor }};">{{ t.kindLabel }}</span>
+          </div>
+          <h3 style="font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:20px; line-height:1.22; letter-spacing:-.01em; margin:0 0 12px; position:relative;">{{ t.title }}</h3>
+          <p style="font-size:14px; line-height:1.6; color:var(--ink-mute); margin:0 0 20px; flex:1; position:relative;">{{ t.summary }}</p>
+          <div style="display:flex; align-items:center; gap:16px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.04em; color:var(--ink-faint); padding-top:16px; border-top:1px solid var(--hair); margin-bottom:16px; position:relative;">
+            <span>{{ t.people }} in</span><span style="opacity:.4;">·</span><span>{{ t.replies }} posts</span><span style="opacity:.4;">·</span><span>{{ t.resCount }} files</span>
+          </div>
+          <button onClick="{{ t.onOpen }}" style="position:relative; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; width:100%; font-family:'Manrope',sans-serif; font-size:14px; font-weight:600; color:var(--ink); padding:12px 18px; border-radius:12px; border:1px solid rgba({{ t.color }},.4); background:rgba({{ t.color }},.1); transition:all .25s;">
+            Start exploring
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+          </button>
+        </article>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ===== ASK / FRAME A QUESTION ===== -->
+  <section id="ask" style="position:relative; z-index:1; max-width:900px; margin:0 auto; padding:clamp(30px,5vh,60px) clamp(20px,5vw,56px) clamp(40px,7vh,80px);">
+    <div data-reveal="" style="margin-bottom:26px;">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#57E0E0; margin-bottom:14px;">START A CONVERSATION</div>
+      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(26px,3.6vw,46px); line-height:1.04; letter-spacing:-.02em; margin:0 0 12px;">Frame a question</h2>
+      <p style="font-size:16px; line-height:1.6; color:var(--ink-soft); max-width:620px; margin:0;">Two ways to begin. An <strong style="color:var(--ink);">exploring question</strong> opens a discussion to learn and pressure-test an idea. A <strong style="color:var(--ink);">research question</strong> commits to a hypothesis and scope — ready to become a study.</p>
+    </div>
+
+    <div data-reveal="" data-reveal-delay="60" style="border:1px solid var(--hair-s); border-radius:24px; background:var(--panel); backdrop-filter:blur(14px); overflow:hidden;">
+      <!-- kind toggle -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0;">
+        <button onClick="{{ pickExploring }}" style="cursor:pointer; text-align:left; padding:22px 24px; border:none; border-bottom:2px solid {{ exploreUnderline }}; background:{{ exploreBg }}; transition:all .3s;">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="{{ exploreIcon }}" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+            <span style="font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:16px; color:{{ exploreTitle }};">Exploring question</span>
+          </div>
+          <div style="font-size:13px; line-height:1.5; color:var(--ink-mute);">Open it up. Gather perspectives, doubts and evidence.</div>
+        </button>
+        <button onClick="{{ pickResearch }}" style="cursor:pointer; text-align:left; padding:22px 24px; border:none; border-bottom:2px solid {{ researchUnderline }}; background:{{ researchBg }}; transition:all .3s;">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="{{ researchIcon }}" stroke-width="1.8" stroke-linecap="round"><path d="M9 3h6M10 3v6.5L5 19a2 2 0 0 0 1.8 3h10.4A2 2 0 0 0 19 19l-5-9.5V3"></path></svg>
+            <span style="font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:16px; color:{{ researchTitle }};">Research question</span>
+          </div>
+          <div style="font-size:13px; line-height:1.5; color:var(--ink-mute);">Commit a hypothesis &amp; scope. Ready to become a study.</div>
+        </button>
+      </div>
+
+      <div style="padding:24px;">
+        <textarea ref="{{ askRef }}" placeholder="{{ askPlaceholder }}" rows="3" style="width:100%; resize:vertical; font-family:'Manrope',sans-serif; font-size:16px; line-height:1.5; color:var(--ink); background:transparent; border:none; outline:none; padding:0; margin-bottom:6px;"></textarea>
+
+        <sc-if value="{{ isResearch }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0 4px;">
+            <input placeholder="Hypothesis — what you expect to find" style="font-family:'Manrope',sans-serif; font-size:13.5px; color:var(--ink); background:rgba(155,123,255,.06); border:1px solid rgba(155,123,255,.22); border-radius:11px; padding:11px 14px; outline:none;">
+            <input placeholder="Scope — population, setting, window" style="font-family:'Manrope',sans-serif; font-size:13.5px; color:var(--ink); background:rgba(155,123,255,.06); border:1px solid rgba(155,123,255,.22); border-radius:11px; padding:11px 14px; outline:none;">
+          </div>
+        </sc-if>
+
+        <!-- domain picker -->
+        <div style="margin:18px 0 14px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.12em; color:var(--ink-faint); margin-bottom:10px;">DOMAIN</div>
+          <div style="display:flex; flex-wrap:wrap; gap:7px;">
+            <sc-for list="{{ askDomains }}" as="ad" hint-placeholder-count="8">
+              <button onClick="{{ ad.onClick }}" style="cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.04em; padding:7px 12px; border-radius:999px; border:1px solid {{ ad.border }}; background:{{ ad.bg }}; color:{{ ad.color }}; transition:all .2s;">{{ ad.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- attach resources -->
+        <div style="padding-top:16px; border-top:1px solid var(--hair);">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.12em; color:var(--ink-faint); margin-bottom:10px;">ATTACH EVIDENCE</div>
+          <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+            <sc-for list="{{ attachButtons }}" as="ab" hint-placeholder-count="5">
+              <button onClick="{{ ab.onClick }}" style="cursor:pointer; display:inline-flex; align-items:center; gap:8px; font-family:'Manrope',sans-serif; font-size:13px; font-weight:500; color:var(--ink-soft); padding:9px 14px; border-radius:11px; border:1px solid var(--hair-s); background:var(--panel-s); transition:all .25s;">
+                <span style="display:grid; place-items:center; width:20px; height:20px; border-radius:6px; background:rgba({{ ab.color }},.18); color:rgb({{ ab.color }}); font-family:'JetBrains Mono',monospace; font-size:8.5px; font-weight:500;">{{ ab.tag }}</span>{{ ab.label }}
+              </button>
+            </sc-for>
+          </div>
+          <sc-if value="{{ hasAttachments }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:4px;">
+              <sc-for list="{{ attachments }}" as="at" hint-placeholder-count="2">
+                <span style="display:inline-flex; align-items:center; gap:9px; font-family:'Manrope',sans-serif; font-size:12.5px; color:var(--ink); padding:7px 10px 7px 8px; border-radius:10px; border:1px solid rgba({{ at.color }},.3); background:rgba({{ at.color }},.08);">
+                  <span style="display:grid; place-items:center; width:22px; height:22px; border-radius:6px; background:rgba({{ at.color }},.2); color:rgb({{ at.color }}); font-family:'JetBrains Mono',monospace; font-size:8.5px;">{{ at.tag }}</span>
+                  {{ at.name }}
+                  <button onClick="{{ at.onRemove }}" style="cursor:pointer; display:grid; place-items:center; width:18px; height:18px; border-radius:50%; border:none; background:var(--hair-s); color:var(--ink-soft); font-size:13px; line-height:1;">×</button>
+                </span>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+
+        <!-- submit -->
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; padding-top:18px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.04em; color:var(--ink-faint);">{{ kindHint }}</div>
+          <button onClick="{{ postQuestion }}" style="cursor:pointer; display:inline-flex; align-items:center; gap:9px; font-family:'Manrope',sans-serif; font-size:14.5px; font-weight:600; color:#06060f; padding:13px 26px; border-radius:12px; border:none; background:linear-gradient(120deg,#9B7BFF,#57E0E0); box-shadow:0 8px 24px rgba(91,141,239,.36);">
+            {{ postLabel }}
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== EVIDENCE / STORAGE STRIP ===== -->
+  <section style="position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:0 clamp(20px,5vw,56px) clamp(50px,9vh,100px);">
+    <div data-reveal="" style="border:1px solid var(--hair); border-radius:22px; background:linear-gradient(150deg, rgba(155,123,255,.08), rgba(87,224,224,.05)); backdrop-filter:blur(10px); padding:clamp(28px,4vw,44px); display:grid; grid-template-columns:1.1fr 1fr; gap:36px; align-items:center;">
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.2em; color:#9B7BFF; margin-bottom:14px;">BRING YOUR EVIDENCE</div>
+        <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(22px,3vw,34px); line-height:1.1; letter-spacing:-.02em; margin:0 0 14px;">Every claim, backed by something you can open.</h2>
+        <p style="font-size:15px; line-height:1.62; color:var(--ink-soft); margin:0;">Drop in a paper, a recorded grand-round, a dataset or a slide deck. Attach straight from Google Drive or any storage you already use — links stay live, versions stay tracked, and the whole thread can trace where a claim came from.</p>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <sc-for list="{{ integrations }}" as="ig" hint-placeholder-count="5">
+          <div style="display:flex; align-items:center; gap:14px; padding:14px 16px; border-radius:14px; border:1px solid var(--hair); background:var(--panel);">
+            <span style="flex:none; display:grid; place-items:center; width:38px; height:38px; border-radius:10px; background:rgba({{ ig.color }},.16); color:rgb({{ ig.color }}); font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:500;">{{ ig.tag }}</span>
+            <div style="flex:1;">
+              <div style="font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:15px;">{{ ig.name }}</div>
+              <div style="font-size:12.5px; color:var(--ink-mute);">{{ ig.desc }}</div>
+            </div>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.08em; color:{{ ig.statusColor }};">{{ ig.status }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer style="position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:clamp(28px,5vh,44px) clamp(20px,5vw,56px); border-top:1px solid var(--hair); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span style="width:9px; height:9px; border-radius:50%; background:#57E0E0; box-shadow:0 0 12px #57E0E0; animation:pulseGlow 2.4s ease-in-out infinite;"></span>
+      <span style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.14em; color:var(--ink-mute);">PARALLED · NEXUS Q · HEALTHCARE</span>
+    </div>
+    <a href="PARALLED Landing.dc.html" style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.1em; color:var(--ink-soft); text-decoration:none;">← BACK TO LANDING</a>
+  </footer>
+
+  <!-- ===== CONVERSATION DRAWER ===== -->
+  <sc-if value="{{ drawerOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; z-index:90; display:flex; justify-content:flex-end;">
+      <div onClick="{{ closeThread }}" style="position:absolute; inset:0; background:rgba(2,3,8,.62); backdrop-filter:blur(4px); animation:backdropIn .3s ease;"></div>
+      <div style="position:relative; width:min(720px,100%); height:100%; background:var(--drawer-bg); backdrop-filter:blur(26px); border-left:1px solid var(--hair-s); box-shadow:-30px 0 80px rgba(0,0,0,.5); display:flex; flex-direction:column; animation:drawerIn .42s cubic-bezier(.16,1,.3,1);">
+
+        <!-- drawer header -->
+        <div style="flex:none; padding:24px clamp(22px,3vw,34px) 20px; border-bottom:1px solid var(--hair);">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.1em; padding:4px 10px; border-radius:999px; background:rgba({{ dTopic.color }},.16); border:1px solid rgba({{ dTopic.color }},.34); color:rgb({{ dTopic.color }});">{{ dTopic.domainLabel }}</span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.08em; padding:3px 9px; border-radius:999px; border:1px solid {{ dTopic.kindBorder }}; color:{{ dTopic.kindColor }};">{{ dTopic.kindLabel }}</span>
+            <span style="display:inline-flex; align-items:center; gap:5px; font-family:'JetBrains Mono',monospace; font-size:10.5px; color:{{ dTopic.momColor }};">{{ dTopic.momArrow }} {{ dTopic.momLabel }}</span>
+            <button onClick="{{ closeThread }}" style="margin-left:auto; cursor:pointer; display:grid; place-items:center; width:34px; height:34px; border-radius:10px; border:1px solid var(--hair-s); background:var(--panel); color:var(--ink-soft); font-size:18px; line-height:1;">×</button>
+          </div>
+          <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(20px,2.4vw,27px); line-height:1.18; letter-spacing:-.02em; margin:0 0 14px;">{{ dTopic.title }}</h2>
+          <div style="display:flex; align-items:center; gap:16px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.04em; color:var(--ink-faint);">
+            <span>{{ dTopic.people }} in conversation</span><span style="opacity:.4;">·</span><span>{{ dThreadCount }} posts</span><span style="opacity:.4;">·</span><span>{{ dTopic.resCount }} files</span>
+          </div>
+        </div>
+
+        <!-- drawer scroll body -->
+        <div ref="{{ drawerBodyRef }}" style="flex:1; overflow-y:auto; padding:24px clamp(22px,3vw,34px) 16px;">
+
+          <!-- newcomer summary -->
+          <div style="position:relative; border-radius:18px; border:1px solid rgba(87,224,224,.32); background:linear-gradient(150deg, rgba(87,224,224,.12), rgba(155,123,255,.07)); padding:22px 22px 20px; margin-bottom:26px; overflow:hidden;">
+            <div style="position:absolute; top:-26px; right:-26px; width:110px; height:110px; border-radius:50%; background:radial-gradient(circle, rgba(87,224,224,.3), transparent 70%); filter:blur(6px);"></div>
+            <div style="display:flex; align-items:center; gap:9px; margin-bottom:13px; position:relative;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#57E0E0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 9 9"></path><path d="M21 3l-9 9"></path><path d="M15 3h6v6"></path></svg>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; color:#57E0E0;">CATCH UP · SUMMARY FOR NEWCOMERS</span>
+            </div>
+            <p style="font-size:15px; line-height:1.66; color:var(--ink); margin:0 0 16px; position:relative;">{{ dTopic.newcomerSummary }}</p>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:18px; position:relative;">
+              <sc-for list="{{ dStances }}" as="s" hint-placeholder-count="3">
+                <div style="display:flex; gap:11px; align-items:flex-start;">
+                  <span style="flex:none; margin-top:5px; width:7px; height:7px; border-radius:50%; background:rgb({{ s.color }}); box-shadow:0 0 8px rgba({{ s.color }},.7);"></span>
+                  <div style="font-size:13.5px; line-height:1.55; color:var(--ink-soft);"><strong style="color:var(--ink); font-weight:600;">{{ s.who }}</strong> {{ s.text }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; position:relative;">
+              <button onClick="{{ scrollToReply }}" style="cursor:pointer; display:inline-flex; align-items:center; gap:8px; font-family:'Manrope',sans-serif; font-size:13.5px; font-weight:600; color:#06060f; padding:11px 18px; border-radius:11px; border:none; background:linear-gradient(120deg,#57E0E0,#9B7BFF);">Join the conversation</button>
+              <button onClick="{{ toResearch }}" style="cursor:pointer; display:inline-flex; align-items:center; gap:8px; font-family:'Manrope',sans-serif; font-size:13.5px; font-weight:600; color:var(--ink); padding:11px 18px; border-radius:11px; border:1px solid var(--hair-s); background:var(--panel);">Frame as research question</button>
+            </div>
+          </div>
+
+          <!-- attached resources rail -->
+          <div style="margin-bottom:26px;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.14em; color:var(--ink-faint); margin-bottom:12px;">SHARED IN THIS THREAD · {{ dTopic.resCount }}</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+              <sc-for list="{{ dResources }}" as="r" hint-placeholder-count="4">
+                <div style="display:flex; align-items:center; gap:12px; padding:12px 13px; border-radius:13px; border:1px solid var(--hair); background:var(--panel); cursor:pointer;">
+                  <span style="flex:none; display:grid; place-items:center; width:36px; height:36px; border-radius:9px; background:rgba({{ r.color }},.18); color:rgb({{ r.color }}); font-family:'JetBrains Mono',monospace; font-size:9px; font-weight:500;">{{ r.tag }}</span>
+                  <div style="flex:1; min-width:0;">
+                    <div style="font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:13.5px; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ r.name }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--ink-faint); letter-spacing:.04em;">{{ r.meta }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <!-- thread -->
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.14em; color:var(--ink-faint); margin-bottom:16px;">THE CONVERSATION</div>
+          <div style="display:flex; flex-direction:column; gap:18px;">
+            <sc-for list="{{ dThread }}" as="m" hint-placeholder-count="4">
+              <div style="display:flex; gap:13px; animation:msgIn .4s ease both;">
+                <span style="flex:none; display:grid; place-items:center; width:40px; height:40px; border-radius:12px; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15px; color:#06060f; background:linear-gradient(135deg, rgb({{ m.color }}), rgba({{ m.color }},.55));">{{ m.initials }}</span>
+                <div style="flex:1; min-width:0;">
+                  <div style="display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin-bottom:7px;">
+                    <span style="font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14.5px; color:var(--ink);">{{ m.name }}</span>
+                    <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.06em; padding:2px 8px; border-radius:999px; background:rgba({{ m.color }},.14); color:rgb({{ m.color }});">{{ m.role }}</span>
+                    <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--ink-faint);">{{ m.time }}</span>
+                  </div>
+                  <div style="font-size:14.5px; line-height:1.62; color:var(--ink-soft); padding:13px 16px; border-radius:4px 14px 14px 14px; border:1px solid var(--hair); background:var(--panel);">{{ m.text }}</div>
+                  <sc-if value="{{ m.hasRes }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:inline-flex; align-items:center; gap:10px; margin-top:8px; padding:9px 13px; border-radius:11px; border:1px solid rgba({{ m.resColor }},.32); background:rgba({{ m.resColor }},.08); cursor:pointer;">
+                      <span style="flex:none; display:grid; place-items:center; width:28px; height:28px; border-radius:8px; background:rgba({{ m.resColor }},.2); color:rgb({{ m.resColor }}); font-family:'JetBrains Mono',monospace; font-size:8.5px;">{{ m.resTag }}</span>
+                      <div>
+                        <div style="font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:13px;">{{ m.resName }}</div>
+                        <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--ink-faint);">{{ m.resMeta }}</div>
+                      </div>
+                    </div>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- reply composer -->
+        <div style="flex:none; padding:14px clamp(22px,3vw,34px) 18px; border-top:1px solid var(--hair-s); background:var(--panel-s);">
+          <div style="display:flex; align-items:flex-end; gap:10px;">
+            <div style="flex:1; display:flex; align-items:center; gap:8px; padding:6px 6px 6px 16px; border-radius:14px; border:1px solid var(--hair-s); background:var(--bg);">
+              <input ref="{{ replyRef }}" placeholder="Add to the conversation…" style="flex:1; font-family:'Manrope',sans-serif; font-size:14.5px; color:var(--ink); background:transparent; border:none; outline:none; padding:9px 0;">
+              <button onClick="{{ attachToReply }}" title="Attach from Drive" style="cursor:pointer; display:grid; place-items:center; width:36px; height:36px; border-radius:10px; border:none; background:var(--panel-s); color:var(--ink-soft);">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.4 11.05l-9.2 9.2a5 5 0 0 1-7.1-7.1l9.2-9.2a3.3 3.3 0 0 1 4.7 4.7l-9.2 9.2a1.7 1.7 0 0 1-2.4-2.4l8.5-8.5"></path></svg>
+              </button>
+            </div>
+            <button onClick="{{ postReply }}" style="cursor:pointer; display:grid; place-items:center; width:46px; height:46px; border-radius:13px; border:none; background:linear-gradient(135deg,#9B7BFF,#57E0E0); color:#06060f; box-shadow:0 8px 22px rgba(91,141,239,.36);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== TOAST ===== -->
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; z-index:95; bottom:84px; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:11px; padding:13px 20px; border-radius:14px; border:1px solid var(--hair-s); background:var(--drawer-bg); backdrop-filter:blur(20px); box-shadow:0 16px 50px rgba(0,0,0,.45); animation:msgIn .35s ease;">
+      <span style="display:grid; place-items:center; width:22px; height:22px; border-radius:50%; background:linear-gradient(135deg,#57E0E0,#9B7BFF); color:#06060f;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg>
+      </span>
+      <span style="font-family:'Manrope',sans-serif; font-size:14px; font-weight:500; color:var(--ink);">{{ toast }}</span>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280},&quot;animations&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;composerDefault&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;exploring&quot;,&quot;options&quot;:[&quot;exploring&quot;,&quot;research&quot;],&quot;tsType&quot;:&quot;'exploring' | 'research'&quot;},&quot;networkDensity&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:46,&quot;min&quot;:12,&quot;max&quot;:110,&quot;tsType&quot;:&quot;number&quot;}}">
+class Component extends DCLogic {
+  state = { theme: 'dark', domain: 'all', drawerId: null, kind: 'exploring', askDomain: 'cardio', added: {}, atts: [], toast: null };
+
+  DOMAINS = [
+    { key: 'all', label: 'All domains', color: '155,123,255' },
+    { key: 'cardio', label: 'Cardiology', color: '241,120,182' },
+    { key: 'onco', label: 'Oncology', color: '155,123,255' },
+    { key: 'neuro', label: 'Neurology', color: '91,141,239' },
+    { key: 'genomics', label: 'Genomics', color: '87,224,224' },
+    { key: 'public', label: 'Public Health', color: '120,224,224' },
+    { key: 'mental', label: 'Mental Health', color: '180,150,255' },
+    { key: 'immuno', label: 'Immunology', color: '120,200,180' }
+  ];
+
+  RES = {
+    drive: { tag: 'DRIVE', color: '87,224,224' },
+    pdf: { tag: 'PDF', color: '241,120,182' },
+    video: { tag: 'VIDEO', color: '155,123,255' },
+    data: { tag: 'DATA', color: '91,141,239' },
+    link: { tag: 'LINK', color: '120,224,224' }
+  };
+
+  TOPICS = [
+    {
+      id: 't1', domain: 'cardio', domainLabel: 'CARDIOLOGY', color: '241,120,182',
+      mom: 'surging', kind: 'exploring',
+      title: 'Does time-restricted eating cut cardiovascular events — or just weight?',
+      summary: 'A recent cohort hinted at higher CV mortality with 8-hour eating windows. Methodology is contested. Is the signal real?',
+      people: 214, resCount: 5,
+      newcomerSummary: 'Earlier this year an observational analysis linked a strict 8-hour eating window to higher cardiovascular mortality. The finding made headlines, but the study was a conference abstract built on self-reported diet recalls. The thread is split between people who think the residual confounding is fatal to the claim, and those who want a proper trial before dismissing it.',
+      stances: [
+        { who: 'The skeptics:', text: 'self-reported windows + sick-quitter bias likely manufacture the signal.', color: '91,141,239' },
+        { who: 'The cautious:', text: 'mechanism is plausible (meal timing, circadian lipid handling) — worth a real RCT.', color: '241,120,182' },
+        { who: 'The pragmatists:', text: 'weight loss is the only proven effect; everything else is hypothesis.', color: '87,224,224' }
+      ],
+      resources: [
+        { type: 'pdf', name: 'AHA 2024 abstract — TRE & CV mortality', meta: 'PDF · 1.2 MB' },
+        { type: 'drive', name: 'Confounder re-analysis (shared sheet)', meta: 'Google Sheets · live' },
+        { type: 'video', name: 'Grand round: chrono-nutrition', meta: 'MP4 · 38 min' },
+        { type: 'data', name: 'NHANES diet-timing extract', meta: 'CSV · 44k rows' },
+        { type: 'link', name: 'Pre-registered RCT protocol', meta: 'osf.io' }
+      ],
+      thread: [
+        { name: 'Dr. Lena Okafor', role: 'CARDIOLOGIST', color: '241,120,182', time: '6h', text: 'Posting this because the abstract is being quoted as settled in clinic. It is one self-reported cohort, never peer-reviewed. Before we tell patients to stop TRE, what would actually change your mind?' },
+        { name: 'Sora Niyazi', role: 'PhD · EPI', color: '91,141,239', time: '5h', text: 'The sick-quitter problem is my worry. People shorten their eating window when they are already unwell. That alone could reverse the direction. I pulled the NHANES timing extract and the association mostly vanishes once you adjust for recent weight loss.', hasRes: true, res: { type: 'data', name: 'NHANES diet-timing extract', meta: 'CSV · 44k rows' } },
+        { name: 'PARALLED Synthesis', role: 'AI · SUMMARY', color: '155,123,255', time: '5h', text: 'Across the 9 posts so far: 2 argue the signal is confounding, 1 defends a circadian mechanism, and nobody has cited an RCT with hard endpoints — because none exists yet. The disagreement is really about evidence threshold, not biology.' },
+        { name: 'Dr. Marco Reyes', role: 'PREVENTIVE', color: '87,224,224', time: '3h', text: 'Shared the grand-round recording — the chrono-nutrition section at 22:00 walks through the lipid-handling argument cleanly. Mechanism is not crazy. But mechanism is not outcome.', hasRes: true, res: { type: 'video', name: 'Grand round: chrono-nutrition', meta: 'MP4 · 38 min' } },
+        { name: 'Amara Singh', role: 'BIOSTAT', color: '120,224,224', time: '1h', text: 'If we want to settle this we need a registered trial with adjudicated MACE, not another recall study. I started a protocol draft — populations and window definitions are open for edits.', hasRes: true, res: { type: 'link', name: 'Pre-registered RCT protocol', meta: 'osf.io' } }
+      ]
+    },
+    {
+      id: 't2', domain: 'onco', domainLabel: 'ONCOLOGY', color: '155,123,255',
+      mom: 'rising', kind: 'research',
+      title: 'Why do some glioblastomas resist CAR-T while others respond?',
+      summary: 'Response is wildly heterogeneous. Is it antigen escape, the immunosuppressive niche, or T-cell exhaustion driving the divide?',
+      people: 168, resCount: 4,
+      newcomerSummary: 'CAR-T has transformed blood cancers but glioblastoma responses are erratic — dramatic in a few patients, absent in most. This thread is trying to separate the leading explanations: tumor antigen loss, a hostile microenvironment, and rapid T-cell exhaustion. It is already framed as a research question, so posts lean toward testable mechanisms and shared datasets.',
+      stances: [
+        { who: 'Antigen-escape camp:', text: 'heterogeneous EGFRvIII expression lets tumor subclones slip through.', color: '155,123,255' },
+        { who: 'Microenvironment camp:', text: 'the immunosuppressive niche disarms T-cells on arrival.', color: '87,224,224' },
+        { who: 'Exhaustion camp:', text: 'persistence, not infiltration, is the real bottleneck.', color: '241,120,182' }
+      ],
+      resources: [
+        { type: 'pdf', name: 'Single-cell GBM immune atlas', meta: 'PDF · 6.4 MB' },
+        { type: 'drive', name: 'Response vs antigen-density (shared)', meta: 'Google Drive · folder' },
+        { type: 'data', name: 'scRNA-seq exhaustion markers', meta: 'H5AD · 2.1 GB' },
+        { type: 'video', name: 'Tumor board: CAR-T failure cases', meta: 'MP4 · 51 min' }
+      ],
+      thread: [
+        { name: 'Dr. Priya Raman', role: 'NEURO-ONC', color: '155,123,255', time: '8h', text: 'Framing this as a research question. Hypothesis: response correlates with baseline antigen density more than with infiltration. Anyone with paired pre/post samples — let us pool them.' },
+        { name: 'Erik Lindqvist', role: 'IMMUNOLOGY', color: '87,224,224', time: '6h', text: 'Careful — in our hands the niche dominates. We saw plenty of T-cells reach the tumor and then go functionally silent within 48h. Density may just be a proxy for a friendlier microenvironment.', hasRes: true, res: { type: 'data', name: 'scRNA-seq exhaustion markers', meta: 'H5AD · 2.1 GB' } },
+        { name: 'PARALLED Synthesis', role: 'AI · SUMMARY', color: '155,123,255', time: '6h', text: 'Three mechanisms are on the table and they are not mutually exclusive. The cleanest discriminating experiment proposed so far: track antigen density AND exhaustion markers in the same paired cohort. Two labs have offered samples.' },
+        { name: 'Dr. Naomi Cole', role: 'PATHOLOGY', color: '241,120,182', time: '2h', text: 'I can contribute the single-cell atlas — annotated by region. If we agree on a shared schema in the Drive folder I will map our cases onto it this week.', hasRes: true, res: { type: 'drive', name: 'Response vs antigen-density (shared)', meta: 'Google Drive · folder' } }
+      ]
+    },
+    {
+      id: 't3', domain: 'neuro', domainLabel: 'NEUROLOGY', color: '91,141,239',
+      mom: 'surging', kind: 'exploring',
+      title: 'Is amyloid still the right target — or have we chased it for 20 years?',
+      summary: 'New anti-amyloid drugs clear plaque but barely move cognition. Time to fund the alternatives, or is the timing just too late?',
+      people: 301, resCount: 4,
+      newcomerSummary: 'Anti-amyloid antibodies now reliably clear plaques, yet the cognitive benefit is small and the safety cost (ARIA) is real. The debate is whether amyloid was the wrong target all along, or simply treated too late in the disease course. Newcomers should know this is the field’s most charged argument right now.',
+      stances: [
+        { who: 'Too-late camp:', text: 'amyloid matters, but only if cleared years before symptoms.', color: '91,141,239' },
+        { who: 'Wrong-target camp:', text: 'tau and neuroinflammation deserve the funding now.', color: '241,120,182' },
+        { who: 'Both-and camp:', text: 'it was never one molecule — combination trials or nothing.', color: '87,224,224' }
+      ],
+      resources: [
+        { type: 'pdf', name: 'Pooled anti-amyloid trial endpoints', meta: 'PDF · 3.0 MB' },
+        { type: 'data', name: 'ADNI biomarker trajectories', meta: 'CSV · 12k subjects' },
+        { type: 'link', name: 'Tau-first trial registry', meta: 'clinicaltrials.gov' },
+        { type: 'video', name: 'Debate: the amyloid hypothesis at 30', meta: 'MP4 · 1h 04m' }
+      ],
+      thread: [
+        { name: 'Dr. Yuki Tanaka', role: 'NEUROLOGY', color: '91,141,239', time: '11h', text: 'Genuine question, not a hot take: if plaque clearance is now routine and cognition barely moves, what is the steelman for staying amyloid-first?' },
+        { name: 'Dr. Hannah Weiss', role: 'TRIALS', color: '241,120,182', time: '9h', text: 'The steelman is timing. Secondary-prevention data in pre-symptomatic carriers tells a different story than the symptomatic trials everyone quotes. Pulled the ADNI trajectories — the divergence starts a decade before diagnosis.', hasRes: true, res: { type: 'data', name: 'ADNI biomarker trajectories', meta: 'CSV · 12k subjects' } },
+        { name: 'PARALLED Synthesis', role: 'AI · SUMMARY', color: '155,123,255', time: '8h', text: '14 posts, roughly 3 camps. Notably nobody is arguing amyloid is irrelevant — the split is purely about timing vs target choice. The most-upvoted proposal is a combination trial reading out tau and inflammation alongside plaque.' }
+      ]
+    },
+    {
+      id: 't4', domain: 'genomics', domainLabel: 'GENOMICS', color: '87,224,224',
+      mom: 'rising', kind: 'research',
+      title: 'Can polygenic risk scores ethically guide embryo selection?',
+      summary: 'Clinics already offer it. The predictive power is modest and the equity questions are enormous. Where is the line?',
+      people: 142, resCount: 3,
+      newcomerSummary: 'Several private clinics now sell polygenic embryo screening for traits like height or disease risk. The science gives only modest, population-specific prediction, and the ethical stakes — equity, consent, ancestry bias — are large. This thread treats it as a research question: what evidence and guardrails would responsible use even require?',
+      stances: [
+        { who: 'Permissive camp:', text: 'parents already select on single-gene tests; this is a gradient, not a cliff.', color: '87,224,224' },
+        { who: 'Restrictive camp:', text: 'scores are ancestry-biased and oversold — harm outweighs signal.', color: '241,120,182' },
+        { who: 'Procedural camp:', text: 'the question is governance, not the molecule.', color: '155,123,255' }
+      ],
+      resources: [
+        { type: 'pdf', name: 'PRS portability across ancestries', meta: 'PDF · 2.2 MB' },
+        { type: 'drive', name: 'Clinic offerings audit (shared doc)', meta: 'Google Docs · live' },
+        { type: 'link', name: 'ESHG position statement', meta: 'eshg.org' }
+      ],
+      thread: [
+        { name: 'Dr. Aisha Bello', role: 'CLIN GENETICS', color: '87,224,224', time: '7h', text: 'Research framing: what is the minimum predictive validity AND equity standard a PRS would need before any clinic offer is defensible? Let us define the bar, not just argue vibes.' },
+        { name: 'Tomás Vidal', role: 'BIOETHICS', color: '155,123,255', time: '5h', text: 'Start with portability. The shared audit shows most offered scores were trained on European cohorts and degrade sharply elsewhere. Any standard has to be ancestry-stratified or it bakes inequity in.', hasRes: true, res: { type: 'drive', name: 'Clinic offerings audit (shared doc)', meta: 'Google Docs · live' } },
+        { name: 'PARALLED Synthesis', role: 'AI · SUMMARY', color: '155,123,255', time: '4h', text: 'Emerging consensus is procedural: people disagree on whether to permit it but largely agree the real lever is governance + ancestry-fair validation. That is a tractable research question.' }
+      ]
+    },
+    {
+      id: 't5', domain: 'public', domainLabel: 'PUBLIC HEALTH', color: '120,224,224',
+      mom: 'steady', kind: 'exploring',
+      title: 'What actually drove the post-pandemic drop in childhood vaccination?',
+      summary: 'Access, trust, or complacency? The policy fix depends entirely on which one dominates — and we keep guessing.',
+      people: 119, resCount: 3,
+      newcomerSummary: 'Routine childhood immunization rates fell after 2021 and have not fully recovered. The competing explanations — disrupted access, eroded trust, and post-COVID complacency — each imply a different policy response. This exploring thread is trying to weight them with real local data before anyone commits to an intervention.',
+      stances: [
+        { who: 'Access camp:', text: 'shuttered clinics + missed well-visits explain most of the gap.', color: '120,224,224' },
+        { who: 'Trust camp:', text: 'spillover from COVID-vaccine politics is the dominant driver.', color: '241,120,182' },
+        { who: 'Mixed camp:', text: 'it is geographically heterogeneous — no single national story.', color: '91,141,239' }
+      ],
+      resources: [
+        { type: 'data', name: 'County-level coverage 2019–2025', meta: 'CSV · 3,142 counties' },
+        { type: 'pdf', name: 'WHO/UNICEF coverage estimates', meta: 'PDF · 1.8 MB' },
+        { type: 'drive', name: 'Intervention pilot tracker (shared)', meta: 'Google Sheets · live' }
+      ],
+      thread: [
+        { name: 'Dr. Grace Mbeki', role: 'PUBLIC HEALTH', color: '120,224,224', time: '1d', text: 'Before we design outreach: does anyone have county data clean enough to separate access from trust? I suspect the answer differs by region and we keep averaging it away.' },
+        { name: 'Liam Schäfer', role: 'HEALTH POLICY', color: '91,141,239', time: '22h', text: 'It is absolutely heterogeneous. The county extract shows rural drops track clinic closures while suburban drops track hesitancy surveys. One national policy will miss both.', hasRes: true, res: { type: 'data', name: 'County-level coverage 2019–2025', meta: 'CSV · 3,142 counties' } },
+        { name: 'PARALLED Synthesis', role: 'AI · SUMMARY', color: '155,123,255', time: '20h', text: 'The thread is converging on "it depends where" — which reframes the question from cause to segmentation. Suggested next step: cluster counties first, then assign tailored interventions.' }
+      ]
+    },
+    {
+      id: 't6', domain: 'mental', domainLabel: 'MENTAL HEALTH', color: '180,150,255',
+      mom: 'rising', kind: 'exploring',
+      title: 'Do SSRIs really beat exercise for moderate depression?',
+      summary: 'Head-to-head data is thinner and messier than guidelines imply. Are we over-stating the drug advantage?',
+      people: 187, resCount: 3,
+      newcomerSummary: 'Guidelines often imply antidepressants are first-line over structured exercise for moderate depression, but the direct head-to-head evidence is sparse, short, and plagued by adherence problems on the exercise arm. This thread is pressure-testing how strong that hierarchy really is and where exercise is genuinely non-inferior.',
+      stances: [
+        { who: 'Drug-first camp:', text: 'effect sizes are more reliable and faster in moderate-to-severe cases.', color: '180,150,255' },
+        { who: 'Exercise camp:', text: 'non-inferior in trials that actually keep people adherent.', color: '87,224,224' },
+        { who: 'Adherence camp:', text: 'the real variable is what the patient will sustain.', color: '241,120,182' }
+      ],
+      resources: [
+        { type: 'pdf', name: 'Network meta-analysis: depression Tx', meta: 'PDF · 4.1 MB' },
+        { type: 'video', name: 'Patient panel: what stuck', meta: 'MP4 · 27 min' },
+        { type: 'link', name: 'Exercise-arm adherence dataset', meta: 'figshare' }
+      ],
+      thread: [
+        { name: 'Dr. Owen Frost', role: 'PSYCHIATRY', color: '180,150,255', time: '9h', text: 'Honest reckoning: how much of the SSRI > exercise hierarchy is real effect vs the fact that exercise arms have terrible adherence and short follow-up?' },
+        { name: 'Dr. Sofia Marchetti', role: 'BEHAV MED', color: '87,224,224', time: '7h', text: 'When you restrict the network meta-analysis to supervised programs the gap narrows a lot. The problem is unsupervised arms collapse by week 6. It is an implementation gap, not a biology gap.', hasRes: true, res: { type: 'pdf', name: 'Network meta-analysis: depression Tx', meta: 'PDF · 4.1 MB' } },
+        { name: 'PARALLED Synthesis', role: 'AI · SUMMARY', color: '155,123,255', time: '6h', text: 'Posts increasingly frame adherence — not drug vs exercise — as the decisive variable. The question is quietly turning into: which option will THIS patient actually sustain?' }
+      ]
+    }
+  ];
+
+  INTEGRATIONS = [
+    { tag: 'DRIVE', color: '87,224,224', name: 'Google Drive', desc: 'Docs, Sheets, Slides & folders — live-linked', status: 'CONNECTED', statusColor: '#57E0E0' },
+    { tag: 'VIDEO', color: '155,123,255', name: 'Video & recordings', desc: 'Grand rounds, talks, patient panels', status: 'CONNECTED', statusColor: '#57E0E0' },
+    { tag: 'DATA', color: '91,141,239', name: 'Datasets', desc: 'CSV, H5AD, registries — versioned', status: 'CONNECTED', statusColor: '#57E0E0' },
+    { tag: 'PDF', color: '241,120,182', name: 'Papers & documents', desc: 'Preprints, protocols, abstracts', status: 'CONNECTED', statusColor: '#57E0E0' },
+    { tag: 'BOX', color: '120,224,224', name: 'Box · Dropbox · OneDrive', desc: 'Other storage platforms', status: 'ADD', statusColor: 'var(--ink-faint)' }
+  ];
+
+  ATTACH_TYPES = [
+    { type: 'drive', label: 'Google Drive', sample: 'shared-analysis.gsheet' },
+    { type: 'video', label: 'Video', sample: 'grand-round.mp4' },
+    { type: 'pdf', label: 'Document', sample: 'protocol-draft.pdf' },
+    { type: 'data', label: 'Dataset', sample: 'cohort-extract.csv' },
+    { type: 'link', label: 'Link', sample: 'clinicaltrials.gov/…' }
+  ];
+
+  // ---- theme ----
+  setDark = () => this.switchTheme('dark');
+  setLight = () => this.switchTheme('light');
+  setAlien = () => this.switchTheme('alien');
+  switchTheme(t) { if (this.state.theme === t) return; this.setState({ theme: t }); this.applyTheme(t); }
+  applyTheme(tArg) {
+    const t = tArg || this.state.theme;
+    if (this.root) this.root.dataset.theme = t;
+    try { document.documentElement.dataset.theme = t; } catch (e) {}
+    if (this.aurora) {
+      this.aurora.style.opacity = t === 'light' ? '0.4' : (t === 'alien' ? '0.7' : '1');
+    }
+  }
+
+  // ---- domain filter ----
+  setDomain(k) { this.setState({ domain: k }); }
+  setAskDomain(k) { this.setState({ askDomain: k }); }
+
+  // ---- drawer ----
+  openThread(id) { this.setState({ drawerId: id }); try { document.body.style.overflow = 'hidden'; } catch (e) {} }
+  closeThread = () => { this.setState({ drawerId: null }); try { document.body.style.overflow = ''; } catch (e) {} };
+  scrollToReply = () => { if (this.replyEl) { try { this.drawerBody.scrollTo({ top: this.drawerBody.scrollHeight, behavior: 'smooth' }); } catch (e) {} this.replyEl.focus(); } };
+  toResearch = () => { this.flash('Drafting a research question from this thread…'); this.closeThread(); this.setState({ kind: 'research' }); setTimeout(() => { try { const a = this.root && this.root.querySelector('#ask'); if (a) window.scrollTo({ top: a.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' }); } catch (e) {} if (this.askEl) this.askEl.focus(); }, 360); };
+
+  postReply = () => {
+    const id = this.state.drawerId; if (!id) return;
+    const v = this.replyEl ? this.replyEl.value.trim() : '';
+    if (!v) { this.flash('Write something to post.'); return; }
+    const added = Object.assign({}, this.state.added);
+    added[id] = (added[id] || []).concat([{ name: 'You', role: 'CONTRIBUTOR', color: '87,224,224', time: 'now', text: v }]);
+    this.setState({ added });
+    if (this.replyEl) this.replyEl.value = '';
+    setTimeout(() => { try { if (this.drawerBody) this.drawerBody.scrollTo({ top: this.drawerBody.scrollHeight, behavior: 'smooth' }); } catch (e) {} }, 60);
+  };
+  attachToReply = () => { this.flash('Pick a file from Google Drive to attach.'); };
+
+  // ---- ask composer ----
+  pickExploring = () => this.setState({ kind: 'exploring' });
+  pickResearch = () => this.setState({ kind: 'research' });
+  addAtt(type) {
+    const def = this.ATTACH_TYPES.find(a => a.type === type);
+    const atts = this.state.atts.concat([{ type, name: def ? def.sample : 'file', id: Date.now() + Math.random() }]);
+    this.setState({ atts });
+  }
+  removeAtt(id) { this.setState({ atts: this.state.atts.filter(a => a.id !== id) }); }
+  postQuestion = () => {
+    const v = this.askEl ? this.askEl.value.trim() : '';
+    if (!v) { this.flash('Write your question first.'); if (this.askEl) this.askEl.focus(); return; }
+    const word = this.state.kind === 'research' ? 'Research question' : 'Exploring question';
+    this.flash(word + ' posted to Nexus Q.');
+    if (this.askEl) this.askEl.value = '';
+    this.setState({ atts: [] });
+  };
+
+  flash(msg) { this.setState({ toast: msg }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 2600); }
+
+  get animOn() {
+    return this.props.animations !== false && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  // ---- conversation-network canvas ----
+  PALETTES = {
+    dark: ['155,123,255', '87,224,224', '91,141,239', '241,120,182'],
+    light: ['90,80,200', '40,150,150', '60,110,210', '200,90,150'],
+    alien: ['110,255,225', '120,224,224', '90,200,210', '150,255,235']
+  };
+  initNetwork() {
+    const cv = this.net; if (!cv) return;
+    const ctx = cv.getContext('2d');
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const resize = () => {
+      this._w = cv.clientWidth; this._h = cv.clientHeight;
+      cv.width = this._w * dpr; cv.height = this._h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    resize();
+    this._onResize = resize; window.addEventListener('resize', resize, { passive: true });
+    const density = Math.max(10, Math.min(120, this.props.networkDensity != null ? this.props.networkDensity : 46));
+    const n = Math.round(density);
+    const nodes = [];
+    for (let i = 0; i < n; i++) {
+      nodes.push({
+        x: Math.random() * this._w, y: Math.random() * this._h,
+        vx: (Math.random() - 0.5) * 0.22, vy: (Math.random() - 0.5) * 0.22,
+        r: Math.random() * 2.2 + 1.2, ci: (Math.random() * 4) | 0,
+        ph: Math.random() * Math.PI * 2
+      });
+    }
+    this._nodes = nodes;
+    const link = 150;
+    const draw = () => {
+      const w = this._w, h = this._h;
+      ctx.clearRect(0, 0, w, h);
+      const pal = this.PALETTES[this.state.theme] || this.PALETTES.dark;
+      // links
+      for (let i = 0; i < nodes.length; i++) {
+        const a = nodes[i];
+        for (let j = i + 1; j < nodes.length; j++) {
+          const b = nodes[j];
+          const dx = a.x - b.x, dy = a.y - b.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < link) {
+            const o = (1 - dist / link) * 0.38;
+            ctx.strokeStyle = 'rgba(' + pal[a.ci] + ',' + o.toFixed(3) + ')';
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+          }
+        }
+      }
+      // nodes
+      const tnow = performance.now() / 1000;
+      for (let i = 0; i < nodes.length; i++) {
+        const a = nodes[i];
+        const pulse = 0.6 + 0.4 * Math.sin(tnow * 1.4 + a.ph);
+        ctx.beginPath();
+        ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(' + pal[a.ci] + ',' + (0.55 * pulse + 0.25).toFixed(3) + ')';
+        ctx.shadowColor = 'rgba(' + pal[a.ci] + ',0.9)';
+        ctx.shadowBlur = 8 * pulse;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    };
+    const step = () => {
+      const w = this._w, h = this._h;
+      for (let i = 0; i < nodes.length; i++) {
+        const a = nodes[i];
+        a.x += a.vx; a.y += a.vy;
+        if (a.x < -20) a.x = w + 20; else if (a.x > w + 20) a.x = -20;
+        if (a.y < -20) a.y = h + 20; else if (a.y > h + 20) a.y = -20;
+      }
+      draw();
+      this._raf = requestAnimationFrame(step);
+    };
+    if (this.animOn) { this._raf = requestAnimationFrame(step); } else { draw(); }
+  }
+
+  // ---- reveals ----
+  setupReveals() {
+    const root = this.root; if (!root) return;
+    const els = Array.from(root.querySelectorAll('[data-reveal]'));
+    const animate = this.animOn && ('IntersectionObserver' in window);
+    if (!animate) { els.forEach(el => { el.style.opacity = '1'; el.style.transform = 'none'; }); return; }
+    els.forEach(el => {
+      el.style.opacity = '0'; el.style.transform = 'translateY(28px)';
+      el.style.transition = 'opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1)';
+    });
+    const reveal = (el) => {
+      if (el.dataset.revealed) return; el.dataset.revealed = '1';
+      const d = parseInt(el.getAttribute('data-reveal-delay') || '0', 10);
+      setTimeout(() => { el.style.opacity = '1'; el.style.transform = 'none'; }, d);
+    };
+    const inView = (el) => { const r = el.getBoundingClientRect(); return r.top < (window.innerHeight || 800) * 0.94 && r.bottom > 0; };
+    els.forEach(el => { if (inView(el)) reveal(el); });
+    this._io = new IntersectionObserver((entries) => { entries.forEach(e => { if (e.isIntersecting) { reveal(e.target); this._io.unobserve(e.target); } }); }, { threshold: 0.1, rootMargin: '0px 0px -6% 0px' });
+    els.forEach(el => this._io.observe(el));
+    this._safety = setTimeout(() => { els.forEach(el => { el.dataset.revealed = '1'; el.style.transition = 'none'; el.style.opacity = '1'; el.style.transform = 'none'; }); }, 1500);
+  }
+
+  bindHover() {
+    const root = this.root; if (!root) return;
+    root.querySelectorAll('[data-topic-card]').forEach(c => {
+      if (c.dataset.bound) return; c.dataset.bound = '1';
+      c.addEventListener('mouseenter', () => { c.style.transform = 'translateY(-5px)'; c.style.borderColor = 'var(--hair-s)'; c.style.background = 'var(--panel-s)'; });
+      c.addEventListener('mouseleave', () => { c.style.transform = 'none'; c.style.borderColor = 'var(--hair)'; c.style.background = 'var(--panel)'; });
+    });
+  }
+
+  componentDidMount() {
+    if (this.props.composerDefault === 'research' && this.state.kind === 'exploring') this.setState({ kind: 'research' });
+    this.applyTheme();
+    this.setupReveals();
+    this.bindHover();
+    this.initNetwork();
+  }
+  componentDidUpdate() { this.bindHover(); }
+  componentWillUnmount() {
+    if (this._io) this._io.disconnect();
+    if (this._safety) clearTimeout(this._safety);
+    if (this._raf) cancelAnimationFrame(this._raf);
+    if (this._onResize) window.removeEventListener('resize', this._onResize);
+    try { document.body.style.overflow = ''; } catch (e) {}
+  }
+
+  renderVals() {
+    const theme = this.state.theme;
+    const sw = (k) => theme === k
+      ? { bg: 'linear-gradient(120deg,#9B7BFF,#57E0E0)', color: '#06060f' }
+      : { bg: 'transparent', color: 'var(--ink-soft)' };
+    const d = sw('dark'), l = sw('light'), a = sw('alien');
+
+    const MOM = {
+      surging: { arrow: '▲▲', label: 'SURGING', color: '#F178B6' },
+      rising: { arrow: '▲', label: 'RISING', color: '#57E0E0' },
+      steady: { arrow: '▬', label: 'STEADY', color: 'var(--ink-faint)' }
+    };
+    const kindMeta = (k) => k === 'research'
+      ? { label: 'RESEARCH', color: '#9B7BFF', border: 'rgba(155,123,255,.5)' }
+      : { label: 'EXPLORING', color: '#57E0E0', border: 'rgba(87,224,224,.5)' };
+
+    const decorate = (t) => {
+      const m = MOM[t.mom] || MOM.steady;
+      const km = kindMeta(t.kind);
+      return Object.assign({}, t, {
+        momArrow: m.arrow, momLabel: m.label, momColor: m.color,
+        kindLabel: km.label, kindColor: km.color, kindBorder: km.border,
+        replies: (t.thread ? t.thread.length : 0) + ((this.state.added[t.id] || []).length),
+        onOpen: () => this.openThread(t.id)
+      });
+    };
+
+    const domain = this.state.domain;
+    const topics = this.TOPICS.filter(t => domain === 'all' || t.domain === domain).map(decorate);
+
+    const domains = this.DOMAINS.map(dd => {
+      const active = dd.key === domain;
+      return {
+        label: dd.label, onClick: () => this.setDomain(dd.key),
+        dot: 'rgb(' + dd.color + ')',
+        bg: active ? 'rgba(' + dd.color + ',.16)' : 'var(--panel)',
+        color: active ? 'rgb(' + dd.color + ')' : 'var(--ink-mute)',
+        border: active ? 'rgba(' + dd.color + ',.5)' : 'var(--hair)'
+      };
+    });
+
+    const askDomains = this.DOMAINS.filter(x => x.key !== 'all').map(dd => {
+      const active = dd.key === this.state.askDomain;
+      return {
+        label: dd.label, onClick: () => this.setAskDomain(dd.key),
+        bg: active ? 'rgba(' + dd.color + ',.16)' : 'var(--panel-s)',
+        color: active ? 'rgb(' + dd.color + ')' : 'var(--ink-mute)',
+        border: active ? 'rgba(' + dd.color + ',.5)' : 'var(--hair)'
+      };
+    });
+
+    const attachButtons = this.ATTACH_TYPES.map(at => {
+      const r = this.RES[at.type] || this.RES.link;
+      return { label: at.label, tag: r.tag, color: r.color, onClick: () => this.addAtt(at.type) };
+    });
+    const attachments = this.state.atts.map(at => {
+      const r = this.RES[at.type] || this.RES.link;
+      return { name: at.name, tag: r.tag, color: r.color, onRemove: () => this.removeAtt(at.id) };
+    });
+
+    const isResearch = this.state.kind === 'research';
+
+    // drawer
+    const base = this.TOPICS.find(t => t.id === this.state.drawerId);
+    let dTopic = null, dThread = [], dResources = [], dStances = [], dThreadCount = 0;
+    if (base) {
+      dTopic = decorate(base);
+      const extra = this.state.added[base.id] || [];
+      dThread = (base.thread || []).concat(extra).map(m => {
+        const r = m.res ? (this.RES[m.res.type] || this.RES.link) : null;
+        return Object.assign({}, m, {
+          initials: m.name.split(' ').map(s => s[0]).slice(0, 2).join('').toUpperCase(),
+          hasRes: !!m.res,
+          resTag: r ? r.tag : '', resColor: r ? r.color : '120,224,224',
+          resName: m.res ? m.res.name : '', resMeta: m.res ? m.res.meta : ''
+        });
+      });
+      dThreadCount = dThread.length;
+      dResources = (base.resources || []).map(r => {
+        const rt = this.RES[r.type] || this.RES.link;
+        return { name: r.name, meta: r.meta, tag: rt.tag, color: rt.color };
+      });
+      dStances = base.stances || [];
+    }
+
+    const integrations = this.INTEGRATIONS;
+
+    const stat = { topics: this.TOPICS.length + '', replies: '1,840', people: '6.2k', resources: '11k' };
+
+    return {
+      rootRef: (el) => { this.root = el; },
+      auroraRef: (el) => { this.aurora = el; },
+      netRef: (el) => { this.net = el; },
+      drawerBodyRef: (el) => { this.drawerBody = el; },
+      replyRef: (el) => { this.replyEl = el; },
+      askRef: (el) => { this.askEl = el; },
+
+      setDark: this.setDark, setLight: this.setLight, setAlien: this.setAlien,
+      darkBg: d.bg, darkColor: d.color, lightBg: l.bg, lightColor: l.color, alienBg: a.bg, alienColor: a.color,
+
+      stat,
+      domains, topics,
+      askDomains, attachButtons, attachments, hasAttachments: attachments.length > 0,
+      isResearch,
+      exploreBg: !isResearch ? 'rgba(87,224,224,.08)' : 'transparent',
+      exploreUnderline: !isResearch ? '#57E0E0' : 'transparent',
+      exploreTitle: !isResearch ? 'var(--ink)' : 'var(--ink-soft)',
+      exploreIcon: !isResearch ? '#57E0E0' : 'var(--ink-mute)',
+      researchBg: isResearch ? 'rgba(155,123,255,.08)' : 'transparent',
+      researchUnderline: isResearch ? '#9B7BFF' : 'transparent',
+      researchTitle: isResearch ? 'var(--ink)' : 'var(--ink-soft)',
+      researchIcon: isResearch ? '#9B7BFF' : 'var(--ink-mute)',
+      askPlaceholder: isResearch ? 'State your research question — specific, answerable, testable…' : 'What do you want to explore? Pose it the way you would to a smart colleague…',
+      kindHint: isResearch ? 'Research questions can be claimed and turned into a study.' : 'Exploring questions open a discussion — convert anytime.',
+      postLabel: isResearch ? 'Post research question' : 'Post exploring question',
+      pickExploring: this.pickExploring, pickResearch: this.pickResearch,
+      postQuestion: this.postQuestion,
+
+      integrations,
+
+      drawerOpen: !!base,
+      dTopic, dThread, dResources, dStances, dThreadCount,
+      closeThread: this.closeThread, postReply: this.postReply, attachToReply: this.attachToReply,
+      scrollToReply: this.scrollToReply, toResearch: this.toResearch,
+
+      toast: this.state.toast
+    };
+  }
+}
+</script>
+</body>
+</html>
