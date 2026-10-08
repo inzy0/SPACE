@@ -1,0 +1,4 @@
+research.db
+*.db
+__pycache__/
+*.pyc
