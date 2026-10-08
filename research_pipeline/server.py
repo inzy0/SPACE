@@ -20,7 +20,7 @@ from .viewer import TEMPLATE, run_json
 
 DEFAULTS = dict(threshold=0.72, max_attempts=3, top_internal=4, top_external=2, evidence_n=8, loop_depth=2, max_questions=6,
                 min_quality=0.0, llm="mock", model="claude-sonnet-5-5", pubmed=False, umbrella="auto",
-                require_clearance=True, auto_reach=True, max_reach_extra=3, use_library=True, consult_all=False, llm_understanding=False)
+                require_clearance=True, auto_reach=True, max_reach_extra=3, use_library=True, consult_all=False, per_umbrella=2, llm_understanding=False)
 
 
 class App:
@@ -55,7 +55,7 @@ class App:
                      system_prompt=roles.get("system_prompt") or agents.DEFAULT_SYSTEM, role_prompts=roles.get("role_prompts", {}),
                      demands=exp.get("demands", ""), required=exp.get("required", []), excluded=exp.get("excluded", []),
                      require_clearance=bool(p["require_clearance"]), auto_reach=bool(p["auto_reach"]), max_reach_extra=int(p["max_reach_extra"]),
-                     use_library=bool(p["use_library"]), consult_all=bool(p["consult_all"]), llm_understanding=bool(p["llm_understanding"]) and p["llm"] != "mock")
+                     use_library=bool(p["use_library"]), consult_all=bool(p["consult_all"]), per_umbrella=int(p["per_umbrella"]), llm_understanding=bool(p["llm_understanding"]) and p["llm"] != "mock")
         return ResearchPipeline(llm, srcs, self.store, self.tax, cfg, library=self.library)
 
     def run(self, req):

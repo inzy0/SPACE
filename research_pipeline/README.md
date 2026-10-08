@@ -98,9 +98,21 @@ For real answers: `export ANTHROPIC_API_KEY=...` and pick *Anthropic API* in the
 ## All specialties, always visible
 
 Every run reports **specialty coverage for all 35 umbrellas**: lead, added by reach, consulted, or available but not needed. The
-Setup roster opens on *ALL healthcare* (every umbrella and all 263 roles, expandable). For a deliberately broad review tick
-**consult ALL healthcare specialties** (or `--all-specialties`): one expert from *every* umbrella joins the panel (35 voices, so expect
-many LLM calls). Otherwise the router consults the lead umbrella, the adjacent/relevant ones and anything the reach step adds.
+Setup roster opens on *ALL healthcare* (every umbrella and all 263 roles, expandable).
+
+**All-specialty mode** (tick *ALL specialties: every umbrella discusses internally + plenary*, or `--all-specialties`) puts every
+specialty on the *internal* side instead of only the lead umbrella's roles:
+
+```
+lead umbrella      specialists -> debate -> umbrella lead consensus          (full panel, as before)
+every other umbrella   its best N roles (per_umbrella, default 2) -> debate -> umbrella consensus   (one graph node each)
+plenary            one voice per umbrella reads every other umbrella's consensus and adds / challenges / refers
+chair              attributes per umbrella, cites evidence, scored (coverage counted per umbrella)
+```
+
+Reach-required roles and exclusions are honoured inside their own umbrella; every participating role feeds expert weights and the
+evidence library. Cost is roughly `35 x (N specialists + N debaters) + 35` model calls per attempt, so use it for broad reviews; the
+default routed mode consults only the lead and relevant umbrellas.
 
 ## Healthcare roster (`taxonomy.py` + `catalog.py`)
 

@@ -40,11 +40,11 @@ def _parse(expert, stage, raw):
                    min(1.0, float(m.group(1))) if m else 0.5, sorted(set(re.findall(r"\[(E\d+)\]", raw))))
 
 
-def ask_experts(llm, question, experts, evidence, stage, prior=None, trace=None, system=DEFAULT_SYSTEM, role_prompts=None, demands='', frame=''):
+def ask_experts(llm, question, experts, evidence, stage, prior=None, trace=None, system=DEFAULT_SYSTEM, role_prompts=None, demands='', frame='', max_peers=8):
     out = []
     for s in experts:
         mine = _relevant(s, question, evidence)
-        peers = "\n".join(f"- {o.role}: {o.text}" for o in (prior or []) if o.expert_id != s.id)
+        peers = "\n".join(f"- {o.role}: {o.text[:260]}" for o in [x for x in (prior or []) if x.expert_id != s.id][:max_peers])
         extra = (role_prompts or {}).get(s.id, "").strip()
         scope = (f"SCOPE OF PRACTICE ({s.tier}): {s.scope}\nEXTENDED SCOPE (advanced practice, jurisdiction-dependent): {s.extended}\n"
                  f"REFER ON: {s.refer} Stay inside this scope; for points outside it, say 'refer to <role>' instead of opining.\n"
@@ -60,9 +60,18 @@ def ask_experts(llm, question, experts, evidence, stage, prior=None, trace=None,
     return out
 
 
-def chair(llm, question, evidence, opinions, examples=(), feedback=None, system=DEFAULT_SYSTEM, demands='', frame='', scope=None):
-    panel = "\n".join(f"PANEL: {o.role}" for o in opinions if o.stage != "debate")
-    positions = "\n".join(f"- {o.role} ({o.stage}, conf {o.confidence:.2f}): {o.text}" for o in opinions)
+def chair(llm, question, evidence, opinions, examples=(), feedback=None, system=DEFAULT_SYSTEM, demands='', frame='', scope=None, umbrella_names=None):
+    big = umbrella_names and len({o.role for o in opinions if o.stage != "debate"}) > 14
+    if big:  # all-specialty mode: attribute and summarise per umbrella so the prompt stays bounded
+        groups = {}
+        for o in opinions:
+            if o.stage != "debate":
+                groups.setdefault(o.expert_id.split(".")[0], []).append(o)
+        panel = "\n".join(f"PANEL: {umbrella_names.get(g, g)}" for g in groups)
+        positions = "\n".join(f"- {umbrella_names.get(g, g)} ({len(os_)} roles, conf {sum(x.confidence for x in os_) / len(os_):.2f}): {os_[0].text[:240]}" for g, os_ in groups.items())
+    else:
+        panel = "\n".join(f"PANEL: {o.role}" for o in opinions if o.stage != "debate")
+        positions = "\n".join(f"- {o.role} ({o.stage}, conf {o.confidence:.2f}): {o.text}" for o in opinions)
     shots = "\n\n".join(f"HIGH-SCORING EXAMPLE:\n{x[:600]}" for x in examples)
     prompt = (f"TASK: chair\nROLE: Chair\n" + (f"EXPERTISE DEMANDS: {demands}\n" if demands else "") + (f"CONFIRMED CONTEXT (tailor the answer to it):\n{frame}\n" if frame else "") + f"QUESTION: {question}\nEVIDENCE:\n{_ev_block(evidence, scope)}\n{panel}\nPOSITIONS:\n{positions}\n"
               f"{shots}\n" + (f"REVISION FEEDBACK (fix all of these):\n{feedback}\n" if feedback else "") +

@@ -22,7 +22,7 @@ TEMPLATE = r"""<!doctype html>
 <title>Research Pipeline Replay</title>
 <style>
 :root{--bg:#090b10;--panel:#0f131b;--card:#141a24;--line:#232c3b;--dim:#7d8aa0;--fg:#e6ecf6;--ok:#4ade80;--warn:#fbbf24;--bad:#f87171;--flow:#ff9f43;
---c0:#2f8f5b;--c1:#5b6bd6;--c2:#c26a8a;--c3:#3b82c4;--c4:#3b82c4;--c5:#d9822b;--c6:#c26a1f;--c7:#b59a1d;--c8:#8b5cf6;--c9:#14a3a3;--c10:#b59a1d;--c11:#d4558a;--c12:#2f8f5b}
+--c0:#2f8f5b;--c1:#5b6bd6;--c2:#c26a8a;--c3:#3b82c4;--c4:#3b82c4;--c5:#d9822b;--c6:#c26a1f;--c7:#b59a1d;--c8:#8b5cf6;--c9:#a855c7;--c10:#14a3a3;--c11:#b59a1d;--c12:#d4558a;--c13:#2f8f5b}
 @media (prefers-color-scheme:light){:root:not([data-theme=dark]){--bg:#eef1f6;--panel:#fff;--card:#fff;--line:#d5dce8;--dim:#5b6a80;--fg:#12192a}}
 *{box-sizing:border-box}html,body{height:100%;margin:0}
 body{background:var(--bg);color:var(--fg);font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;display:grid;grid-template-rows:auto auto 1fr 190px;overflow:hidden}
@@ -121,7 +121,7 @@ svg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
 <label>Primary umbrella</label><select id="f-umb"></select><div id="p-sec3"></div></details>
 <details><summary>4 · Parameters</summary><div id="p-sec4"></div>
 <label>LLM</label><select id="p-llm"><option value="mock">Offline mock (no API, extractive)</option><option value="anthropic">Anthropic API (needs ANTHROPIC_API_KEY on server)</option></select>
-<label class="chk"><input type="checkbox" id="p-clr"> require confirmation (clearance 1 → 2) before research</label><label class="chk"><input type="checkbox" id="p-all"> consult ALL healthcare specialties (one expert from every umbrella)</label><label class="chk"><input type="checkbox" id="p-reach"> auto-extend reach to the question's demands</label><label class="chk"><input type="checkbox" id="p-lib"> use + train evidence library</label><div id="p-sec4b"></div>
+<label class="chk"><input type="checkbox" id="p-clr"> require confirmation (clearance 1 → 2) before research</label><label class="chk"><input type="checkbox" id="p-all"> ALL specialties: every umbrella discusses internally + plenary</label><label class="chk"><input type="checkbox" id="p-reach"> auto-extend reach to the question's demands</label><label class="chk"><input type="checkbox" id="p-lib"> use + train evidence library</label><div id="p-sec4b"></div>
 <label>Model</label><input type="text" id="p-model"><label><input type="checkbox" id="p-pubmed" style="width:auto"> also search PubMed (needs network)</label></details>
 <details><summary>5 · Knowledge</summary><div class="hint">Evidence the experts may cite. Each doc gets a quality weight (trial/review ≈ 0.9, opinion ≈ 0.3).</div>
 <div id="kdocs"></div><label>Add text</label><input type="text" id="k-title" placeholder="title"><textarea id="k-text" rows="4" placeholder="paste abstract / guideline / notes"></textarea>
@@ -134,7 +134,7 @@ svg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
 <div class="bottom"><div class="bp"><h5>RUN LOG</h5><div class="lg" id="log"></div></div><div class="bp"><h5>SPECIALISTS · CONFIDENCE</h5><div id="spec"></div></div><div class="bp"><h5>SCORE &amp; GATE</h5><div id="sc"></div></div></div>
 <script>
 let RUNS=__DATA__;
-const LANES=["Inputs","Language pyramid","Clearance & reach","Gather + library","Route (multi-term)","Internal specialists","Internal debate","Umbrella lead","External experts","Chair","Score & filter","Learn & loop","Output"];
+const LANES=["Inputs","Language pyramid","Clearance & reach","Gather + library","Route (multi-term)","Internal specialists","Internal debate","Umbrella lead","Other umbrellas / external","All-umbrella plenary","Chair","Score & filter","Learn & loop","Output"];
 const LW=270,NW=236,TOP=34,GAP=18;
 let run,ev,cur=0,timer=null,sel=null,follow=true,zoom=1,pos={};
 const $=id=>document.getElementById(id);
@@ -148,7 +148,7 @@ function loadRun(i){
  if(!RUNS[i])return;$("stage").querySelector(".empty")?.remove();
  run=RUNS[i];stop();cur=0;sel=null;
  ev=run.trace.map(e=>({...e}));const last=[...ev].reverse().find(e=>e.node.startsWith("score"));
- if(run.status!=="awaiting_confirmation")ev.push({seq:ev.length,t:(ev[ev.length-1]||{t:0}).t,node:"out:answer",label:"Final answer",lane:12,after:[last?last.node:""],inputs:{status:run.status,composite:run.composite,attempts:run.attempts},outputs:{answer:run.answer,umbrella:run.umbrella},status:run.status==="accepted"?"ok":"fail",note:run.status.toUpperCase()});
+ if(run.status!=="awaiting_confirmation")ev.push({seq:ev.length,t:(ev[ev.length-1]||{t:0}).t,node:"out:answer",label:"Final answer",lane:13,after:[last?last.node:""],inputs:{status:run.status,composite:run.composite,attempts:run.attempts},outputs:{answer:run.answer,umbrella:run.umbrella},status:run.status==="accepted"?"ok":"fail",note:run.status.toUpperCase()});
  document.querySelectorAll(".tab").forEach((t,j)=>t.classList.toggle("sel",j===i));
  $("q").textContent=run.question;$("scrub").max=ev.length-1;layout();render();play()}
 function rowsOf(o,cls,max=4){const ks=Object.keys(o);return ks.slice(0,max).map(k=>`<div class="r ${cls}"><span class="k">${esc(k)}</span><span class="v">${esc(sm(o[k]))}</span></div>`).join("")+(ks.length>max?`<div class="more">+${ks.length-max} more ›</div>`:"")}
@@ -184,8 +184,8 @@ function render(){
  // log
  $("log").innerHTML=ev.slice(0,i+1).map((e,k)=>`<div class="${k===i?"n":""} ${e.status==="fail"?"f":""}${e.node==="out:answer"&&e.status==="ok"?"o":""}">${String(e.seq).padStart(2,"0")}  ${e.t.toFixed(2).padStart(5)}s  ${esc(e.label)}${e.note?" · "+esc(e.note):""}</div>`).join("");$("log").scrollTop=1e5;
  // specialists
- const sp=ev.slice(0,i+1).filter(e=>/^(spec|ext):/.test(e.node));
- $("spec").innerHTML=sp.map(e=>`<div class="sb"><span>${esc(e.label.slice(0,22))}</span><div class="t"><i style="width:${e.outputs.confidence*100}%;background:${e.node.startsWith("ext")?"var(--c8)":"var(--c5)"}"></i></div><span>${e.outputs.confidence.toFixed(2)}</span></div>`).join("")||'<span style="color:var(--dim)">waiting…</span>';
+ const sp=ev.slice(0,i+1).filter(e=>/^(spec|ext|umb):/.test(e.node));
+ $("spec").innerHTML=sp.map(e=>`<div class="sb"><span>${esc(e.label.slice(0,22))}</span><div class="t"><i style="width:${e.outputs.confidence*100}%;background:${/^(ext|umb)/.test(e.node)?"var(--c8)":"var(--c5)"}"></i></div><span>${e.outputs.confidence.toFixed(2)}</span></div>`).join("")||'<span style="color:var(--dim)">waiting…</span>';
  // score
  $("sc").innerHTML=sc?Object.entries(sc.outputs.dims).map(([k,v])=>`<div class="sb"><span>${k}</span><div class="t"><i style="width:${v*100}%;background:${v>=.6?"var(--ok)":"var(--bad)"}"></i><u style="left:60%"></u></div><span>${v.toFixed(2)}</span></div>`).join("")+`<div style="margin-top:6px">composite <b class="big ${sc.status==="ok"?"ok":"bad"}">${sc.outputs.composite}</b> <span class="chip">${sc.note}</span></div>`:'<span style="color:var(--dim)">waiting…</span>';
  side();
@@ -236,7 +236,7 @@ function kdocs(){$("kdocs").innerHTML="";C.knowledge.forEach((k,i)=>{const d=doc
 function addDoc(title,text,q){if(text.trim()){C.knowledge.push({title:title||text.trim().slice(0,50),text:text.trim(),quality:q});save();kdocs()}}
 
 /* ===== clearance modal, reach, library ===== */
-const PR4=[["max_reach_extra","Max extra experts from reach",0,6,1]];
+const PR4=[["max_reach_extra","Max extra experts from reach",0,6,1],["per_umbrella","Roles per umbrella (all-specialty mode)",1,4,1]];
 const WL={1:"Lexical · words & terms",2:"Syntactic · structure",3:"Semantic · meaning",4:"Pragmatic · intent",5:"Contextual · situation"};
 const clean=t=>String(t||"").replace(/\*\*/g,"").replace(/\*/g,"");
 function pyramid(u){const W={5:44,4:58,3:72,2:86,1:100};

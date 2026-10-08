@@ -272,16 +272,35 @@ class Tests(unittest.TestCase):
         self.assertEqual([c["status"] for c in cov].count("lead"), 1)
         self.assertGreaterEqual({c["status"] for c in cov}, {"lead", "available"})
 
-    def test_consult_all_puts_every_umbrella_on_the_panel(self):
+    def test_all_specialty_mode_runs_internal_discussion_in_every_umbrella(self):
         tax = load_taxonomy()
-        res = pipe(consult_all=True).ask(Q)
-        spoke = {c["id"] for c in res.coverage if c["status"] != "available"}
-        self.assertEqual(spoke, set(tax))  # every umbrella has at least one expert
-        ext = next(e for e in res.trace if e["node"] == "route")["outputs"]["external"]
-        self.assertGreaterEqual(len(ext), len(tax) - 1)
+        res = pipe(consult_all=True, per_umbrella=2).ask(Q)
         self.assertEqual(res.status, "accepted")
-        r = route(Q, tax, required=["geri.physician"], consult_all=True)
-        self.assertEqual(sum(1 for s in r.external if s.umbrella == "geri"), 1)  # still one voice per umbrella
+        nodes = [e["node"] for e in res.trace]
+        groups = [n for n in nodes if n.startswith("umb:")]
+        self.assertEqual(len(groups), len(tax) - 1)  # every non-lead umbrella holds its own discussion
+        self.assertIn("plenary", nodes)  # and a plenary sits on top of all of them
+        g = next(e for e in res.trace if e["node"].startswith("umb:"))
+        self.assertEqual(len(g["inputs"]["roles"]), 2)  # per_umbrella roles speak (specialist round + debate behind the node)
+        self.assertEqual({c["status"] for c in res.coverage} - {"lead", "consulted", "reach"}, set())  # nothing left "available"
+        self.assertEqual(sum(1 for c in res.coverage if c["status"] == "lead"), 1)
+        route_out = next(e for e in res.trace if e["node"] == "route")["outputs"]
+        self.assertIn("all_specialty_mode", route_out)
+        self.assertEqual(next(e for e in res.trace if e["node"].startswith("chair"))["lane"], 10)
+        self.assertGreater(len(res.score.dims) and res.score.dims["coverage"], 0.9)  # coverage counted per umbrella, not per role
+
+    def test_all_specialty_mode_learns_every_role_and_respects_exclusions(self):
+        p = pipe(consult_all=True, excluded=["cardio.physician"], required=["pharm.clinical"])
+        p.ask(Q)
+        trained = {e["expert"] for e in p.store.stats()["experts"]} | {r[0] for r in p.store.db.execute("select expert from expert_stats")}
+        self.assertNotIn("cardio.physician", trained)
+        self.assertIn("pharm.clinical", trained)
+        self.assertGreater(len(trained), 40)  # roles from all umbrellas feed the expert weights
+        self.assertGreaterEqual(p.library.size(), 1)
+
+    def test_plenary_can_be_switched_off(self):
+        res = pipe(consult_all=True, plenary=False).ask(Q)
+        self.assertEqual(next(e for e in res.trace if e["node"] == "plenary")["outputs"], {"note": "plenary off"})
 
 
 if __name__ == "__main__":

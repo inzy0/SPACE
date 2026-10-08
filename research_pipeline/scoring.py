@@ -31,7 +31,7 @@ class Score:
     feedback: str
 
 
-def score(answer, question, evidence, opinions, threshold=0.72, context_terms=()) -> Score:
+def score(answer, question, evidence, opinions, threshold=0.72, context_terms=(), umbrella_names=None) -> Score:
     by_id = {e.id: e for e in evidence}
     sents = [s for s in re.split(r"(?<=[.!?])\s+|\n", answer) if len(s.split()) >= 6 and not META.match(s.strip())]
     cites = re.findall(r"\[(E\d+)\]", answer)
@@ -41,7 +41,14 @@ def score(answer, question, evidence, opinions, threshold=0.72, context_terms=()
     good = {c for c in cites if c in by_id}
     equality = statistics.mean(by_id[c].quality for c in good) if good else 0.0
     roles = {o.role for o in opinions if o.stage != "debate"}
-    coverage = sum(1 for r in roles if r.lower() in answer.lower()) / len(roles) if roles else 0.0
+    if umbrella_names and len(roles) > 14:  # all-specialty mode: an umbrella counts as covered if it or any of its roles is attributed
+        groups = {}
+        for o in opinions:
+            if o.stage != "debate":
+                groups.setdefault(o.expert_id.split(".")[0], set()).add(o.role)
+        coverage = sum(1 for g, rs in groups.items() if umbrella_names.get(g, g).lower() in answer.lower() or any(r.lower() in answer.lower() for r in rs)) / len(groups) if groups else 0.0
+    else:
+        coverage = sum(1 for r in roles if r.lower() in answer.lower()) / len(roles) if roles else 0.0
     conf = [o.confidence for o in opinions if o.stage != "debate"] or [0.0]
     consensus = max(0.0, statistics.mean(conf) * 0.6 + (1 - (statistics.pstdev(conf) if len(conf) > 1 else 0)) * 0.4)
     calibration = (0.5 if re.search(r"limitation|uncertain|insufficient|may be", answer, re.I) else 0) + (0 if ABSOLUTE.search(answer) else 0.5)

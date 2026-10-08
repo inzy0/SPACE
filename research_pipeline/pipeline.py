@@ -37,7 +37,9 @@ class Config:
     auto_reach: bool = True  # extend the panel (paediatrics, geriatrics, pharmacy, emergency, public health ...) to the question's demands
     max_reach_extra: int = 3
     use_library: bool = True  # per-specialty + per-umbrella evidence score library
-    consult_all: bool = False  # one expert from EVERY umbrella joins the panel (broad, expensive with a real LLM)
+    consult_all: bool = False  # ALL-SPECIALTY mode: every umbrella runs its own internal discussion, then a plenary over all of them
+    per_umbrella: int = 2  # roles per non-lead umbrella in all-specialty mode
+    plenary: bool = True  # cross-umbrella plenary round on top of the per-umbrella discussions
     llm_understanding: bool = False  # let the LLM refine the pyramid slots (needs a real LLM)
 
 
@@ -118,19 +120,34 @@ class ResearchPipeline:
         tr.emit("reach", "Reach: extend to the question's demands", 2, ["clearance"], {"scale": reach["scale"], "auto_reach": c.auto_reach},
                 {"extra_experts": reach["reasons"] or ["none needed"], "top_external +": reach["top_external_delta"], "evidence +": reach["evidence_delta"], "multimorbidity": reach["multimorbidity"]})
         required = list(dict.fromkeys(list(c.required) + reach["extra_required"]))
-        r = do_route(question, self.tax, weights, c.top_internal, c.top_external + reach["top_external_delta"], required, c.excluded, c.umbrella, concepts=u.concepts, consult_all=c.consult_all)
+        others = None
+        if c.consult_all:  # internal discussion in EVERY umbrella; the lead keeps its full panel, the others send their best roles
+            r = do_route(question, self.tax, weights, c.top_internal, 0, [i for i in required if i.startswith(pre.umbrella.id + ".")], c.excluded, c.umbrella, concepts=u.concepts)
+            others = {}
+            for uid in self.tax:
+                if uid != r.umbrella.id:
+                    rr = do_route(question, self.tax, weights, c.per_umbrella, 0, [i for i in required if i.startswith(uid + ".")], c.excluded, uid, concepts=u.concepts)
+                    if rr.internal:
+                        others[uid] = rr.internal
+            reqset = set(required)
+            r.coverage = [dict(id=x["id"], name=x["name"], category=x["category"], roles=x["roles"], relevance=x["relevance"],
+                               status="lead" if x["id"] == r.umbrella.id else ("reach" if any(s.id in reqset for s in others.get(x["id"], [])) else "consulted") if x["id"] in others else "available",
+                               consulted=[s.name for s in (r.internal if x["id"] == r.umbrella.id else others.get(x["id"], []))]) for x in r.coverage]
+        else:
+            r = do_route(question, self.tax, weights, c.top_internal, c.top_external + reach["top_external_delta"], required, c.excluded, c.umbrella, concepts=u.concepts)
         tr.emit("in:memory", "Learned memory", 0, inputs={"umbrella": pre.umbrella.id},
                 outputs={"expert_weights": {k: round(v, 2) for k, v in weights.items()}, "few_shot_examples": len(examples), "library_items": self.library.size() if c.use_library else 0})
         tr.emit("route", "Route (multi-term)", 4, ["reach", "in:memory"], {"terms": [f"{x['surface']}→{x['canonical']}" for x in u.concepts if not x["negated"]][:8], "required": required},
                 {"umbrella": r.umbrella.name, "body_areas": r.body_areas, "internal": [s.name for s in r.internal], "external": [s.name for s in r.external],
+                 **({"all_specialty_mode": f"{len(others) + 1} umbrellas each hold an internal discussion, then a plenary", **{f"· {self.tax[k].name}": ", ".join(s.name for s in v) for k, v in others.items()}} if others is not None else {}),
                  "umbrella_scores": {k: round(v, 1) for k, v in r.scores.items() if v},
                  "coverage": f"{len(r.coverage)} umbrellas: " + ", ".join(f"{n} {s}" for s, n in sorted({(x['status']): sum(1 for y in r.coverage if y['status'] == x['status']) for x in r.coverage}.items()))})
-        experts = [s.id for s in r.internal + r.external]
+        experts = [s.id for s in r.internal + r.external + [x for v in (others or {}).values() for x in v]]
         scopes = experts + [umb(r.umbrella.id)]
         frame, cterms = u.frame(), u.frame_terms()
         concept_q = " ".join(dict.fromkeys(x["canonical"] for x in u.concepts if not x["negated"]))
 
-        attempts, best, rows, feedback, query, n_ev, chair_only = 0, None, [], None, (question + " " + concept_q + " " + " ".join(answers.values())).strip(), c.evidence_n + reach["evidence_delta"], False
+        attempts, best, rows, feedback, query, n_ev, chair_only = 0, None, [], None, (question + " " + concept_q + " " + " ".join(answers.values())).strip(), c.evidence_n + reach["evidence_delta"] + (4 if c.consult_all else 0), False
         evidence, ops, last_score = [], [], ""
         while attempts < c.max_attempts:
             attempts += 1
@@ -146,16 +163,17 @@ class ResearchPipeline:
                         {"query": query[:140], "n": n_ev, "library scopes": len(scopes) if c.use_library else 0},
                         {"evidence": [dict(id=e.id, title=e.title, q=e.quality, design=e.design, lib=e.lib.get(umb(r.umbrella.id)), source=e.source) for e in evidence]},
                         status="ok" if evidence else "warn", note="" if evidence else "no evidence found")
-                ops = self._panel(tr, question, r, evidence, sfx, frame)
-            ans, cprompt = agents.chair(self.llm, question, evidence, ops, examples, feedback, c.system_prompt, c.demands, frame, umb(r.umbrella.id))
-            up = [last_score] if chair_only else ["lead" + sfx, *[f"ext:{s.id}{sfx}" for s in r.external]]
-            tr.emit("chair" + sfx, "Chair synthesis", 9, up,
+                ops = self._panel(tr, question, r, evidence, sfx, frame, others)
+            names = {k: v.name for k, v in self.tax.items()}
+            ans, cprompt = agents.chair(self.llm, question, evidence, ops, examples, feedback, c.system_prompt, c.demands, frame, umb(r.umbrella.id), names)
+            up = [last_score] if chair_only else (["plenary" + sfx] if others is not None else ["lead" + sfx, *[f"ext:{s.id}{sfx}" for s in r.external]])
+            tr.emit("chair" + sfx, "Chair synthesis", 10, up,
                     {"positions": len(ops), "revision_feedback": feedback or "", "prompt": cprompt[:1800]}, {"answer": ans})
-            sc = do_score(ans, question, evidence, ops, c.threshold, cterms)
+            sc = do_score(ans, question, evidence, ops, c.threshold, cterms, names)
             if self.judge:
                 sc = self.judge(question, ans, sc)
             last_score = "score" + sfx
-            tr.emit("score" + sfx, "Score & filter", 10, ["chair" + sfx], {"threshold": c.threshold}, {"dims": sc.dims, "composite": sc.composite, "failing": sc.failing},
+            tr.emit("score" + sfx, "Score & filter", 11, ["chair" + sfx], {"threshold": c.threshold}, {"dims": sc.dims, "composite": sc.composite, "failing": sc.failing},
                     status="ok" if sc.passed else "fail", note="PASS" if sc.passed else "REGENERATE", score=sc.composite)
             rows.append((attempts, ans, sc.composite, str(sc.dims), ",".join(sc.failing), sc.feedback, str([e.to_dict() for e in evidence])))
             if best is None or sc.composite > best[1].composite:
@@ -181,12 +199,12 @@ class ResearchPipeline:
         fups = agents.followups(self.llm, question, ans, system=c.system_prompt)
         fups += [f"What additional {s.name} evidence addresses: {question}" for s in r.internal if s.id.split('.')[-1] in sc.failing][:1]
         rid = self.store.log_run(question, r.umbrella.id, parent, depth, ans, sc.composite, status, attempts, experts, rows)
-        tr.emit("store", "Learn: store, weights, library", 11, [last_score],
+        tr.emit("store", "Learn: store, weights, library", 12, [last_score],
                 {"status": status, "composite": sc.composite}, {"run_id": rid, "attempts_logged": attempts, "library_updated": c.use_library, "export": "sft + preference pairs"}, status="ok")
-        tr.emit("followups", "Follow-up questions", 11, [last_score], {"open_issues": sc.failing}, {"queue": fups})
+        tr.emit("followups", "Follow-up questions", 12, [last_score], {"open_issues": sc.failing}, {"queue": fups})
         return RunResult(question, ans, sc, status, attempts, fups, tr.events, r.umbrella.id, depth, rid, parent, u.to_dict(), reach, False, r.coverage)
 
-    def _panel(self, tr, question, r, evidence, sfx, frame=""):
+    def _panel(self, tr, question, r, evidence, sfx, frame="", others=None):
         def logger(stage, lane):
             def f(spec, mine, op, prompt):
                 tr.emit(f"{stage}:{spec.id}{sfx}", spec.name, lane, [("gather" + sfx) if stage == "spec" else f"spec:{spec.id}{sfx}"] if stage != "ext" else ["lead" + sfx],
@@ -201,8 +219,35 @@ class ResearchPipeline:
         tr.emit("lead" + sfx, f"{r.umbrella.name} lead: internal consensus", 7, [f"deb:{s.id}{sfx}" for s in r.internal],
                 {"positions": [o.role for o in first]},
                 {"mean_confidence": round(sum(conf) / len(conf), 2) if conf else 0, "cited": sorted({e for o in first for e in o.evidence_ids})})
+        if others is not None:
+            return first + deb + self._all_umbrellas(tr, question, r, evidence, sfx, kw, others, first)
         ext = agents.ask_experts(self.llm, question, r.external, evidence, "external", prior=internal, trace=logger("ext", 8), **kw)
         return first + ext + deb
+
+    def _all_umbrellas(self, tr, question, r, evidence, sfx, kw, others, lead_first):
+        """Every other umbrella holds its own internal discussion (specialists -> debate -> consensus); then a plenary over all umbrellas."""
+        c, out, views, nodes = self.cfg, [], [], []
+        lead_conf = sum(o.confidence for o in lead_first) / len(lead_first) if lead_first else 0.0
+        views.append(agents.Opinion(r.internal[0].id, f"{r.umbrella.name} (umbrella consensus)", "specialist", " | ".join(o.text for o in lead_first[:2]), lead_conf, []))
+        for uid, specs in others.items():
+            f1 = agents.ask_experts(self.llm, question, specs, evidence, "specialist", **kw)
+            d1 = agents.ask_experts(self.llm, question, specs, evidence, "debate", prior=f1, **kw)
+            conf = sum(o.confidence for o in f1) / len(f1)
+            cited = sorted({e for o in f1 for e in o.evidence_ids})
+            views.append(agents.Opinion(specs[0].id, f"{self.tax[uid].name} (umbrella consensus)", "specialist", " | ".join(o.text for o in f1[:2]), conf, cited))
+            out += f1 + d1
+            nodes.append(tr.emit(f"umb:{uid}{sfx}", self.tax[uid].name, 8, ["gather" + sfx], {"roles": [s.name for s in specs], "evidence": cited or "none relevant"},
+                                 {**{o.role: o.text[:150] for o in f1}, "debate": d1[0].text[:120] if d1 else "", "confidence": round(conf, 2)}))
+        if c.plenary:
+            reps = [r.internal[0]] + [specs[0] for specs in others.values()]
+            plen = agents.ask_experts(self.llm, question, reps, evidence, "external", prior=views, max_peers=len(views), **kw)
+            out += plen
+            tr.emit("plenary" + sfx, "Plenary: all umbrellas cross-review", 9, ["lead" + sfx, *nodes],
+                    {"umbrellas": len(views), "each voice reads": f"up to {len(views) - 1} peer consensus views"},
+                    {**{o.role: o.text[:130] for o in plen[:6]}, "…": f"+{max(0, len(plen) - 6)} more voices", "confidence": round(sum(o.confidence for o in plen) / len(plen), 2)})
+        else:
+            tr.emit("plenary" + sfx, "All umbrellas (no plenary)", 9, ["lead" + sfx, *nodes], {"umbrellas": len(views)}, {"note": "plenary off"})
+        return out
 
     # ---- loop: discussion -> follow-up questions -> discussion ---------------------------------------------------
     def loop(self, seed, on_result=None, context=None) -> list[RunResult]:
