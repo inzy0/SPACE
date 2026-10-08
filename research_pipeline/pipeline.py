@@ -8,6 +8,7 @@ from . import agents
 from .router import route as do_route
 from .scoring import STYLE_DIMS, Score, score as do_score
 from .library import Library, umb
+from .memory import CogneeMemory, CogneeSource
 from .sources import gather
 from .store import Store
 from .taxonomy import load_taxonomy
@@ -40,6 +41,8 @@ class Config:
     consult_all: bool = False  # ALL-SPECIALTY mode: every umbrella runs its own internal discussion, then a plenary over all of them
     per_umbrella: int = 2  # roles per non-lead umbrella in all-specialty mode
     plenary: bool = True  # cross-umbrella plenary round on top of the per-umbrella discussions
+    use_cognee: bool = False  # optional Cognee graph memory (pip install cognee); silently inactive when unavailable
+    cognee_prefix: str = "healthcare"
     llm_understanding: bool = False  # let the LLM refine the pyramid slots (needs a real LLM)
 
 
@@ -73,13 +76,14 @@ class _LibSource:
 
 
 class ResearchPipeline:
-    def __init__(self, llm, sources, store: Store | None = None, taxonomy=None, cfg: Config | None = None, judge=None, library=None):
+    def __init__(self, llm, sources, store: Store | None = None, taxonomy=None, cfg: Config | None = None, judge=None, library=None, memory=None):
         self.llm, self.sources = llm, sources
         self.store = store or Store()
         self.tax = taxonomy or load_taxonomy()
         self.cfg = cfg or Config()
         self.judge = judge  # optional callable(question, answer, Score) -> Score, e.g. LLM-as-judge blend
         self.library = library or Library(self.store.db, self.tax)
+        self.memory = memory or CogneeMemory(self.cfg.cognee_prefix)
 
     # ---- one question -------------------------------------------------------------------------------------------
     def understand(self, question, answers=None):
@@ -113,7 +117,8 @@ class ResearchPipeline:
             return RunResult(question, "", Score({}, 0.0, False, [], ""), "awaiting_confirmation", 0, [], tr.events, "", depth, 0, parent, u.to_dict(), None, True)
         u.clearance = 2
         # ---- route (multi-term concepts) + reach extension
-        pre = do_route(question, self.tax, umbrella=c.umbrella, concepts=u.concepts)
+        lead_pref = c.umbrella if c.umbrella != "auto" else ctx.get("umbrella", "auto")  # follow-ups stay with their parent's lead umbrella
+        pre = do_route(question, self.tax, umbrella=lead_pref, concepts=u.concepts)
         weights = self.store.expert_weights(pre.umbrella.id)
         examples = self.store.best_examples(pre.umbrella.id)
         reach = plan_reach(u, self.tax, c.max_reach_extra, c.excluded) if c.auto_reach else dict(extra_required=[], reasons=[], top_external_delta=0, evidence_delta=0, scale="", multimorbidity=False, dropped=[])
@@ -122,7 +127,7 @@ class ResearchPipeline:
         required = list(dict.fromkeys(list(c.required) + reach["extra_required"]))
         others = None
         if c.consult_all:  # internal discussion in EVERY umbrella; the lead keeps its full panel, the others send their best roles
-            r = do_route(question, self.tax, weights, c.top_internal, 0, [i for i in required if i.startswith(pre.umbrella.id + ".")], c.excluded, c.umbrella, concepts=u.concepts)
+            r = do_route(question, self.tax, weights, c.top_internal, 0, [i for i in required if i.startswith(pre.umbrella.id + ".")], c.excluded, lead_pref, concepts=u.concepts)
             others = {}
             for uid in self.tax:
                 if uid != r.umbrella.id:
@@ -134,7 +139,7 @@ class ResearchPipeline:
                                status="lead" if x["id"] == r.umbrella.id else ("reach" if any(s.id in reqset for s in others.get(x["id"], [])) else "consulted") if x["id"] in others else "available",
                                consulted=[s.name for s in (r.internal if x["id"] == r.umbrella.id else others.get(x["id"], []))]) for x in r.coverage]
         else:
-            r = do_route(question, self.tax, weights, c.top_internal, c.top_external + reach["top_external_delta"], required, c.excluded, c.umbrella, concepts=u.concepts)
+            r = do_route(question, self.tax, weights, c.top_internal, c.top_external + reach["top_external_delta"], required, c.excluded, lead_pref, concepts=u.concepts)
         tr.emit("in:memory", "Learned memory", 0, inputs={"umbrella": pre.umbrella.id},
                 outputs={"expert_weights": {k: round(v, 2) for k, v in weights.items()}, "few_shot_examples": len(examples), "library_items": self.library.size() if c.use_library else 0})
         tr.emit("route", "Route (multi-term)", 4, ["reach", "in:memory"], {"terms": [f"{x['surface']}→{x['canonical']}" for x in u.concepts if not x["negated"]][:8], "required": required},
@@ -147,20 +152,21 @@ class ResearchPipeline:
         frame, cterms = u.frame(), u.frame_terms()
         concept_q = " ".join(dict.fromkeys(x["canonical"] for x in u.concepts if not x["negated"]))
 
+        cog = c.use_cognee and self.memory.available()
         attempts, best, rows, feedback, query, n_ev, chair_only = 0, None, [], None, (question + " " + concept_q + " " + " ".join(answers.values())).strip(), c.evidence_n + reach["evidence_delta"] + (4 if c.consult_all else 0), False
         evidence, ops, last_score = [], [], ""
         while attempts < c.max_attempts:
             attempts += 1
             sfx = "" if attempts == 1 else f"#{attempts}"
             if not chair_only:
-                srcs = list(self.sources) + ([_LibSource(self.library, scopes)] if c.use_library else [])
+                srcs = list(self.sources) + ([_LibSource(self.library, scopes)] if c.use_library else []) + ([CogneeSource(self.memory, r.umbrella.id)] if cog else [])
                 evidence = gather(srcs, query, n_ev, c.min_quality)
                 if c.use_library:  # ingest into every panelist's library, then attach per-specialty scores for this panel
                     for e in evidence:
                         e.lib_id = self.library.ingest(e, scopes)
                         e.lib = {s: self.library.score(e.lib_id, s)["overall"] for s in scopes}
                 tr.emit("gather" + sfx, "Gather evidence" + (f" (attempt {attempts})" if sfx else ""), 3, ["route"] if not sfx else ["in:question"],
-                        {"query": query[:140], "n": n_ev, "library scopes": len(scopes) if c.use_library else 0},
+                        {"query": query[:140], "n": n_ev, "library scopes": len(scopes) if c.use_library else 0, "cognee memory": "on" if cog else ("unavailable" if c.use_cognee else "off")},
                         {"evidence": [dict(id=e.id, title=e.title, q=e.quality, design=e.design, lib=e.lib.get(umb(r.umbrella.id)), source=e.source) for e in evidence]},
                         status="ok" if evidence else "warn", note="" if evidence else "no evidence found")
                 ops = self._panel(tr, question, r, evidence, sfx, frame, others)
@@ -180,6 +186,8 @@ class ResearchPipeline:
                 best = (ans, sc, ops, list(evidence))
             if sc.passed:
                 break
+            if not evidence and attempts >= 2:  # two retrievals found nothing: more attempts would only repeat the panel
+                break
             feedback = sc.feedback
             chair_only = set(sc.failing) <= STYLE_DIMS and bool(evidence)
             if not chair_only:  # needs new material: broaden retrieval with the panel's own keywords
@@ -196,11 +204,16 @@ class ResearchPipeline:
             allc = set().union(*cited.values()) if cited else set()
             cited[umb(r.umbrella.id)] = allc
             self.library.feedback(cited, status == "accepted", sc.composite)
+        remembered = False
+        if cog and status == "accepted":  # graph memory of what passed the gate, per umbrella
+            used = sorted({i for o in bops if o.stage != "debate" for i in o.evidence_ids})
+            ev_txt = "\n".join(f"- {e.title}: {e.text[:300]}" for e in bev if e.id in used)
+            remembered = self.memory.remember(f"Question: {question}\nAnswer:\n{ans}\nEvidence relied on:\n{ev_txt}", r.umbrella.id)
         fups = agents.followups(self.llm, question, ans, system=c.system_prompt)
         fups += [f"What additional {s.name} evidence addresses: {question}" for s in r.internal if s.id.split('.')[-1] in sc.failing][:1]
         rid = self.store.log_run(question, r.umbrella.id, parent, depth, ans, sc.composite, status, attempts, experts, rows)
         tr.emit("store", "Learn: store, weights, library", 12, [last_score],
-                {"status": status, "composite": sc.composite}, {"run_id": rid, "attempts_logged": attempts, "library_updated": c.use_library, "export": "sft + preference pairs"}, status="ok")
+                {"status": status, "composite": sc.composite}, {"run_id": rid, "attempts_logged": attempts, "library_updated": c.use_library, "cognee_remembered": remembered if cog else "off", **({"cognee_note": self.memory.error} if c.use_cognee and self.memory.error else {}), "export": "sft + preference pairs"}, status="ok")
         tr.emit("followups", "Follow-up questions", 12, [last_score], {"open_issues": sc.failing}, {"queue": fups})
         return RunResult(question, ans, sc, status, attempts, fups, tr.events, r.umbrella.id, depth, rid, parent, u.to_dict(), reach, False, r.coverage)
 
@@ -250,21 +263,30 @@ class ResearchPipeline:
         return out
 
     # ---- loop: discussion -> follow-up questions -> discussion ---------------------------------------------------
+    def _inherit(self, res, ctx):
+        """Follow-ups stay about the same patient and topic: carry the parent's confirmed context (time course, population, setting,
+        situation, area, scale) and its medical topic, so retrieval, routing and prompts keep the thread."""
+        u = res.understanding or {}
+        keep = {k: s["value"] for k, s in u.get("slots", {}).items() if k in ("acuity", "who", "place", "situation", "where", "scale") and s["value"] and s["conf"] >= 0.5}
+        topic = ", ".join(dict.fromkeys(x["canonical"] for x in u.get("concepts", []) if not x["negated"]))
+        return dict(ctx or {}, confirmed=True, umbrella=res.umbrella, answers={**keep, **({"topic": topic} if topic else {}), **(ctx or {}).get("answers", {})})
+
     def loop(self, seed, on_result=None, context=None) -> list[RunResult]:
-        c, queue, seen, out = self.cfg, deque([(seed, 0, None)]), [], []
+        c, queue, seen, out = self.cfg, deque([(seed, 0, None, context or {})]), [], []
         while queue and len(out) < c.max_questions:
-            q, d, parent = queue.popleft()
+            q, d, parent, ctx = queue.popleft()
             if any(jaccard(q, s) >= c.dedupe for s in seen):
                 continue
             seen.append(q)
-            res = self.ask(q, parent, d, context if d == 0 else dict(context or {}, confirmed=True))  # follow-ups inherit the confirmed context
+            res = self.ask(q, parent, d, ctx)
             out.append(res)
-            if res.awaiting:
-                break
             if on_result:
                 on_result(res)
+            if res.awaiting:
+                break
             if d < c.loop_depth:
-                queue.extend((f, d + 1, res.run_id) for f in res.followups)
+                child = self._inherit(res, ctx)
+                queue.extend((f, d + 1, res.run_id, child) for f in res.followups)
         return out
 
     # ---- background training --------------------------------------------------------------------------------------

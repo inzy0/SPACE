@@ -95,6 +95,19 @@ For real answers: `export ANTHROPIC_API_KEY=...` and pick *Anthropic API* in the
 | **Knowledge** | pasted/uploaded documents with a quality weight (plus the server `--corpus` folder) |
 | **Learning** | background training on a question list; export SFT + preference pairs |
 
+## Optional: Cognee graph memory (`memory.py`)
+
+`pip install cognee`, then tick *Cognee graph memory* in Setup (or `--cognee`). After every **accepted** answer the question, answer and the
+evidence the experts relied on are `remember`-ed into one Cognee dataset per umbrella (`healthcare_<umbrella>`); before gathering, `recall`
+over that dataset is added as one more evidence source. Off by default; if Cognee is missing or errors, the run proceeds normally and the
+reason is shown in the trace. (Cognee repo: https://github.com/topoteretes/cognee. Verified here against a stand-in module only, not a live Cognee install.)
+
+## Loop mode keeps the thread
+
+Follow-up questions inherit the parent's confirmed context (time course, population, setting, situation, area), its medical topic and its lead
+umbrella, so a generic follow-up such as "which subgroups respond differently?" stays about the same patient. Choosing an umbrella
+explicitly overrides this. If two retrievals find no evidence at all, the run stops instead of repeating the whole panel.
+
 ## All specialties, always visible
 
 Every run reports **specialty coverage for all 35 umbrellas**: lead, added by reach, consulted, or available but not needed. The

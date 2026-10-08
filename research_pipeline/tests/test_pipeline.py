@@ -7,6 +7,7 @@ from research_pipeline import Config, ResearchPipeline, Store
 from research_pipeline.llm import MockLLM
 from research_pipeline.router import route
 from research_pipeline.server import App
+from research_pipeline.memory import CogneeMemory
 from research_pipeline.sources import Inline
 from research_pipeline.taxonomy import load_taxonomy
 from research_pipeline.terms import CONCEPTS, find_concepts
@@ -301,6 +302,98 @@ class Tests(unittest.TestCase):
     def test_plenary_can_be_switched_off(self):
         res = pipe(consult_all=True, plenary=False).ask(Q)
         self.assertEqual(next(e for e in res.trace if e["node"] == "plenary")["outputs"], {"note": "plenary off"})
+
+
+    # ---------------------------------------------------------------- optional Cognee graph memory
+    def _fake_cognee(self, fail=False):
+        import types
+        calls = dict(remember=[], recall=[])
+
+        async def remember(text, dataset_name="main_dataset", **kw):
+            if fail:
+                raise RuntimeError("graph db down")
+            calls["remember"].append((dataset_name, text))
+
+        async def recall(query, query_type=None, *, datasets=None, top_k=15, **kw):
+            calls["recall"].append((datasets, top_k))
+            return [types.SimpleNamespace(text="Cognee remembered: early rehabilitation matters after stroke.\nmore")] if calls["remember"] else []
+        return types.SimpleNamespace(remember=remember, recall=recall), calls
+
+    def test_cognee_is_off_by_default_and_harmless_when_missing(self):
+        res = pipe().ask(Q)  # default: off
+        self.assertEqual(next(e for e in res.trace if e["node"] == "gather")["inputs"]["cognee memory"], "off")
+        p = pipe(use_cognee=True)
+        p.memory = CogneeMemory(prefix="x")
+        import sys
+        sys.modules.pop("cognee", None)
+        res = p.ask(Q)  # asked for but not installed: still a normal accepted run
+        self.assertEqual(res.status, "accepted")
+        self.assertIn(next(e for e in res.trace if e["node"] == "gather")["inputs"]["cognee memory"], ("unavailable", "on"))
+
+    def test_cognee_remembers_accepted_answers_and_recalls_them(self):
+        fake, calls = self._fake_cognee()
+        p = pipe(use_cognee=True)
+        p.memory = CogneeMemory(prefix="hc", module=fake)
+        r1 = p.ask(Q)
+        self.assertEqual(r1.status, "accepted")
+        self.assertEqual([d for d, _ in calls["remember"]], ["hc_neuro"])  # one dataset per umbrella
+        self.assertIn("Question:", calls["remember"][0][1])
+        self.assertIn("Evidence relied on:", calls["remember"][0][1])
+        self.assertTrue(next(e for e in r1.trace if e["node"] == "store")["outputs"]["cognee_remembered"])
+        r2 = p.ask(Q)
+        ev = next(e for e in r2.trace if e["node"] == "gather")["outputs"]["evidence"]
+        self.assertTrue([x for x in ev if x["source"].startswith("cognee:hc_neuro")])  # recalled memory joins the evidence pool
+        self.assertEqual(calls["recall"][0][0], ["hc_neuro"])
+
+    def test_cognee_failures_never_break_a_run(self):
+        fake, calls = self._fake_cognee(fail=True)
+        p = pipe(use_cognee=True)
+        p.memory = CogneeMemory(module=fake)
+        res = p.ask(Q)
+        self.assertEqual(res.status, "accepted")
+        out = next(e for e in res.trace if e["node"] == "store")["outputs"]
+        self.assertFalse(out["cognee_remembered"])
+        self.assertIn("graph db down", out["cognee_note"])
+
+
+    # ---------------------------------------------------------------- alignment regressions (features used together)
+    def test_loop_followups_inherit_context_topic_and_lead_umbrella(self):
+        p = pipe(loop_depth=1, max_questions=3)
+        txt = "My mum is 72 and had a brain attack last week, she is on warfarin. What are her chances of recovery?"
+        out = p.loop(txt, context=dict(confirmed=True))
+        self.assertGreaterEqual(len(out), 2)
+        for r in out:
+            self.assertEqual(r.umbrella, out[0].umbrella)  # follow-ups do not drift to another specialty
+            self.assertEqual(r.status, "accepted")
+        child = out[1]
+        prompt = next(e for e in child.trace if e["node"].startswith("spec:"))["inputs"]["prompt"]
+        self.assertIn("POPULATION", prompt)  # the confirmed patient context is carried into the follow-up
+        self.assertIn("stroke", child.understanding["text"].lower())  # and so is the topic
+
+    def test_explicit_umbrella_choice_beats_inheritance(self):
+        p = pipe(loop_depth=1, max_questions=2, umbrella="cardio")
+        self.assertTrue(all(r.umbrella == "cardio" for r in p.loop(Q, context=dict(confirmed=True))))
+
+    def test_stops_after_two_empty_retrievals(self):
+        res = ResearchPipeline(MockLLM(), [], Store(), cfg=Config(max_attempts=3, consult_all=True)).ask(Q)
+        self.assertEqual(res.status, "needs_review")
+        self.assertEqual(res.attempts, 2)  # no evidence twice -> do not re-run 35 umbrellas a third time
+
+    def test_every_feature_together_keeps_graph_consistent(self):
+        p = ResearchPipeline(MockLLM(), [Inline([dict(title=t, text=x, quality=q) for t, x, q in DOCS])], Store(),
+                             cfg=Config(consult_all=True, require_clearance=True, loop_depth=1, max_questions=2, use_cognee=True))
+        self.assertTrue(p.loop(Q)[0].awaiting)  # clearance gate first
+        out = p.loop(Q, context=dict(confirmed=True, answers={"how": "moderate"}))
+        for r in out:
+            nodes = {e["node"] for e in r.trace}
+            for e in r.trace:
+                self.assertTrue(set(filter(None, e["after"])) <= nodes, (e["node"], e["after"]))  # no dangling edges
+                self.assertTrue(0 <= e["lane"] <= 13)
+                self.assertTrue(e["lane"] == 0 or e["after"], e["node"])  # no orphan nodes
+            self.assertEqual(len(r.coverage), len(load_taxonomy()))
+            self.assertIn("plenary", nodes)
+        self.assertEqual(p.store.stats()["runs"], len(out))
+        self.assertEqual(len(p.library.overview()), len(load_taxonomy()))  # all-specialty mode feeds every umbrella's library
 
 
 if __name__ == "__main__":
