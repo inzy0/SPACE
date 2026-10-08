@@ -154,6 +154,11 @@ class Tests(unittest.TestCase):
         u2 = understand("Is MS safe in pregnancy?", load_taxonomy())
         self.assertTrue(any(q["group"] == "CLARIFY" for q in u2.questions))  # ambiguous abbreviation
 
+    def test_generic_symptom_fallback(self):
+        u = understand("my knee hurts, there is swelling in the knee", load_taxonomy())
+        self.assertTrue([c for c in u.concepts if c["type"] == "symptom"])
+        self.assertEqual(route("knee pain", load_taxonomy(), concepts=understand("knee pain", load_taxonomy()).concepts).umbrella.id, "msk")
+
     def test_answers_fill_slots_and_remove_questions(self):
         tax = load_taxonomy()
         u = understand("knee pain", tax, {"acuity": "chronic, 2 years", "why": "treatment options"})

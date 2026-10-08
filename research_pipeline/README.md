@@ -1,4 +1,14 @@
-# Research pipeline
+# Healthcare research pipeline — all in one
+
+```bash
+python healthcare_research.pyz          # ONE file, stdlib only, Python 3.10+  ->  full app at http://127.0.0.1:8765
+python healthcare_research.pyz --open --corpus ./my_papers --db research.db     # + your own evidence folder, persistent learning
+python research_pipeline/build_single_file.py                                     # rebuild the .pyz after editing the source
+```
+
+The one file contains everything below: language-pyramid understanding and clearance, the 35-umbrella / 263-role roster with scope of
+practice, multi-term routing, reach extension, the multi-specialist discussion, the scorer and regenerate loop, the evidence score
+libraries, background training, the CLI and the live node-graph UI.
 
 Multi-specialist research pipeline with scoring, regeneration, learning and a live node-graph replay.
 

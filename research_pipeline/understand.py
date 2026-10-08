@@ -224,6 +224,12 @@ def understand(question: str, taxonomy=None, answers: dict | None = None) -> Und
     full = question.strip() + (". " + ". ".join(str(v) for v in answers.values()) if answers else "")
     low = " " + full.lower() + " "
     concepts = find_concepts(full)
+    SYMPTOM = re.search(r"\b(pain|ache|aching|sore|swelling|swollen|stiff|stiffness|numb|numbness|tingling|weakness|rash|itch\w*|lump|bleeding|cough|fever|nausea|burning)\b", full.lower())
+    areas0 = body_areas(full)
+    if SYMPTOM and areas0 and not any(c["type"] in ("condition", "symptom") and not c["negated"] for c in concepts):
+        # generic fallback: "knee pain", "sore throat" ... a body area plus a symptom word is still a symptom, routed by the area's umbrella keywords
+        concepts.append(dict(canonical=f"{areas0[0]} {SYMPTOM.group(1)}", type="symptom", surface=f"{areas0[0]} {SYMPTOM.group(1)}", start=0,
+                             negated=False, routes=[], emergent=False))
     live = [c for c in concepts if not c["negated"]]
 
     # ---- 1 lexical

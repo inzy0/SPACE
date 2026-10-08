@@ -36,18 +36,23 @@ def main(argv=None):
     p.add_argument("--threshold", type=float, default=0.72)
     p.add_argument("--attempts", type=int, default=3)
     p.add_argument("--viz", help="write an interactive HTML replay of the run(s) to this path")
-    sub = p.add_subparsers(dest="cmd", required=True)
+    sub = p.add_subparsers(dest="cmd")  # no subcommand = open the full app
     s = sub.add_parser("ask"); s.add_argument("question")
     s = sub.add_parser("loop"); s.add_argument("question"); s.add_argument("--depth", type=int, default=2); s.add_argument("--max-questions", type=int, default=8)
     s = sub.add_parser("train"); s.add_argument("file", help="one question per line"); s.add_argument("--loop", action="store_true")
-    s = sub.add_parser("serve"); s.add_argument("--port", type=int, default=8765); s.add_argument("--host", default="127.0.0.1")
+    s = sub.add_parser("serve"); s.add_argument("--port", type=int, default=8765); s.add_argument("--host", default="127.0.0.1"); s.add_argument("--open", action="store_true", help="open the browser")
     s = sub.add_parser("understand"); s.add_argument("question"); s.add_argument("--answer", action="append", default=[], help="slot=text, e.g. acuity=chronic")
     s = sub.add_parser("library"); s.add_argument("scope", nargs="?", default="overview", help="overview | umb:<umbrella> | <role id>"); s.add_argument("--ingest", help="folder of .txt/.md to add"); s.add_argument("--to", help="scopes for --ingest, comma separated")
     sub.add_parser("stats")
     s = sub.add_parser("export"); s.add_argument("--sft", default="sft.jsonl"); s.add_argument("--prefs", default="prefs.jsonl")
     a = p.parse_args(argv)
+    if a.cmd is None:  # one command, everything: `python healthcare_research.pyz`
+        a.cmd, a.port, a.host = "serve", getattr(a, "port", 8765), getattr(a, "host", "127.0.0.1")
     if a.cmd == "serve":
         from .server import App, serve
+        if getattr(a, "open", False):
+            import threading, webbrowser
+            threading.Timer(1.0, lambda: webbrowser.open(f"http://{a.host}:{a.port}")).start()
         return serve(App(a.db, a.corpus, a.taxonomy), a.host, a.port)
     pl = build(a)
     results = []
