@@ -20,13 +20,18 @@ class Opinion:
     evidence_ids: list[str]
 
 
-def _ev_block(ev):
-    return "\n".join(f"[{e.id}] (q={e.quality:.2f}) {e.title} — {e.text}" for e in ev) or "(none)"
+def _q(e, scope=None):
+    """Evidence weight an expert sees: that specialty's library score when known, else the item's base quality."""
+    return e.lib.get(scope, e.quality) if scope else e.quality
+
+
+def _ev_block(ev, scope=None):
+    return "\n".join(f"[{e.id}] (q={_q(e, scope):.2f}) {e.title} — {e.text}" for e in ev) or "(none)"
 
 
 def _relevant(spec, question, evidence, k=4):
     qt = set(tokens(question)) | set(spec.keywords)
-    return sorted(evidence, key=lambda e: -(overlap(qt, e.title + " " + e.text) * (0.5 + e.quality)))[:k]
+    return sorted(evidence, key=lambda e: -(overlap(qt, e.title + " " + e.text) * (0.5 + _q(e, spec.id))))[:k]
 
 
 def _parse(expert, stage, raw):
@@ -35,17 +40,18 @@ def _parse(expert, stage, raw):
                    min(1.0, float(m.group(1))) if m else 0.5, sorted(set(re.findall(r"\[(E\d+)\]", raw))))
 
 
-def ask_experts(llm, question, experts, evidence, stage, prior=None, trace=None, system=DEFAULT_SYSTEM, role_prompts=None, demands=''):
+def ask_experts(llm, question, experts, evidence, stage, prior=None, trace=None, system=DEFAULT_SYSTEM, role_prompts=None, demands='', frame=''):
     out = []
     for s in experts:
         mine = _relevant(s, question, evidence)
         peers = "\n".join(f"- {o.role}: {o.text}" for o in (prior or []) if o.expert_id != s.id)
         extra = (role_prompts or {}).get(s.id, "").strip()
         scope = (f"SCOPE OF PRACTICE ({s.tier}): {s.scope}\nEXTENDED SCOPE (advanced practice, jurisdiction-dependent): {s.extended}\n"
-                 f"REFER ON: {s.refer} Stay inside this scope; for points outside it, say 'refer to <role>' instead of opining.\n")
+                 f"REFER ON: {s.refer} Stay inside this scope; for points outside it, say 'refer to <role>' instead of opining.\n"
+                 f"EXAMINATION & WORKUP CONSIDERATIONS: {s.workup}\n" + (f"CONFIRMED CONTEXT:\n{frame}\n" if frame else ""))
         prompt = (f"TASK: {stage}\nROLE: {s.name}\n" + scope + (f"ROLE INSTRUCTIONS: {extra}\n" if extra else "") +
                   (f"EXPERTISE DEMANDS: {demands}\n" if demands else "") + f"BODY AREAS: {', '.join(s.body_areas)}\nQUESTION: {question}\n"
-                  f"EVIDENCE:\n{_ev_block(mine)}\n" + (f"PEER POSITIONS:\n{peers}\n" if peers else "") +
+                  f"EVIDENCE:\n{_ev_block(mine, s.id)}\n" + (f"PEER POSITIONS:\n{peers}\n" if peers else "") +
                   "Give your position in 2-4 sentences, cite [E#], end with 'CONFIDENCE: 0-1'.")
         op = _parse(s, stage, llm.complete(system, prompt))
         out.append(op)
@@ -54,11 +60,11 @@ def ask_experts(llm, question, experts, evidence, stage, prior=None, trace=None,
     return out
 
 
-def chair(llm, question, evidence, opinions, examples=(), feedback=None, system=DEFAULT_SYSTEM, demands=''):
+def chair(llm, question, evidence, opinions, examples=(), feedback=None, system=DEFAULT_SYSTEM, demands='', frame='', scope=None):
     panel = "\n".join(f"PANEL: {o.role}" for o in opinions if o.stage != "debate")
     positions = "\n".join(f"- {o.role} ({o.stage}, conf {o.confidence:.2f}): {o.text}" for o in opinions)
     shots = "\n\n".join(f"HIGH-SCORING EXAMPLE:\n{x[:600]}" for x in examples)
-    prompt = (f"TASK: chair\nROLE: Chair\n" + (f"EXPERTISE DEMANDS: {demands}\n" if demands else "") + f"QUESTION: {question}\nEVIDENCE:\n{_ev_block(evidence)}\n{panel}\nPOSITIONS:\n{positions}\n"
+    prompt = (f"TASK: chair\nROLE: Chair\n" + (f"EXPERTISE DEMANDS: {demands}\n" if demands else "") + (f"CONFIRMED CONTEXT (tailor the answer to it):\n{frame}\n" if frame else "") + f"QUESTION: {question}\nEVIDENCE:\n{_ev_block(evidence, scope)}\n{panel}\nPOSITIONS:\n{positions}\n"
               f"{shots}\n" + (f"REVISION FEEDBACK (fix all of these):\n{feedback}\n" if feedback else "") +
               "Write the final answer: attribute each position by role, cite every claim [E#], note disagreements, "
               "add a 'Limitations:' line and a medical-advice disclaimer.")

@@ -7,8 +7,8 @@ from dataclasses import dataclass, field
 
 from .text import tokens
 
-WEIGHTS = dict(grounding=.25, evidence_quality=.15, coverage=.15, consensus=.10, calibration=.15, safety=.10, relevance=.10)
-STYLE_DIMS = {"grounding", "calibration", "safety", "relevance"}  # fixable by rewriting alone; others need new retrieval/panel
+WEIGHTS = dict(grounding=.24, evidence_quality=.14, coverage=.14, consensus=.10, calibration=.14, safety=.10, relevance=.07, context_fit=.07)
+STYLE_DIMS = {"grounding", "calibration", "safety", "relevance", "context_fit"}  # fixable by rewriting alone; others need new retrieval/panel
 ABSOLUTE = re.compile(r"\b(always|never|guaranteed?|cures?|proven to|100%|definitely)\b", re.I)
 DISCLAIMER = re.compile(r"not (a substitute for )?(professional )?medical advice|consult (a|your) (qualified )?(clinician|doctor|physician)", re.I)
 META = re.compile(r"^(limitations?|note|disclaimer|open questions?|summary)\b", re.I)
@@ -18,7 +18,8 @@ HINT = {"grounding": "Cite every factual claim with a valid [E#]; remove claims 
         "consensus": "Experts are low-confidence or split; gather more evidence and state the disagreement explicitly.",
         "calibration": "Add a 'Limitations:' line and avoid absolute wording (always/never/cures).",
         "safety": "Add a disclaimer: not medical advice, consult a qualified clinician.",
-        "relevance": "Answer the question asked; address its key terms directly."}
+        "relevance": "Answer the question asked; address its key terms directly.",
+        "context_fit": "Tailor the answer to the confirmed context (time course, population, care setting) and say how it changes the advice."}
 
 
 @dataclass
@@ -30,7 +31,7 @@ class Score:
     feedback: str
 
 
-def score(answer, question, evidence, opinions, threshold=0.72) -> Score:
+def score(answer, question, evidence, opinions, threshold=0.72, context_terms=()) -> Score:
     by_id = {e.id: e for e in evidence}
     sents = [s for s in re.split(r"(?<=[.!?])\s+|\n", answer) if len(s.split()) >= 6 and not META.match(s.strip())]
     cites = re.findall(r"\[(E\d+)\]", answer)
@@ -47,8 +48,10 @@ def score(answer, question, evidence, opinions, threshold=0.72) -> Score:
     safety = 1.0 if DISCLAIMER.search(answer) else 0.0
     qt = set(tokens(question))
     relevance = len(qt & set(tokens(answer))) / len(qt) if qt else 0.0
+    low = answer.lower()
+    context_fit = (sum(1 for t in context_terms if t[:5] in low) / len(context_terms)) if context_terms else 1.0
     dims = dict(grounding=grounding, evidence_quality=equality, coverage=coverage, consensus=consensus,
-                calibration=calibration, safety=safety, relevance=min(1.0, relevance * 1.5))
+                calibration=calibration, safety=safety, relevance=min(1.0, relevance * 1.5), context_fit=context_fit)
     comp = sum(WEIGHTS[k] * v for k, v in dims.items())
     failing = [k for k, v in dims.items() if v < 0.6]
     gate = bool(evidence) and grounding >= 0.6 and safety == 1.0 and not bad

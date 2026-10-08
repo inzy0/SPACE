@@ -6,7 +6,7 @@ import re
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, field, asdict
 from pathlib import Path
 
 from .text import overlap, tokens
@@ -21,6 +21,9 @@ class Evidence:
     quality: float = 0.5  # 0..1 study-design weight
     url: str = ""
     year: int | None = None
+    design: str = ""
+    lib_id: int = 0
+    lib: dict = field(default_factory=dict)  # scope -> library score (specialty ids and umb:<id>)
 
     def to_dict(self):
         return asdict(self)

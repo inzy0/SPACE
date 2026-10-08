@@ -20,11 +20,25 @@ def _hits(q: str, qt: set[str], kws) -> int:
     return sum(1 for k in kws if (k in q if " " in k else k in qt or (len(k) >= 5 and any(t.startswith(k) for t in qt))))
 
 
-def route(question, taxonomy, weights=None, top_internal=4, top_external=2, required=(), excluded=(), umbrella=None) -> Route:
+def route(question, taxonomy, weights=None, top_internal=4, top_external=2, required=(), excluded=(), umbrella=None, concepts=None) -> Route:
     """weights: expert_id -> learned multiplier from past scored runs (Store.expert_weight)."""
-    q, qt = question.lower(), set(tokens(question))
+    concepts = [c for c in (concepts or []) if not c.get("negated")]
+    # lay words / synonyms are expanded to their canonical terms so "brain attack" routes like "stroke"
+    q = (question + " " + " ".join(c["canonical"] for c in concepts)).lower()
+    qt = set(tokens(q))
     weights = weights or {}
-    scores = {u.id: _hits(q, qt, u.keywords) * 2 + _hits(q, qt, [a for a in u.body_areas]) for u in taxonomy.values()}
+    boost_u, boost_s = {}, {}
+    for c in concepts:
+        for rt in c["routes"]:
+            if "." in rt:
+                boost_s[rt] = boost_s.get(rt, 0) + 2
+                boost_u[rt.split(".")[0]] = boost_u.get(rt.split(".")[0], 0) + 1.5
+            else:
+                boost_u[rt] = boost_u.get(rt, 0) + 3
+                if rt in taxonomy and taxonomy[rt].specialties:  # an umbrella-level term always brings that umbrella's lead (generalist) role
+                    g = taxonomy[rt].specialties[0].id
+                    boost_s[g] = boost_s.get(g, 0) + 1.5
+    scores = {u.id: _hits(q, qt, u.keywords) * 2 + _hits(q, qt, [a for a in u.body_areas]) + boost_u.get(u.id, 0) for u in taxonomy.values()}
     lead = {k: v * (0.7 if taxonomy[k].support else 1.0) for k, v in scores.items()}  # support umbrellas (pharmacy, nursing, labs...) rarely lead
     primary = taxonomy[umbrella] if umbrella in taxonomy else taxonomy[max(lead, key=lambda k: (lead[k], k == "neuro"))]
     allspec = {s.id: s for u in taxonomy.values() for s in u.specialties}
@@ -34,8 +48,8 @@ def route(question, taxonomy, weights=None, top_internal=4, top_external=2, requ
 
     def spec_score(s: Specialty) -> float:
         base = BASE.get(s.id.split('.')[-1], 0.3) if s.umbrella == primary.id else 0.0  # members of the primary umbrella always qualify, ranked by facet match
-        areas = 0.5 * _hits(q, qt, s.body_areas) if s.id.split('.')[-1] not in FACETS else 0  # facets share the umbrella's areas
-        return (_hits(q, qt, s.keywords) + areas + base) * weights.get(s.id, 1.0)
+        areas = 0.25 * _hits(q, qt, s.body_areas) if s.id.split('.')[-1] not in FACETS else 0  # facets share the umbrella's areas
+        return (_hits(q, qt, s.keywords) + areas + base + boost_s.get(s.id, 0)) * weights.get(s.id, 1.0)
 
     ranked = sorted((s for s in primary.specialties if s.id not in excluded), key=lambda s: (-spec_score(s), order[s.id]))
     req_int = [allspec[i] for i in required if allspec[i].umbrella == primary.id]

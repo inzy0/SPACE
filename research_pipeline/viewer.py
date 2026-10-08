@@ -7,7 +7,7 @@ from dataclasses import asdict
 
 
 def run_json(r):
-    return dict(question=r.question, answer=r.answer, status=r.status, attempts=r.attempts, depth=r.depth, umbrella=r.umbrella,
+    return dict(question=r.question, understanding=r.understanding, reach=r.reach, answer=r.answer, status=r.status, attempts=r.attempts, depth=r.depth, umbrella=r.umbrella,
                 composite=r.score.composite, dims=r.score.dims, followups=r.followups, trace=r.trace)
 
 
@@ -22,7 +22,7 @@ TEMPLATE = r"""<!doctype html>
 <title>Research Pipeline Replay</title>
 <style>
 :root{--bg:#090b10;--panel:#0f131b;--card:#141a24;--line:#232c3b;--dim:#7d8aa0;--fg:#e6ecf6;--ok:#4ade80;--warn:#fbbf24;--bad:#f87171;--flow:#ff9f43;
---c0:#2f8f5b;--c1:#3b82c4;--c2:#3b82c4;--c3:#d9822b;--c4:#c26a1f;--c5:#b59a1d;--c6:#8b5cf6;--c7:#14a3a3;--c8:#b59a1d;--c9:#d4558a;--c10:#2f8f5b}
+--c0:#2f8f5b;--c1:#5b6bd6;--c2:#c26a8a;--c3:#3b82c4;--c4:#3b82c4;--c5:#d9822b;--c6:#c26a1f;--c7:#b59a1d;--c8:#8b5cf6;--c9:#14a3a3;--c10:#b59a1d;--c11:#d4558a;--c12:#2f8f5b}
 @media (prefers-color-scheme:light){:root:not([data-theme=dark]){--bg:#eef1f6;--panel:#fff;--card:#fff;--line:#d5dce8;--dim:#5b6a80;--fg:#12192a}}
 *{box-sizing:border-box}html,body{height:100%;margin:0}
 body{background:var(--bg);color:var(--fg);font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;display:grid;grid-template-rows:auto auto 1fr 190px;overflow:hidden}
@@ -69,6 +69,20 @@ svg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
 .lg div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--dim)}.lg div.n{color:var(--fg)}.lg .f{color:var(--bad)}.lg .o{color:var(--ok)}
 .sb{display:grid;grid-template-columns:150px 1fr 40px;align-items:center;gap:8px;margin:3px 0}.sb .t{height:7px;background:var(--line);border-radius:4px;position:relative}
 .sb .t i{position:absolute;left:0;top:0;height:100%;border-radius:4px}.sb .t u{position:absolute;top:-3px;bottom:-3px;width:1px;background:var(--fg);opacity:.5}
+.modal{position:fixed;inset:0;background:#000b;z-index:50;display:flex;align-items:center;justify-content:center;padding:14px}.modal[hidden]{display:none}
+.mbox{background:var(--panel);border:1px solid var(--line);border-radius:10px;max-width:1080px;width:100%;max-height:94vh;overflow:auto;padding:16px}
+.mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:14px}.mgrid{display:grid;grid-template-columns:minmax(300px,1fr) minmax(320px,1.25fr);gap:20px}
+.pyr{display:flex;flex-direction:column;align-items:center;gap:4px}.pyr h4{margin:0 0 6px;color:var(--dim);font-size:10px;letter-spacing:.14em;font-weight:400;align-self:flex-start}
+.tier{width:var(--w);min-width:230px;border-radius:6px;padding:7px 10px;color:#fff;cursor:pointer;text-align:center;transition:transform .15s}.tier:hover{transform:scale(1.015)}
+.tier b{display:block}.tier span{font-size:11px;opacity:.95}.tier ul{margin:6px 0 0;padding-left:16px;text-align:left;font-size:11px;display:none}.tier.open ul{display:block}
+.banner{background:#7f1d1d;color:#fff;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px}
+.qrow{margin:9px 0}.qrow .g{display:inline-block;font-size:10px;letter-spacing:.1em;padding:1px 6px;border-radius:4px;background:var(--line);margin-right:6px}.qrow .g.crit{background:var(--bad);color:#fff}
+.qrow input{width:100%;margin-top:4px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:5px 8px;font:inherit}
+.opts button{margin:3px 4px 0 0;padding:2px 8px;font-size:11px}.mf{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.mf .go{background:var(--flow);color:#1a1000;border:0;font-weight:700}.msg{white-space:pre-wrap;color:var(--dim);font-size:11px;border-top:1px solid var(--line);margin-top:12px;padding-top:8px;max-height:140px;overflow:auto}
+.libi{border:1px solid var(--line);border-radius:6px;padding:6px 8px;margin:6px 0;background:var(--bg);font-size:11px}.libi .t{font-weight:700;font-size:12px}
+.chk{display:flex!important;gap:6px;align-items:center;text-transform:none!important;letter-spacing:0!important;color:var(--fg)!important;font-size:12px!important}.chk input{width:auto!important}
+@media(max-width:900px){.mgrid{grid-template-columns:1fr}}
 #cfg{width:340px;border-right:1px solid var(--line);background:var(--panel);overflow:auto;padding:0 0 70px;position:relative;min-height:0}
 #cfg .cfgh{padding:10px 12px;letter-spacing:.14em;color:var(--dim);font-size:10px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between}
 #cfg details{border-bottom:1px solid var(--line);padding:0 12px}#cfg summary{padding:9px 0;cursor:pointer;font-weight:700}
@@ -97,7 +111,7 @@ svg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
 <details open><summary>1 · Prompt</summary>
 <label>Question / research prompt</label><textarea id="f-q" rows="4" placeholder="e.g. What are the surgical, rehabilitation and toxicity considerations after severe traumatic brain injury?"></textarea>
 <label>Mode</label><select id="f-mode"><option value="ask">Single question</option><option value="loop">Loop: discuss → follow-up questions → discuss</option></select>
-<label>Examples</label><select id="f-ex"></select></details>
+<label>Examples</label><select id="f-ex"></select><div style="margin-top:8px"><button id="f-und">① Understand &amp; confirm first</button></div><div class="hint">Language pyramid: words → structure → meaning → intent → context. I reply with what I understood plus when / how / why / where / place / situation questions before any research (clearance 1).</div></details>
 <details><summary>2 · Roles</summary>
 <label>Global system prompt (applies to every role)</label><textarea id="f-sys" rows="5"></textarea>
 <label>Roster — all healthcare (<span id="rcount"></span>)</label><input type="text" id="f-rsearch" placeholder="search any role, e.g. nurse practitioner, pharmacist, dentist…"><select id="f-ros" style="margin-top:6px"></select>
@@ -107,18 +121,20 @@ svg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
 <label>Primary umbrella</label><select id="f-umb"></select><div id="p-sec3"></div></details>
 <details><summary>4 · Parameters</summary><div id="p-sec4"></div>
 <label>LLM</label><select id="p-llm"><option value="mock">Offline mock (no API, extractive)</option><option value="anthropic">Anthropic API (needs ANTHROPIC_API_KEY on server)</option></select>
+<label class="chk"><input type="checkbox" id="p-clr"> require confirmation (clearance 1 → 2) before research</label><label class="chk"><input type="checkbox" id="p-reach"> auto-extend reach to the question's demands</label><label class="chk"><input type="checkbox" id="p-lib"> use + train evidence library</label><div id="p-sec4b"></div>
 <label>Model</label><input type="text" id="p-model"><label><input type="checkbox" id="p-pubmed" style="width:auto"> also search PubMed (needs network)</label></details>
 <details><summary>5 · Knowledge</summary><div class="hint">Evidence the experts may cite. Each doc gets a quality weight (trial/review ≈ 0.9, opinion ≈ 0.3).</div>
 <div id="kdocs"></div><label>Add text</label><input type="text" id="k-title" placeholder="title"><textarea id="k-text" rows="4" placeholder="paste abstract / guideline / notes"></textarea>
 <div style="display:flex;gap:6px;margin-top:6px"><input type="number" id="k-q" value="0.7" min="0" max="1" step="0.05" style="width:70px"><button id="k-add">+ add</button><label style="margin:0;flex:1"><input type="file" id="k-file" accept=".txt,.md" multiple style="display:none"><span class="chip" style="cursor:pointer;display:block;text-align:center">upload .txt/.md</span></label></div></details>
-<details><summary>6 · Learning</summary><div id="lstats" class="hint"></div>
+<details id="libsec"><summary>6 · Evidence library</summary><div class="hint">Score library per specialty and a common library per umbrella. Scores = quality, study design, recency, source and fit, then learned from what the experts cite in answers that pass the gate.</div><label>Library</label><select id="lib-scope"></select><div id="lib-list"></div></details>
+<details><summary>7 · Learning</summary><div id="lstats" class="hint"></div>
 <label>Training questions (one per line, runs in background)</label><textarea id="t-q" rows="4"></textarea>
 <div style="display:flex;gap:6px;margin-top:6px"><button id="t-go">Train in background</button><button id="t-exp">Export data</button></div><div id="t-log" class="hint"></div></details>
 <div class="runbar"><button class="runbtn" id="run">▶ Run pipeline</button><div id="err"></div></div></aside><div id="cv"><div id="stage"><svg id="wires"></svg></div></div><aside class="side" id="side"><div style="color:var(--dim)">Run summary, final answer and per-node inputs/outputs appear here after you press Run.</div></aside></div>
 <div class="bottom"><div class="bp"><h5>RUN LOG</h5><div class="lg" id="log"></div></div><div class="bp"><h5>SPECIALISTS · CONFIDENCE</h5><div id="spec"></div></div><div class="bp"><h5>SCORE &amp; GATE</h5><div id="sc"></div></div></div>
 <script>
 let RUNS=__DATA__;
-const LANES=["Inputs","Gather","Route","Internal specialists","Internal debate","Umbrella lead","External experts","Chair","Score & filter","Learn & loop","Output"];
+const LANES=["Inputs","Language pyramid","Clearance & reach","Gather + library","Route (multi-term)","Internal specialists","Internal debate","Umbrella lead","External experts","Chair","Score & filter","Learn & loop","Output"];
 const LW=270,NW=236,TOP=34,GAP=18;
 let run,ev,cur=0,timer=null,sel=null,follow=true,zoom=1,pos={};
 const $=id=>document.getElementById(id);
@@ -132,7 +148,7 @@ function loadRun(i){
  if(!RUNS[i])return;$("stage").querySelector(".empty")?.remove();
  run=RUNS[i];stop();cur=0;sel=null;
  ev=run.trace.map(e=>({...e}));const last=[...ev].reverse().find(e=>e.node.startsWith("score"));
- ev.push({seq:ev.length,t:(ev[ev.length-1]||{t:0}).t,node:"out:answer",label:"Final answer",lane:10,after:[last?last.node:""],inputs:{status:run.status,composite:run.composite,attempts:run.attempts},outputs:{answer:run.answer,umbrella:run.umbrella},status:run.status==="accepted"?"ok":"fail",note:run.status.toUpperCase()});
+ if(run.status!=="awaiting_confirmation")ev.push({seq:ev.length,t:(ev[ev.length-1]||{t:0}).t,node:"out:answer",label:"Final answer",lane:12,after:[last?last.node:""],inputs:{status:run.status,composite:run.composite,attempts:run.attempts},outputs:{answer:run.answer,umbrella:run.umbrella},status:run.status==="accepted"?"ok":"fail",note:run.status.toUpperCase()});
  document.querySelectorAll(".tab").forEach((t,j)=>t.classList.toggle("sel",j===i));
  $("q").textContent=run.question;$("scrub").max=ev.length-1;layout();render();play()}
 function rowsOf(o,cls,max=4){const ks=Object.keys(o);return ks.slice(0,max).map(k=>`<div class="r ${cls}"><span class="k">${esc(k)}</span><span class="v">${esc(sm(o[k]))}</span></div>`).join("")+(ks.length>max?`<div class="more">+${ks.length-max} more ›</div>`:"")}
@@ -169,7 +185,7 @@ function render(){
  $("log").innerHTML=ev.slice(0,i+1).map((e,k)=>`<div class="${k===i?"n":""} ${e.status==="fail"?"f":""}${e.node==="out:answer"&&e.status==="ok"?"o":""}">${String(e.seq).padStart(2,"0")}  ${e.t.toFixed(2).padStart(5)}s  ${esc(e.label)}${e.note?" · "+esc(e.note):""}</div>`).join("");$("log").scrollTop=1e5;
  // specialists
  const sp=ev.slice(0,i+1).filter(e=>/^(spec|ext):/.test(e.node));
- $("spec").innerHTML=sp.map(e=>`<div class="sb"><span>${esc(e.label.slice(0,22))}</span><div class="t"><i style="width:${e.outputs.confidence*100}%;background:${e.node.startsWith("ext")?"var(--c6)":"var(--c3)"}"></i></div><span>${e.outputs.confidence.toFixed(2)}</span></div>`).join("")||'<span style="color:var(--dim)">waiting…</span>';
+ $("spec").innerHTML=sp.map(e=>`<div class="sb"><span>${esc(e.label.slice(0,22))}</span><div class="t"><i style="width:${e.outputs.confidence*100}%;background:${e.node.startsWith("ext")?"var(--c8)":"var(--c5)"}"></i></div><span>${e.outputs.confidence.toFixed(2)}</span></div>`).join("")||'<span style="color:var(--dim)">waiting…</span>';
  // score
  $("sc").innerHTML=sc?Object.entries(sc.outputs.dims).map(([k,v])=>`<div class="sb"><span>${k}</span><div class="t"><i style="width:${v*100}%;background:${v>=.6?"var(--ok)":"var(--bad)"}"></i><u style="left:60%"></u></div><span>${v.toFixed(2)}</span></div>`).join("")+`<div style="margin-top:6px">composite <b class="big ${sc.status==="ok"?"ok":"bad"}">${sc.outputs.composite}</b> <span class="chip">${sc.note}</span></div>`:'<span style="color:var(--dim)">waiting…</span>';
  side();
@@ -177,7 +193,7 @@ function render(){
 }
 function side(){const e=sel?ev.find(x=>x.node===sel):null,s=$("side");
  if(!e){s.innerHTML=`<h3>Run summary</h3><dl class="kv"><dt>question</dt><dd>${esc(run.question)}</dd><dt>umbrella</dt><dd>${esc(run.umbrella)}</dd><dt>status</dt><dd class="${run.status==="accepted"?"ok":"bad"}">${run.status}</dd><dt>score</dt><dd><b class="big">${run.composite}</b></dd><dt>attempts</dt><dd>${run.attempts}</dd></dl>
- <h4>FINAL ANSWER (OUTPUT)</h4><div style="white-space:pre-wrap">${esc(run.answer)}</div><h4>NEXT QUESTIONS (LOOP)</h4>${run.followups.map(f=>`<div>→ ${esc(f)}</div>`).join("")||"–"}<h4>TIP</h4><div style="color:var(--dim)">Click any node to inspect its full inputs and outputs. Orange dashed wire = a failed gate sending the draft back for regeneration.</div>`;return}
+ <h4>UNDERSTOOD AS</h4><div>${esc(run.understanding?run.understanding.restatement.replace(/\*\*/g,""):"–")}</div>${run.reach&&run.reach.reasons.length?`<h4>REACH EXTENDED</h4>${run.reach.reasons.map(r=>`<div>+ ${esc(r)}</div>`).join("")}`:""}<h4>FINAL ANSWER (OUTPUT)</h4><div style="white-space:pre-wrap">${esc(run.answer)}</div><h4>NEXT QUESTIONS (LOOP)</h4>${run.followups.map(f=>`<div>→ ${esc(f)}</div>`).join("")||"–"}<h4>TIP</h4><div style="color:var(--dim)">Click any node to inspect its full inputs and outputs. Orange dashed wire = a failed gate sending the draft back for regeneration.</div>`;return}
  const up=e.after.filter(Boolean).map(a=>`<span class="chip">${esc((ev.find(x=>x.node===a)||{label:a}).label)}</span>`).join(""),dn=ev.filter(x=>x.after.includes(e.node)).map(x=>`<span class="chip">${esc(x.label)}</span>`).join("");
  const kv=o=>`<dl class="kv">${Object.entries(o).map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(full(v))}</dd>`).join("")||"<dd>–</dd>"}</dl>`;
  s.innerHTML=`<h3>${esc(e.label)} <span class="chip ${e.status==="ok"?"ok":"bad"}">${e.status}</span></h3><div style="color:var(--dim)">${LANES[e.lane]} · t=${e.t.toFixed(2)}s ${e.note?"· "+esc(e.note):""}</div><h4>◀ FED BY</h4>${up||"–"}<h4>INPUT</h4>${kv(e.inputs)}<h4>OUTPUT ▶</h4>${kv(e.outputs)}<h4>FEEDS</h4>${dn||"–"}<h4><a href="#" onclick="sel=null;render();return false" style="color:var(--flow)">← run summary</a></h4>`}
@@ -203,14 +219,53 @@ function roster(){const u=META.umbrellas.find(x=>x.id===C.roster),q=($("f-rsearc
  const list=q?META.umbrellas.flatMap(x=>x.specialties.filter(s=>(s.name+" "+s.tier+" "+x.name+" "+s.keywords.join(" ")).toLowerCase().includes(q))):u.specialties;
  if(q&&!list.length)$("roster").innerHTML='<div class="hint">No role matches.</div>';
  list.slice(0,60).forEach(s=>{const st=C.state[s.id]||"auto",d=document.createElement("div");d.className="rrow "+(st==="required"?"req":st==="excluded"?"exc":"");
-  d.innerHTML=`<div class="rt"><span><b>${esc(s.name)}</b> <span class="chip">${s.tier}</span></span><select><option>auto</option><option>required</option><option>excluded</option></select></div><details class="scp"><summary style="font-size:11px;color:var(--dim);padding:3px 0">scope of practice</summary><div class="hint"><b>Core:</b> ${esc(s.scope)}<br><b>Extended / advanced:</b> ${esc(s.extended)}<br><b>Refer on:</b> ${esc(s.refer)}</div></details><textarea rows="2" placeholder="Role instruction, e.g. focus on paediatric cases; cite guidelines"></textarea>`;
+  d.innerHTML=`<div class="rt"><span><b>${esc(s.name)}</b> <span class="chip">${s.tier}</span></span><select><option>auto</option><option>required</option><option>excluded</option></select></div><details class="scp"><summary style="font-size:11px;color:var(--dim);padding:3px 0">scope of practice</summary><div class="hint"><b>Core:</b> ${esc(s.scope)}<br><b>Extended / advanced:</b> ${esc(s.extended)}<br><b>Refer on:</b> ${esc(s.refer)}<br><b>Examination &amp; workup:</b> ${esc(s.workup)}<br><b>Route terms:</b> ${esc((s.terms||[]).join(", "))}</div></details><textarea rows="2" placeholder="Role instruction, e.g. focus on paediatric cases; cite guidelines"></textarea>`;
   const sel=d.querySelector("select"),ta=d.querySelector("textarea");sel.value=st;ta.value=C.role_prompts[s.id]||"";
   sel.onchange=()=>{C.state[s.id]=sel.value;save();roster()};ta.oninput=()=>{C.role_prompts[s.id]=ta.value;save()};$("roster").appendChild(d)})}
 function kdocs(){$("kdocs").innerHTML="";C.knowledge.forEach((k,i)=>{const d=document.createElement("div");d.className="kdoc";d.innerHTML=`<span title="${esc(k.text.slice(0,300))}">${esc(k.title)}</span><input type="number" min="0" max="1" step="0.05" value="${k.quality}"><button>✕</button>`;
  d.querySelector("input").onchange=e=>{k.quality=+e.target.value;save()};d.querySelector("button").onclick=()=>{C.knowledge.splice(i,1);save();kdocs()};$("kdocs").appendChild(d)})}
 function addDoc(title,text,q){if(text.trim()){C.knowledge.push({title:title||text.trim().slice(0,50),text:text.trim(),quality:q});save();kdocs()}}
+
+/* ===== clearance modal, reach, library ===== */
+const PR4=[["max_reach_extra","Max extra experts from reach",0,6,1]];
+const WL={1:"Lexical · words & terms",2:"Syntactic · structure",3:"Semantic · meaning",4:"Pragmatic · intent",5:"Contextual · situation"};
+const clean=t=>String(t||"").replace(/\*\*/g,"").replace(/\*/g,"");
+function pyramid(u){const W={5:44,4:58,3:72,2:86,1:100};
+ return `<div class="pyr"><h4>LANGUAGE PYRAMID — how I read you (click a tier)</h4>`+[5,4,3,2,1].map(n=>{const L=u.levels[n];return `<div class="tier" style="--w:${W[n]}%;background:var(--c${n})" onclick="this.classList.toggle('open')"><b>${n} · ${esc(WL[n])}</b><span>${esc(clean(L.summary).slice(0,150))}</span><ul>${L.items.map(i=>`<li>${esc(clean(i))}</li>`).join("")}</ul></div>`}).join("")+`</div>`}
+function showClearance(u,answers={}){
+ const m=$("clr");m.hidden=false;
+ m.innerHTML=`<div class="mbox"><div class="mh"><b>Clearance 1 · confirm my understanding before I research</b><button id="clr-x">✕</button></div>
+ ${u.emergent?`<div class="banner">⚠ <b>This may be an emergency.</b> If this is happening now (chest pain, stroke signs, trouble breathing, overdose, thoughts of suicide) call your local emergency number or go to the nearest emergency department. Research output is not a substitute for urgent care.</div>`:""}
+ <div class="mgrid">${pyramid(u)}<div><div style="margin-bottom:6px"><b>I understand that…</b></div><div style="font-size:13px">${esc(clean(u.restatement))}</div>
+ <div class="hint" style="margin-top:6px">Perspective: ${esc(u.perspective)} · urgency: ${esc(u.urgency)} · clearance level ${u.clearance}${u.ready?" · enough to proceed":" · critical details missing"}</div>
+ <div style="margin-top:12px"><b>To get it exactly right, tell me (skip any you don't know):</b></div><div id="qs">${u.questions.length?u.questions.map((q,i)=>`<div class="qrow"><span class="g ${q.critical?"crit":""}">${q.group}</span>${esc(q.text)}<div class="opts">${(q.options||[]).map(o=>`<button data-k="${esc(q.key)}" data-v="${esc(o)}">${esc(o.length>44?o.slice(0,42)+"…":o)}</button>`).join("")}</div><input type="text" data-key="${esc(q.key)}" placeholder="your answer (optional)" value="${esc(answers[q.key]||"")}"></div>`).join(""):'<div class="hint">Nothing critical is missing.</div>'}</div></div></div>
+ <div class="msg">${esc(clean(u.message))}</div>
+ <div class="mf"><button class="go" id="clr-go">✔ Confirm &amp; run research</button><button id="clr-up">↻ Update understanding with my answers</button><button id="clr-skip">Skip questions &amp; run</button><button id="clr-cancel">Cancel</button></div></div>`;
+ const collect=()=>{const a={...answers};m.querySelectorAll("input[data-key]").forEach(i=>{const k=i.dataset.key,t=i.value.trim();if(t)a[k.startsWith("ambiguity:")?"clarify_"+k.slice(10):k]=t});return a};
+ m.querySelectorAll(".opts button").forEach(b=>b.onclick=()=>{m.querySelector(`input[data-key="${b.dataset.k}"]`).value=b.dataset.v});
+ const close=()=>{m.hidden=true;m.innerHTML=""};
+ $("clr-x").onclick=$("clr-cancel").onclick=close;
+ $("clr-up").onclick=async()=>{const a=collect();try{const j=await api("/api/understand",{...req(),context:{answers:a}});showClearance(j.understanding,a)}catch(e){$("err").textContent=e.message}};
+ $("clr-go").onclick=$("clr-skip").onclick=async e=>{const a=e.target.id==="clr-skip"?{...answers}:collect();close();await execute({answers:a,confirmed:true})};
+}
+async function execute(context){$("err").textContent="";$("run").disabled=true;$("run").textContent="⏳ running…";
+ try{const j=await api("/api/run",{...req(),context});
+  if(j.awaiting){RUNS=[{question:C.question,understanding:j.understanding,reach:null,answer:"",status:"awaiting_confirmation",attempts:0,depth:0,umbrella:"",composite:0,dims:{},followups:[],trace:j.trace}];buildTabs();loadRun(0);showClearance(j.understanding,context&&context.answers||{})}
+  else{RUNS=j.runs;buildTabs();loadRun(0)}
+  stats(j.stats);refreshLib()}catch(e){$("err").textContent=e.message}
+ $("run").disabled=false;$("run").textContent="▶ Run pipeline"}
+async function refreshLib(){try{const m=await api("/api/meta");const ov=Object.fromEntries(m.library.map(o=>[o.scope,o.items]));
+ const cur=$("lib-scope").value;const roleOpts=(META.umbrellas.find(x=>x.id===C.roster)||{specialties:[]}).specialties.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join("");
+ $("lib-scope").innerHTML=`<optgroup label="Umbrella common libraries (all specialties merged)">`+META.umbrellas.map(u=>`<option value="umb:${u.id}">${esc(u.name)} — ${ov["umb:"+u.id]||0} items</option>`).join("")+`</optgroup><optgroup label="Specialty libraries · roster umbrella: ${esc(C.roster)}">${roleOpts}</optgroup>`;
+ if(cur)$("lib-scope").value=cur;loadLib()}catch(e){}}
+async function loadLib(){const sc=$("lib-scope").value;if(!sc){$("lib-list").innerHTML="";return}
+ try{const r=await api("/api/library?scope="+encodeURIComponent(sc));
+  $("lib-list").innerHTML=r.items.length?`<div class="hint">${r.count} item(s) · ${r.total_library} in the whole library</div>`+r.items.map(i=>`<div class="libi"><div class="t">${esc(i.title)}</div><div class="bar"><i style="width:${i.overall*100}%;background:${i.overall>=.7?"var(--ok)":i.overall>=.5?"var(--warn)":"var(--bad)"}"></i></div>
+   <div style="margin-top:4px"><span class="chip">score ${i.overall}</span><span class="chip">${esc(i.design)}</span>${i.year?`<span class="chip">${i.year}</span>`:""}<span class="chip">cited ${i.cited}×</span><span class="chip">${esc(i.source.split(":")[0])}</span></div>
+   <div style="color:var(--dim)">quality ${i.parts.quality} · design ${i.parts.design} · recency ${i.parts.recency} · source ${i.parts.source} · fit ${i.parts.fit} · learned ${i.learned}</div>
+   ${i.by_specialty&&i.by_specialty.length?`<div>${i.by_specialty.map(b=>`<span class="chip">${esc(b.id)} ${b.score}</span>`).join("")}</div>`:""}</div>`).join(""):'<div class="hint">Empty — run the pipeline (or ingest documents) to build this library.</div>'}catch(e){$("lib-list").innerHTML='<div class="hint">'+esc(e.message)+'</div>'}}
 function req(){const ids=v=>Object.entries(C.state).filter(([k,x])=>x===v).map(([k])=>k);
- return{question:C.question,mode:C.mode,params:{...C.params,llm:$("p-llm").value,model:$("p-model").value,pubmed:$("p-pubmed").checked,umbrella:C.umbrella},
+ return{question:C.question,mode:C.mode,params:{...C.params,llm:$("p-llm").value,model:$("p-model").value,pubmed:$("p-pubmed").checked,umbrella:C.umbrella,require_clearance:$("p-clr").checked,auto_reach:$("p-reach").checked,use_library:$("p-lib").checked},
   roles:{system_prompt:C.system_prompt,role_prompts:Object.fromEntries(Object.entries(C.role_prompts).filter(([k,v])=>v.trim()))},
   expertise:{demands:C.demands,required:ids("required"),excluded:ids("excluded")},knowledge:C.knowledge,questions:C.train.split("\n")}}
 async function api(path,body){const r=await fetch(path,body?{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)}:{});const j=await r.json();if(!r.ok)throw new Error(j.error||r.statusText);return j}
@@ -226,17 +281,20 @@ async function initCfg(){
  $("f-dem").value=C.demands;$("f-dem").oninput=e=>{C.demands=e.target.value;save()};
  const cats=[...new Set(META.umbrellas.map(u=>u.category))];
  $("f-ros").innerHTML=cats.map(c=>`<optgroup label="${esc(c)}">`+META.umbrellas.filter(u=>u.category===c).map(u=>`<option value="${u.id}">${esc(u.name)} (${u.specialties.length} roles)</option>`).join("")+"</optgroup>").join("");
- $("rcount").textContent=`${META.umbrellas.length} umbrellas · ${META.umbrellas.reduce((n,u)=>n+u.specialties.length,0)} roles`;$("f-rsearch").oninput=roster;$("f-ros").value=C.roster;$("f-ros").onchange=e=>{C.roster=e.target.value;save();roster()};
+ $("rcount").textContent=`${META.umbrellas.length} umbrellas · ${META.umbrellas.reduce((n,u)=>n+u.specialties.length,0)} roles`;$("f-rsearch").oninput=roster;$("f-ros").value=C.roster;$("f-ros").onchange=e=>{C.roster=e.target.value;save();roster();refreshLib()};
  $("f-umb").innerHTML='<option value="auto">auto (router decides from the question)</option>'+cats.map(c=>`<optgroup label="${esc(c)}">`+META.umbrellas.filter(u=>u.category===c).map(u=>`<option value="${u.id}">${esc(u.name)}</option>`).join("")+"</optgroup>").join("");$("f-umb").value=C.umbrella;$("f-umb").onchange=e=>{C.umbrella=e.target.value;save()};
  PR.forEach(p=>slider(p[0],p[1],p[2],p[3],p[4],"p-sec4"));PR3.forEach(p=>slider(p[0],p[1],p[2],p[3],p[4],"p-sec3"));
+ PR4.forEach(p=>slider(p[0],p[1],p[2],p[3],p[4],"p-sec4b"));
+ $("p-clr").checked=C.params.require_clearance??META.defaults.require_clearance;$("p-reach").checked=C.params.auto_reach??META.defaults.auto_reach;$("p-lib").checked=C.params.use_library??META.defaults.use_library;
+ [$("p-clr"),$("p-reach"),$("p-lib")].forEach(c=>c.onchange=()=>{C.params.require_clearance=$("p-clr").checked;C.params.auto_reach=$("p-reach").checked;C.params.use_library=$("p-lib").checked;save()});
+ $("lib-scope").onchange=loadLib;$("libsec").ontoggle=()=>{if($("libsec").open)refreshLib()};
+ $("f-und").onclick=async()=>{$("err").textContent="";try{const j=await api("/api/understand",{...req(),context:{answers:{}}});showClearance(j.understanding,{})}catch(e){$("err").textContent=e.message}};
  $("p-llm").value=C.params.llm||"mock";$("p-model").value=C.params.model||META.defaults.model;$("p-pubmed").checked=!!C.params.pubmed;
  if(!META.llm_ready)$("p-llm").options[1].text+=" — key NOT set";
- roster();kdocs();stats(META.stats);$("t-q").value=C.train;$("t-q").oninput=e=>{C.train=e.target.value;save()};
+ roster();kdocs();stats(META.stats);refreshLib();$("t-q").value=C.train;$("t-q").oninput=e=>{C.train=e.target.value;save()};
  $("k-add").onclick=()=>{addDoc($("k-title").value,$("k-text").value,+$("k-q").value);$("k-title").value=$("k-text").value=""};
  $("k-file").onchange=async e=>{for(const f of e.target.files){const t=await f.text();addDoc(f.name.replace(/\.\w+$/,""),t,+$("k-q").value)}e.target.value=""};
- $("run").onclick=async()=>{$("err").textContent="";$("run").disabled=true;$("run").textContent="⏳ running…";
-  try{const j=await api("/api/run",req());RUNS=j.runs;buildTabs();loadRun(0);stats(j.stats)}catch(e){$("err").textContent=e.message}
-  $("run").disabled=false;$("run").textContent="▶ Run pipeline"};
+ $("run").onclick=()=>execute({answers:{},confirmed:!$("p-clr").checked});
  $("t-go").onclick=async()=>{try{await api("/api/train",req());poll()}catch(e){$("t-log").textContent=e.message}};
  const poll=async()=>{const s=await api("/api/train");$("t-log").textContent=`${s.running?"training… ":"done "}${s.done}/${s.total}\n`+s.log.slice(-5).map(l=>`${l.status} ${l.score} (${l.attempts}×) ${l.q.slice(0,40)}`).join("\n");$("t-log").style.whiteSpace="pre-wrap";
   if(s.running)setTimeout(poll,1000);else api("/api/meta").then(m=>stats(m.stats))};
@@ -244,4 +302,4 @@ async function initCfg(){
 }
 $("cfgbtn").onclick=()=>$("main").classList.toggle("nocfg");
 initCfg();
-</script></body></html>"""
+</script><div class="modal" id="clr" hidden></div></body></html>"""

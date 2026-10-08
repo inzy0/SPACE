@@ -53,6 +53,23 @@ TIERS = {
 }
 
 
+WORKUP = {
+    "physician": "History (onset, course, severity, red flags), examination, baseline investigations, comorbidities and current medicines, then a stepwise differential and management options.",
+    "surgeon": "Operative candidacy: indication, imaging and fitness assessment, anaesthetic/medical risk, alternatives to surgery, expected benefit vs complication risk, post-operative course.",
+    "advanced": "Structured history and focused examination, point-of-care tests, red-flag screening, protocol-based plan with explicit escalation criteria.",
+    "nurse": "Observations and early-warning scores, symptom and risk screening, medicines and allergy check, care-plan goals, escalation triggers.",
+    "allied": "Functional assessment with validated outcome measures, baseline strength/mobility/participation, goals set with the patient, red-flag screen, home and work context.",
+    "diagnostic": "Choose the test by the clinical question, pre-test probability and test accuracy; consider radiation/contrast risk, timing, and what result would change management.",
+    "scientist": "Exposure, dose and timing history; mechanism and plausibility; dose-response and causality criteria; relevant levels or biomarkers; susceptible groups.",
+    "pharmacist": "Full medicines reconciliation; indication and dose check against kidney/liver function; interactions, adverse effects, adherence and a monitoring plan.",
+    "public": "Define population and outcome; check study design, bias and confounding; absolute vs relative risk; applicability and equity.",
+    "dental": "Dental/oral history and pain assessment, intra- and extra-oral examination, radiographs as indicated, periodontal status, caries risk, treatment sequencing.",
+    "psychosocial": "Biopsychosocial assessment, risk assessment, validated symptom measures, supports and stressors, goals and safety planning.",
+    "acute": "Primary survey (ABCDE), vital signs, time-critical diagnoses first, immediate stabilisation, escalation and disposition.",
+    "integrative": "Document what is used (product, dose, practitioner); check evidence grade and interactions with prescribed medicines; safety red flags; never delay effective care.",
+}
+
+
 @dataclass(frozen=True)
 class Specialty:
     id: str
@@ -64,6 +81,7 @@ class Specialty:
     scope: str = ""
     extended: str = ""
     refer: str = ""
+    workup: str = ""
 
 
 @dataclass(frozen=True)
@@ -92,7 +110,7 @@ ALL_FACETS = tuple(FACETS)
 
 def _mk(uid, s_id, name, kw, areas, tier, detail, umb_name):
     core, ext, ref = TIERS[tier]
-    return Specialty(f"{uid}.{s_id}", name, uid, tuple(kw), tuple(areas), tier, f"{core} Focus: {detail or umb_name}.", ext, ref)
+    return Specialty(f"{uid}.{s_id}", name, uid, tuple(kw), tuple(areas), tier, f"{core} Focus: {detail or umb_name}.", ext, ref, WORKUP[tier])
 
 
 def make_umbrella(uid, name, keywords, body_areas, adjacent=(), names=None, extras=(), cat="Medical specialties",
