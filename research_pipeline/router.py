@@ -17,7 +17,7 @@ class Route:
 
 
 def _hits(q: str, qt: set[str], kws) -> int:
-    return sum(1 for k in kws if (k in q if " " in k else k in qt or any(t.startswith(k) for t in qt)))
+    return sum(1 for k in kws if (k in q if " " in k else k in qt or (len(k) >= 5 and any(t.startswith(k) for t in qt))))
 
 
 def route(question, taxonomy, weights=None, top_internal=4, top_external=2, required=(), excluded=(), umbrella=None) -> Route:
@@ -25,26 +25,34 @@ def route(question, taxonomy, weights=None, top_internal=4, top_external=2, requ
     q, qt = question.lower(), set(tokens(question))
     weights = weights or {}
     scores = {u.id: _hits(q, qt, u.keywords) * 2 + _hits(q, qt, [a for a in u.body_areas]) for u in taxonomy.values()}
-    primary = taxonomy[umbrella] if umbrella in taxonomy else taxonomy[max(scores, key=lambda k: (scores[k], k == "neuro"))]
+    lead = {k: v * (0.7 if taxonomy[k].support else 1.0) for k, v in scores.items()}  # support umbrellas (pharmacy, nursing, labs...) rarely lead
+    primary = taxonomy[umbrella] if umbrella in taxonomy else taxonomy[max(lead, key=lambda k: (lead[k], k == "neuro"))]
     allspec = {s.id: s for u in taxonomy.values() for s in u.specialties}
+    order = {s.id: i for u in taxonomy.values() for i, s in enumerate(u.specialties)}  # umbrella order = generalist first
+    BASE = {"dermato": 0.1, "toxicologist": 0.2}  # facets that join a panel by default only when the question points at them
     excluded, required = set(excluded), [i for i in required if i in allspec and i not in excluded]
 
     def spec_score(s: Specialty) -> float:
-        base = 0.3 if s.umbrella == primary.id else 0.0  # members of the primary umbrella always qualify, ranked by facet match
+        base = BASE.get(s.id.split('.')[-1], 0.3) if s.umbrella == primary.id else 0.0  # members of the primary umbrella always qualify, ranked by facet match
         areas = 0.5 * _hits(q, qt, s.body_areas) if s.id.split('.')[-1] not in FACETS else 0  # facets share the umbrella's areas
         return (_hits(q, qt, s.keywords) + areas + base) * weights.get(s.id, 1.0)
 
-    ranked = sorted((s for s in primary.specialties if s.id not in excluded), key=lambda s: (-spec_score(s), s.id))
+    ranked = sorted((s for s in primary.specialties if s.id not in excluded), key=lambda s: (-spec_score(s), order[s.id]))
     req_int = [allspec[i] for i in required if allspec[i].umbrella == primary.id]
     internal = req_int + [s for s in ranked if s not in req_int][:max(0, top_internal - len(req_int))]
     req_ext = [allspec[i] for i in required if allspec[i].umbrella != primary.id]
     ext_pool = []
-    for uid, sc in scores.items():
-        if uid != primary.id and (sc > 0 or uid in primary.adjacent):
-            for s in taxonomy[uid].specialties:
-                if s.id not in excluded and s not in req_ext:
-                  ext_pool.append((spec_score(s) + (sc + (1 if uid in primary.adjacent else 0)) * 0.1, s))
-    ext_pool.sort(key=lambda x: (-x[0], x[1].id))
-    external = req_ext + [s for sc, s in ext_pool if sc > 0.1][:max(0, top_external - len(req_ext))]
+    for uid, u in taxonomy.items():
+        if uid == primary.id:
+            continue
+        adj = 1.0 if uid in primary.adjacent else 0.0
+        if scores[uid] == 0 and not adj:
+            continue
+        cands = [(spec_score(s), s) for s in u.specialties if s.id not in excluded and s not in req_ext]
+        if cands:  # one voice per umbrella keeps the external panel diverse
+            hits, best = max(cands, key=lambda x: (x[0], -order[x[1].id]))
+            ext_pool.append((scores[uid] + 0.5 * adj + hits * 0.5 if (scores[uid] or hits >= 2) else 0, best))
+    ext_pool.sort(key=lambda x: (-x[0], order[x[1].id]))
+    external = req_ext + [s for sc, s in ext_pool if sc > 0.5][:max(0, top_external - len(req_ext))]
     areas = sorted({a for s in internal for a in s.body_areas if a.lower() in q or _hits(q, qt, [a])}) or list(primary.body_areas[:3])
     return Route(primary, internal, external, scores, areas)

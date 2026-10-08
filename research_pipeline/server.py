@@ -27,9 +27,9 @@ class App:
 
     def meta(self):
         return dict(
-            umbrellas=[dict(id=u.id, name=u.name, body_areas=list(u.body_areas), adjacent=list(u.adjacent),
-                            specialties=[dict(id=s.id, name=s.name, keywords=list(s.keywords[:8]), body_areas=list(s.body_areas),
-                                              facet=s.id.split(".")[-1] if s.id.split(".")[-1] in FACETS else "extra") for s in u.specialties])
+            umbrellas=[dict(id=u.id, name=u.name, category=u.category, body_areas=list(u.body_areas), adjacent=list(u.adjacent),
+                            specialties=[dict(id=s.id, name=s.name, keywords=list(s.keywords[:8]), body_areas=list(s.body_areas), tier=s.tier,
+                                              scope=s.scope, extended=s.extended, refer=s.refer) for s in u.specialties])
                        for u in self.tax.values()],
             defaults=dict(DEFAULTS, system_prompt=agents.DEFAULT_SYSTEM), llm_ready=bool(os.environ.get("ANTHROPIC_API_KEY")),
             corpus=self.corpus, stats=self.store.stats())

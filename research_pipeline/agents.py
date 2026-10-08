@@ -41,7 +41,9 @@ def ask_experts(llm, question, experts, evidence, stage, prior=None, trace=None,
         mine = _relevant(s, question, evidence)
         peers = "\n".join(f"- {o.role}: {o.text}" for o in (prior or []) if o.expert_id != s.id)
         extra = (role_prompts or {}).get(s.id, "").strip()
-        prompt = (f"TASK: {stage}\nROLE: {s.name}\n" + (f"ROLE INSTRUCTIONS: {extra}\n" if extra else "") +
+        scope = (f"SCOPE OF PRACTICE ({s.tier}): {s.scope}\nEXTENDED SCOPE (advanced practice, jurisdiction-dependent): {s.extended}\n"
+                 f"REFER ON: {s.refer} Stay inside this scope; for points outside it, say 'refer to <role>' instead of opining.\n")
+        prompt = (f"TASK: {stage}\nROLE: {s.name}\n" + scope + (f"ROLE INSTRUCTIONS: {extra}\n" if extra else "") +
                   (f"EXPERTISE DEMANDS: {demands}\n" if demands else "") + f"BODY AREAS: {', '.join(s.body_areas)}\nQUESTION: {question}\n"
                   f"EVIDENCE:\n{_ev_block(mine)}\n" + (f"PEER POSITIONS:\n{peers}\n" if peers else "") +
                   "Give your position in 2-4 sentences, cite [E#], end with 'CONFIDENCE: 0-1'.")

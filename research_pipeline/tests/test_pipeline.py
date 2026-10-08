@@ -86,5 +86,40 @@ class Tests(unittest.TestCase):
         self.assertTrue(app.meta()["umbrellas"])
 
 
+    def test_catalog_covers_all_healthcare_with_scope(self):
+        tax = load_taxonomy()
+        self.assertGreaterEqual(len(tax), 30)
+        cats = {u.category for u in tax.values()}
+        for c in ("Medical specialties", "Surgical & perioperative", "Nursing & midwifery", "Pharmacy & medicines", "Dental & oral health",
+                  "Allied health & rehabilitation", "Public health & evidence", "Palliative care & ethics", "Emergency & critical care"):
+            self.assertIn(c, cats)
+        ids = [s.id for u in tax.values() for s in u.specialties]
+        self.assertEqual(len(ids), len(set(ids)))
+        for u in tax.values():
+            self.assertTrue(all(a in tax for a in u.adjacent), u.id)
+            for s in u.specialties:
+                self.assertTrue(s.scope and s.extended and s.refer, s.id)
+
+    def test_routing_across_professions(self):
+        tax = load_taxonomy()
+        cases = {"Management of periodontitis and when is a root canal indicated": ("dental", "Periodontist"),
+                 "Can nurse practitioners safely prescribe for chronic hypertension": ("nursing", "Nurse practitioner"),
+                 "Should a pharmacist adjust warfarin dose when starting an antibiotic": ("pharm", "Clinical pharmacist"),
+                 "Gestational diabetes screening and labour management": ("obgyn", "Obstetrician"),
+                 "Palliative sedation and consent for a patient lacking capacity": ("pall", "Palliative-medicine physician"),
+                 "Return to play after ACL reconstruction in an athlete": ("sportsmed", "Sports physiotherapist"),
+                 "How is sepsis recognised in the emergency department": ("emerg", "Emergency physician")}
+        for q, (umb, role) in cases.items():
+            r = route(q, tax)
+            self.assertEqual(r.umbrella.id, umb, q)
+            self.assertTrue(any(role in s.name for s in r.internal), (q, [s.name for s in r.internal]))
+
+    def test_scope_of_practice_in_prompt(self):
+        res = pipe().ask(Q)
+        p = next(e for e in res.trace if e["node"].startswith("spec:neuro.surgeon"))["inputs"]["prompt"]
+        for w in ("SCOPE OF PRACTICE", "EXTENDED SCOPE", "REFER ON"):
+            self.assertIn(w, p)
+
+
 if __name__ == "__main__":
     unittest.main()

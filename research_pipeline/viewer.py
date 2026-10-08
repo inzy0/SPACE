@@ -100,7 +100,7 @@ svg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
 <label>Examples</label><select id="f-ex"></select></details>
 <details><summary>2 · Roles</summary>
 <label>Global system prompt (applies to every role)</label><textarea id="f-sys" rows="5"></textarea>
-<label>Roster (pick umbrella, then set each role)</label><select id="f-ros"></select>
+<label>Roster — all healthcare (<span id="rcount"></span>)</label><input type="text" id="f-rsearch" placeholder="search any role, e.g. nurse practitioner, pharmacist, dentist…"><select id="f-ros" style="margin-top:6px"></select>
 <div class="hint">auto = router decides · required = always on the panel · excluded = never. Role instructions are added to that expert's prompt.</div><div id="roster"></div></details>
 <details><summary>3 · Expertise demands</summary>
 <label>Demands (injected into every expert + chair prompt)</label><textarea id="f-dem" rows="4" placeholder="e.g. Prefer RCTs and meta-analyses. Address paediatric patients separately. Flag any dosing claims."></textarea>
@@ -114,7 +114,7 @@ svg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
 <details><summary>6 · Learning</summary><div id="lstats" class="hint"></div>
 <label>Training questions (one per line, runs in background)</label><textarea id="t-q" rows="4"></textarea>
 <div style="display:flex;gap:6px;margin-top:6px"><button id="t-go">Train in background</button><button id="t-exp">Export data</button></div><div id="t-log" class="hint"></div></details>
-<div class="runbar"><button class="runbtn" id="run">▶ Run pipeline</button><div id="err"></div></div></aside><div id="cv"><div id="stage"><svg id="wires"></svg></div></div><aside class="side" id="side"></aside></div>
+<div class="runbar"><button class="runbtn" id="run">▶ Run pipeline</button><div id="err"></div></div></aside><div id="cv"><div id="stage"><svg id="wires"></svg></div></div><aside class="side" id="side"><div style="color:var(--dim)">Run summary, final answer and per-node inputs/outputs appear here after you press Run.</div></aside></div>
 <div class="bottom"><div class="bp"><h5>RUN LOG</h5><div class="lg" id="log"></div></div><div class="bp"><h5>SPECIALISTS · CONFIDENCE</h5><div id="spec"></div></div><div class="bp"><h5>SCORE &amp; GATE</h5><div id="sc"></div></div></div>
 <script>
 let RUNS=__DATA__;
@@ -199,9 +199,11 @@ const PR3=[["top_internal","Internal experts on panel",1,8,1],["top_external","E
 function save(){try{localStorage.setItem("rp-cfg",JSON.stringify(C))}catch(e){}}
 function slider(id,label,mn,mx,st,box){const d=document.createElement("div");d.className="prm";d.innerHTML=`<label>${label}</label><input type="range" min="${mn}" max="${mx}" step="${st}" id="p-${id}"><b id="v-${id}"></b>`;$(box).appendChild(d);
  const r=d.querySelector("input");r.value=C.params[id]??META.defaults[id];const u=()=>{C.params[id]=+r.value;$("v-"+id).textContent=r.value;save()};r.oninput=u;u()}
-function roster(){const u=META.umbrellas.find(x=>x.id===C.roster);$("roster").innerHTML="";
- u.specialties.forEach(s=>{const st=C.state[s.id]||"auto",d=document.createElement("div");d.className="rrow "+(st==="required"?"req":st==="excluded"?"exc":"");
-  d.innerHTML=`<div class="rt"><span><b>${esc(s.name)}</b> <span class="chip">${s.facet}</span></span><select><option>auto</option><option>required</option><option>excluded</option></select></div><textarea rows="2" placeholder="Role instruction, e.g. focus on paediatric cases; cite guidelines"></textarea>`;
+function roster(){const u=META.umbrellas.find(x=>x.id===C.roster),q=($("f-rsearch").value||"").toLowerCase().trim();$("roster").innerHTML="";
+ const list=q?META.umbrellas.flatMap(x=>x.specialties.filter(s=>(s.name+" "+s.tier+" "+x.name+" "+s.keywords.join(" ")).toLowerCase().includes(q))):u.specialties;
+ if(q&&!list.length)$("roster").innerHTML='<div class="hint">No role matches.</div>';
+ list.slice(0,60).forEach(s=>{const st=C.state[s.id]||"auto",d=document.createElement("div");d.className="rrow "+(st==="required"?"req":st==="excluded"?"exc":"");
+  d.innerHTML=`<div class="rt"><span><b>${esc(s.name)}</b> <span class="chip">${s.tier}</span></span><select><option>auto</option><option>required</option><option>excluded</option></select></div><details class="scp"><summary style="font-size:11px;color:var(--dim);padding:3px 0">scope of practice</summary><div class="hint"><b>Core:</b> ${esc(s.scope)}<br><b>Extended / advanced:</b> ${esc(s.extended)}<br><b>Refer on:</b> ${esc(s.refer)}</div></details><textarea rows="2" placeholder="Role instruction, e.g. focus on paediatric cases; cite guidelines"></textarea>`;
   const sel=d.querySelector("select"),ta=d.querySelector("textarea");sel.value=st;ta.value=C.role_prompts[s.id]||"";
   sel.onchange=()=>{C.state[s.id]=sel.value;save();roster()};ta.oninput=()=>{C.role_prompts[s.id]=ta.value;save()};$("roster").appendChild(d)})}
 function kdocs(){$("kdocs").innerHTML="";C.knowledge.forEach((k,i)=>{const d=document.createElement("div");d.className="kdoc";d.innerHTML=`<span title="${esc(k.text.slice(0,300))}">${esc(k.title)}</span><input type="number" min="0" max="1" step="0.05" value="${k.quality}"><button>✕</button>`;
@@ -216,14 +218,16 @@ function stats(st){$("lstats").textContent=`runs ${st.runs} · accepted ${st.acc
 async function initCfg(){
  try{META=await api("/api/meta")}catch(e){$("cfgbtn").style.display="none";return}
  try{Object.assign(C,JSON.parse(localStorage.getItem("rp-cfg")||"{}"))}catch(e){}
- $("cfg").style.display="";$("srv").textContent=META.corpus?"server corpus: "+META.corpus:"";
+ $("cfg").style.display="";$("srv").textContent=META.corpus?"corpus: "+META.corpus.split("/").pop():"";$("srv").title=META.corpus||"";
  if(!C.system_prompt)C.system_prompt=META.defaults.system_prompt;if(!C.question)C.question=EXAMPLES[0];
  $("f-q").value=C.question;$("f-q").oninput=e=>{C.question=e.target.value;save()};$("f-mode").value=C.mode;$("f-mode").onchange=e=>{C.mode=e.target.value;save()};
  $("f-ex").innerHTML='<option value="">— load an example —</option>'+EXAMPLES.map((x,i)=>`<option value="${i}">${esc(x.slice(0,60))}…</option>`).join("");$("f-ex").onchange=e=>{if(e.target.value!==""){C.question=EXAMPLES[e.target.value];$("f-q").value=C.question;save()}};
  $("f-sys").value=C.system_prompt;$("f-sys").oninput=e=>{C.system_prompt=e.target.value;save()};
  $("f-dem").value=C.demands;$("f-dem").oninput=e=>{C.demands=e.target.value;save()};
- $("f-ros").innerHTML=META.umbrellas.map(u=>`<option value="${u.id}">${esc(u.name)} (${u.specialties.length} roles · ${esc(u.body_areas.slice(0,3).join(", "))})</option>`).join("");$("f-ros").value=C.roster;$("f-ros").onchange=e=>{C.roster=e.target.value;save();roster()};
- $("f-umb").innerHTML='<option value="auto">auto (router decides from the question)</option>'+META.umbrellas.map(u=>`<option value="${u.id}">${esc(u.name)}</option>`).join("");$("f-umb").value=C.umbrella;$("f-umb").onchange=e=>{C.umbrella=e.target.value;save()};
+ const cats=[...new Set(META.umbrellas.map(u=>u.category))];
+ $("f-ros").innerHTML=cats.map(c=>`<optgroup label="${esc(c)}">`+META.umbrellas.filter(u=>u.category===c).map(u=>`<option value="${u.id}">${esc(u.name)} (${u.specialties.length} roles)</option>`).join("")+"</optgroup>").join("");
+ $("rcount").textContent=`${META.umbrellas.length} umbrellas · ${META.umbrellas.reduce((n,u)=>n+u.specialties.length,0)} roles`;$("f-rsearch").oninput=roster;$("f-ros").value=C.roster;$("f-ros").onchange=e=>{C.roster=e.target.value;save();roster()};
+ $("f-umb").innerHTML='<option value="auto">auto (router decides from the question)</option>'+cats.map(c=>`<optgroup label="${esc(c)}">`+META.umbrellas.filter(u=>u.category===c).map(u=>`<option value="${u.id}">${esc(u.name)}</option>`).join("")+"</optgroup>").join("");$("f-umb").value=C.umbrella;$("f-umb").onchange=e=>{C.umbrella=e.target.value;save()};
  PR.forEach(p=>slider(p[0],p[1],p[2],p[3],p[4],"p-sec4"));PR3.forEach(p=>slider(p[0],p[1],p[2],p[3],p[4],"p-sec3"));
  $("p-llm").value=C.params.llm||"mock";$("p-model").value=C.params.model||META.defaults.model;$("p-pubmed").checked=!!C.params.pubmed;
  if(!META.llm_ready)$("p-llm").options[1].text+=" — key NOT set";

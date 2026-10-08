@@ -36,12 +36,33 @@ For real answers: `export ANTHROPIC_API_KEY=...` and pick *Anthropic API* in the
 | **Knowledge** | pasted/uploaded documents with a quality weight (plus the server `--corpus` folder) |
 | **Learning** | background training on a question list; export SFT + preference pairs |
 
-## Specialty tree (`taxonomy.py`)
+## Healthcare roster (`taxonomy.py` + `catalog.py`)
 
-Each umbrella (neuro, cardio, onco, immuno, endo, psych, msk, gastro, pulmo, nephro) is generated from the same facets
-(physician, surgeon, physiotherapist, toxicologist, diagnostics, dermatology liaison) plus custom extras
-(neuro-ophthalmologist, neuro-oncologist, neuropathic pain, neuro-otologist, ...), each linked to body areas.
-Add umbrellas with `--taxonomy file.json` (see `load_taxonomy`).
+35 umbrellas / 260+ roles in 9 categories, every role linked to body areas and carrying a **tier** with its
+**scope of practice** (core), **extended / advanced-practice scope** (e.g. nurse and pharmacist prescribing, extended-scope
+physiotherapy, jurisdiction-dependent) and **refer-on limits**. These go into the role's prompt so experts stay in scope and
+say "refer to ..." instead of opining outside it.
+
+| Category | Umbrellas |
+|---|---|
+| Medical specialties | neuro, cardio, vascular, onco, haematology, immuno/allergy, endocrine, gastro/hepatology, pulmo/sleep, nephro, urology, dermatology, eye, ENT/audiology, musculoskeletal, infectious disease, geriatrics, genetics, sports & exercise |
+| Surgical & perioperative | general surgery (colorectal, HPB, bariatric, plastic, breast, transplant ...), anaesthesia & pain |
+| Women's & children's | obstetrics/gynaecology/midwifery/fertility, paediatrics/neonatology/adolescent |
+| Emergency & critical care | emergency, intensive care, trauma, paramedic, poison centre, disaster |
+| Mental health | psychiatry, clinical psychology, addiction, child & adolescent, counselling, social work |
+| Nursing & midwifery | nurse practitioner, physician associate, clinical nurse specialist, community, tissue viability ... |
+| Pharmacy & medicines | clinical / prescribing / community pharmacist, clinical pharmacologist, pharmacogenomics, pharmacovigilance |
+| Diagnostics & laboratory | radiology, interventional, nuclear medicine, pathology, biochemistry, microbiology, medical physics, clinical AI |
+| Allied health & rehabilitation | rehab medicine, physio, OT, speech & language, prosthetics, podiatry, dietetics/nutrition, exercise physiology |
+| Dental & oral | general, perio, endo, ortho, prostho, paediatric, OMFS, oral medicine, hygiene/therapy |
+| Public health & evidence | epidemiology, biostatistics/EBM, occupational & environmental, health economics, vaccinology, informatics |
+| Palliative care & ethics | palliative medicine, hospice nursing, clinical ethics, chaplaincy, bereavement |
+| Integrative (evidence-graded) | acupuncture, herbal, TCM/Ayurveda, mind-body, supplements: appraised for evidence and interactions, never a substitute for care |
+
+Organ-system umbrellas are generated from shared facets (physician, surgeon, physiotherapist, toxicologist, diagnostics,
+dermatology liaison) plus custom extras. The router picks the primary umbrella, the best internal roles, and **one best expert per
+relevant other umbrella** as the external panel. Support umbrellas (pharmacy, nursing, labs ...) rarely lead but join when relevant.
+Add or override umbrellas with `--taxonomy file.json` (see `load_taxonomy`).
 
 ## Scoring & learning
 
