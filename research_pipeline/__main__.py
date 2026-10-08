@@ -15,7 +15,7 @@ from .viewer import write_viewer
 def build(a):
     llm = AnthropicLLM() if a.llm == "anthropic" else MockLLM()
     srcs = ([LocalCorpus(a.corpus)] if a.corpus else []) + ([PubMed()] if a.pubmed else [])
-    cfg = Config(threshold=a.threshold, max_attempts=a.attempts, require_clearance=False, loop_depth=getattr(a, "depth", 0), max_questions=getattr(a, "max_questions", 8))
+    cfg = Config(threshold=a.threshold, max_attempts=a.attempts, require_clearance=False, consult_all=getattr(a, 'all_specialties', False), loop_depth=getattr(a, "depth", 0), max_questions=getattr(a, "max_questions", 8))
     return ResearchPipeline(llm, srcs, Store(a.db), load_taxonomy(a.taxonomy), cfg)
 
 
@@ -35,6 +35,7 @@ def main(argv=None):
     p.add_argument("--taxonomy", help="JSON file extending the specialty tree")
     p.add_argument("--threshold", type=float, default=0.72)
     p.add_argument("--attempts", type=int, default=3)
+    p.add_argument("--all-specialties", action="store_true", help="consult one expert from EVERY umbrella")
     p.add_argument("--viz", help="write an interactive HTML replay of the run(s) to this path")
     sub = p.add_subparsers(dest="cmd")  # no subcommand = open the full app
     s = sub.add_parser("ask"); s.add_argument("question")

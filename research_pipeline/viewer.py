@@ -7,7 +7,7 @@ from dataclasses import asdict
 
 
 def run_json(r):
-    return dict(question=r.question, understanding=r.understanding, reach=r.reach, answer=r.answer, status=r.status, attempts=r.attempts, depth=r.depth, umbrella=r.umbrella,
+    return dict(question=r.question, understanding=r.understanding, reach=r.reach, coverage=r.coverage, answer=r.answer, status=r.status, attempts=r.attempts, depth=r.depth, umbrella=r.umbrella,
                 composite=r.score.composite, dims=r.score.dims, followups=r.followups, trace=r.trace)
 
 
@@ -121,7 +121,7 @@ svg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
 <label>Primary umbrella</label><select id="f-umb"></select><div id="p-sec3"></div></details>
 <details><summary>4 · Parameters</summary><div id="p-sec4"></div>
 <label>LLM</label><select id="p-llm"><option value="mock">Offline mock (no API, extractive)</option><option value="anthropic">Anthropic API (needs ANTHROPIC_API_KEY on server)</option></select>
-<label class="chk"><input type="checkbox" id="p-clr"> require confirmation (clearance 1 → 2) before research</label><label class="chk"><input type="checkbox" id="p-reach"> auto-extend reach to the question's demands</label><label class="chk"><input type="checkbox" id="p-lib"> use + train evidence library</label><div id="p-sec4b"></div>
+<label class="chk"><input type="checkbox" id="p-clr"> require confirmation (clearance 1 → 2) before research</label><label class="chk"><input type="checkbox" id="p-all"> consult ALL healthcare specialties (one expert from every umbrella)</label><label class="chk"><input type="checkbox" id="p-reach"> auto-extend reach to the question's demands</label><label class="chk"><input type="checkbox" id="p-lib"> use + train evidence library</label><div id="p-sec4b"></div>
 <label>Model</label><input type="text" id="p-model"><label><input type="checkbox" id="p-pubmed" style="width:auto"> also search PubMed (needs network)</label></details>
 <details><summary>5 · Knowledge</summary><div class="hint">Evidence the experts may cite. Each doc gets a quality weight (trial/review ≈ 0.9, opinion ≈ 0.3).</div>
 <div id="kdocs"></div><label>Add text</label><input type="text" id="k-title" placeholder="title"><textarea id="k-text" rows="4" placeholder="paste abstract / guideline / notes"></textarea>
@@ -193,7 +193,7 @@ function render(){
 }
 function side(){const e=sel?ev.find(x=>x.node===sel):null,s=$("side");
  if(!e){s.innerHTML=`<h3>Run summary</h3><dl class="kv"><dt>question</dt><dd>${esc(run.question)}</dd><dt>umbrella</dt><dd>${esc(run.umbrella)}</dd><dt>status</dt><dd class="${run.status==="accepted"?"ok":"bad"}">${run.status}</dd><dt>score</dt><dd><b class="big">${run.composite}</b></dd><dt>attempts</dt><dd>${run.attempts}</dd></dl>
- <h4>UNDERSTOOD AS</h4><div>${esc(run.understanding?run.understanding.restatement.replace(/\*\*/g,""):"–")}</div>${run.reach&&run.reach.reasons.length?`<h4>REACH EXTENDED</h4>${run.reach.reasons.map(r=>`<div>+ ${esc(r)}</div>`).join("")}`:""}<h4>FINAL ANSWER (OUTPUT)</h4><div style="white-space:pre-wrap">${esc(run.answer)}</div><h4>NEXT QUESTIONS (LOOP)</h4>${run.followups.map(f=>`<div>→ ${esc(f)}</div>`).join("")||"–"}<h4>TIP</h4><div style="color:var(--dim)">Click any node to inspect its full inputs and outputs. Orange dashed wire = a failed gate sending the draft back for regeneration.</div>`;return}
+ <h4>UNDERSTOOD AS</h4><div>${esc(run.understanding?run.understanding.restatement.replace(/\*\*/g,""):"–")}</div>${run.reach&&run.reach.reasons.length?`<h4>REACH EXTENDED</h4>${run.reach.reasons.map(r=>`<div>+ ${esc(r)}</div>`).join("")}`:""}${run.coverage?`<h4>SPECIALTY COVERAGE · all ${run.coverage.length} umbrellas</h4>${[...new Set(run.coverage.map(c=>c.category))].map(cat=>`<div style="margin:4px 0"><div style="color:var(--dim);font-size:10px">${esc(cat)}</div>${run.coverage.filter(c=>c.category===cat).map(c=>`<span class="chip" title="${esc(c.name)} · ${c.roles} roles · relevance ${c.relevance}${c.consulted.length?" · "+esc(c.consulted.join(", ")):""}" style="${c.status==="lead"?"background:var(--ok);color:#06240f;border-color:var(--ok)":c.status==="reach"?"background:var(--flow);color:#1a1000;border-color:var(--flow)":c.status==="consulted"?"border-color:var(--ok);color:var(--ok)":"opacity:.55"}">${esc(c.name)}${c.consulted.length?" · "+c.consulted.length:""}</span>`).join("")}</div>`).join("")}<div class="hint">filled green = lead · orange = added by reach · green outline = consulted · faded = available, not needed for this question (turn on “consult ALL specialties” to include them)</div>`:""}<h4>FINAL ANSWER (OUTPUT)</h4><div style="white-space:pre-wrap">${esc(run.answer)}</div><h4>NEXT QUESTIONS (LOOP)</h4>${run.followups.map(f=>`<div>→ ${esc(f)}</div>`).join("")||"–"}<h4>TIP</h4><div style="color:var(--dim)">Click any node to inspect its full inputs and outputs. Orange dashed wire = a failed gate sending the draft back for regeneration.</div>`;return}
  const up=e.after.filter(Boolean).map(a=>`<span class="chip">${esc((ev.find(x=>x.node===a)||{label:a}).label)}</span>`).join(""),dn=ev.filter(x=>x.after.includes(e.node)).map(x=>`<span class="chip">${esc(x.label)}</span>`).join("");
  const kv=o=>`<dl class="kv">${Object.entries(o).map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(full(v))}</dd>`).join("")||"<dd>–</dd>"}</dl>`;
  s.innerHTML=`<h3>${esc(e.label)} <span class="chip ${e.status==="ok"?"ok":"bad"}">${e.status}</span></h3><div style="color:var(--dim)">${LANES[e.lane]} · t=${e.t.toFixed(2)}s ${e.note?"· "+esc(e.note):""}</div><h4>◀ FED BY</h4>${up||"–"}<h4>INPUT</h4>${kv(e.inputs)}<h4>OUTPUT ▶</h4>${kv(e.outputs)}<h4>FEEDS</h4>${dn||"–"}<h4><a href="#" onclick="sel=null;render();return false" style="color:var(--flow)">← run summary</a></h4>`}
@@ -209,19 +209,28 @@ buildTabs();
 if(RUNS.length)loadRun(0);else{$("stage").insertAdjacentHTML("beforeend",'<div class="empty">Set the prompt, roles, expertise demands, parameters and knowledge in <b>⚙ Setup</b>, then press <b>Run pipeline</b>.<br>The graph shows every step: its <b>inputs</b> (left ports) and <b>outputs</b> (right ports), the prompt each expert received, the score gate, and any regeneration loop.</div>')}
 /* ================= SETUP PANEL (needs the local server: python -m research_pipeline serve) ================= */
 const EXAMPLES=["What are the surgical, rehabilitation and toxicity considerations after severe traumatic brain injury?","How should atrial fibrillation be managed after an ischemic stroke?","What does the evidence say about early mobilisation after stroke?"];
-let META=null,C={question:"",mode:"ask",system_prompt:"",demands:"",umbrella:"auto",params:{},state:{},role_prompts:{},knowledge:[],roster:"neuro",train:""};
+let META=null,C={question:"",mode:"ask",system_prompt:"",demands:"",umbrella:"auto",params:{},state:{},role_prompts:{},knowledge:[],roster:"all",train:""};
 const PR=[["threshold","Pass threshold (composite score)",.4,.95,.01],["max_attempts","Max regeneration attempts",1,6,1],["evidence_n","Evidence items per attempt",2,20,1],["loop_depth","Loop depth (follow-up rounds)",0,4,1],["max_questions","Max questions in a loop",1,15,1]];
 const PR3=[["top_internal","Internal experts on panel",1,8,1],["top_external","External experts (other umbrellas)",0,5,1],["min_quality","Min evidence quality",0,1,.05]];
 function save(){try{localStorage.setItem("rp-cfg",JSON.stringify(C))}catch(e){}}
 function slider(id,label,mn,mx,st,box){const d=document.createElement("div");d.className="prm";d.innerHTML=`<label>${label}</label><input type="range" min="${mn}" max="${mx}" step="${st}" id="p-${id}"><b id="v-${id}"></b>`;$(box).appendChild(d);
  const r=d.querySelector("input");r.value=C.params[id]??META.defaults[id];const u=()=>{C.params[id]=+r.value;$("v-"+id).textContent=r.value;save()};r.oninput=u;u()}
-function roster(){const u=META.umbrellas.find(x=>x.id===C.roster),q=($("f-rsearch").value||"").toLowerCase().trim();$("roster").innerHTML="";
+function roster(){if(C.roster==="all"&&!($("f-rsearch").value||"").trim()){rosterAll();return}
+ const u=META.umbrellas.find(x=>x.id===C.roster)||META.umbrellas[0],q=($("f-rsearch").value||"").toLowerCase().trim();$("roster").innerHTML="";
  const list=q?META.umbrellas.flatMap(x=>x.specialties.filter(s=>(s.name+" "+s.tier+" "+x.name+" "+s.keywords.join(" ")).toLowerCase().includes(q))):u.specialties;
  if(q&&!list.length)$("roster").innerHTML='<div class="hint">No role matches.</div>';
  list.slice(0,60).forEach(s=>{const st=C.state[s.id]||"auto",d=document.createElement("div");d.className="rrow "+(st==="required"?"req":st==="excluded"?"exc":"");
   d.innerHTML=`<div class="rt"><span><b>${esc(s.name)}</b> <span class="chip">${s.tier}</span></span><select><option>auto</option><option>required</option><option>excluded</option></select></div><details class="scp"><summary style="font-size:11px;color:var(--dim);padding:3px 0">scope of practice</summary><div class="hint"><b>Core:</b> ${esc(s.scope)}<br><b>Extended / advanced:</b> ${esc(s.extended)}<br><b>Refer on:</b> ${esc(s.refer)}<br><b>Examination &amp; workup:</b> ${esc(s.workup)}<br><b>Route terms:</b> ${esc((s.terms||[]).join(", "))}</div></details><textarea rows="2" placeholder="Role instruction, e.g. focus on paediatric cases; cite guidelines"></textarea>`;
   const sel=d.querySelector("select"),ta=d.querySelector("textarea");sel.value=st;ta.value=C.role_prompts[s.id]||"";
   sel.onchange=()=>{C.state[s.id]=sel.value;save();roster()};ta.oninput=()=>{C.role_prompts[s.id]=ta.value;save()};$("roster").appendChild(d)})}
+function rowEl(s){const st=C.state[s.id]||"auto",d=document.createElement("div");d.className="rrow "+(st==="required"?"req":st==="excluded"?"exc":"");
+ d.innerHTML=`<div class="rt"><span><b>${esc(s.name)}</b> <span class="chip">${s.tier}</span></span><select><option>auto</option><option>required</option><option>excluded</option></select></div><details class="scp"><summary style="font-size:11px;color:var(--dim);padding:3px 0">scope of practice</summary><div class="hint"><b>Core:</b> ${esc(s.scope)}<br><b>Extended / advanced:</b> ${esc(s.extended)}<br><b>Refer on:</b> ${esc(s.refer)}<br><b>Examination &amp; workup:</b> ${esc(s.workup)}<br><b>Route terms:</b> ${esc((s.terms||[]).join(", "))}</div></details><textarea rows="2" placeholder="Role instruction"></textarea>`;
+ const sel=d.querySelector("select"),ta=d.querySelector("textarea");sel.value=st;ta.value=C.role_prompts[s.id]||"";
+ sel.onchange=()=>{C.state[s.id]=sel.value;save();d.className="rrow "+(sel.value==="required"?"req":sel.value==="excluded"?"exc":"")};ta.oninput=()=>{C.role_prompts[s.id]=ta.value;save()};return d}
+function rosterAll(){const box=$("roster");box.innerHTML="";
+ [...new Set(META.umbrellas.map(u=>u.category))].forEach(cat=>{const h=document.createElement("div");h.className="hint";h.style.cssText="margin-top:10px;font-weight:700;color:var(--fg)";h.textContent=cat;box.appendChild(h);
+  META.umbrellas.filter(u=>u.category===cat).forEach(u=>{const d=document.createElement("details");d.innerHTML=`<summary style="cursor:pointer;padding:3px 0">${esc(u.name)} <span class="chip">${u.specialties.length} roles</span></summary><div class="hint">${esc(u.body_areas.join(" · "))}</div>`;let done=false;
+   d.ontoggle=()=>{if(d.open&&!done){done=true;u.specialties.forEach(s=>d.appendChild(rowEl(s)))}};box.appendChild(d)})})}
 function kdocs(){$("kdocs").innerHTML="";C.knowledge.forEach((k,i)=>{const d=document.createElement("div");d.className="kdoc";d.innerHTML=`<span title="${esc(k.text.slice(0,300))}">${esc(k.title)}</span><input type="number" min="0" max="1" step="0.05" value="${k.quality}"><button>✕</button>`;
  d.querySelector("input").onchange=e=>{k.quality=+e.target.value;save()};d.querySelector("button").onclick=()=>{C.knowledge.splice(i,1);save();kdocs()};$("kdocs").appendChild(d)})}
 function addDoc(title,text,q){if(text.trim()){C.knowledge.push({title:title||text.trim().slice(0,50),text:text.trim(),quality:q});save();kdocs()}}
@@ -265,7 +274,7 @@ async function loadLib(){const sc=$("lib-scope").value;if(!sc){$("lib-list").inn
    <div style="color:var(--dim)">quality ${i.parts.quality} · design ${i.parts.design} · recency ${i.parts.recency} · source ${i.parts.source} · fit ${i.parts.fit} · learned ${i.learned}</div>
    ${i.by_specialty&&i.by_specialty.length?`<div>${i.by_specialty.map(b=>`<span class="chip">${esc(b.id)} ${b.score}</span>`).join("")}</div>`:""}</div>`).join(""):'<div class="hint">Empty — run the pipeline (or ingest documents) to build this library.</div>'}catch(e){$("lib-list").innerHTML='<div class="hint">'+esc(e.message)+'</div>'}}
 function req(){const ids=v=>Object.entries(C.state).filter(([k,x])=>x===v).map(([k])=>k);
- return{question:C.question,mode:C.mode,params:{...C.params,llm:$("p-llm").value,model:$("p-model").value,pubmed:$("p-pubmed").checked,umbrella:C.umbrella,require_clearance:$("p-clr").checked,auto_reach:$("p-reach").checked,use_library:$("p-lib").checked},
+ return{question:C.question,mode:C.mode,params:{...C.params,llm:$("p-llm").value,model:$("p-model").value,pubmed:$("p-pubmed").checked,umbrella:C.umbrella,require_clearance:$("p-clr").checked,auto_reach:$("p-reach").checked,consult_all:$("p-all").checked,use_library:$("p-lib").checked},
   roles:{system_prompt:C.system_prompt,role_prompts:Object.fromEntries(Object.entries(C.role_prompts).filter(([k,v])=>v.trim()))},
   expertise:{demands:C.demands,required:ids("required"),excluded:ids("excluded")},knowledge:C.knowledge,questions:C.train.split("\n")}}
 async function api(path,body){const r=await fetch(path,body?{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)}:{});const j=await r.json();if(!r.ok)throw new Error(j.error||r.statusText);return j}
@@ -280,11 +289,12 @@ async function initCfg(){
  $("f-sys").value=C.system_prompt;$("f-sys").oninput=e=>{C.system_prompt=e.target.value;save()};
  $("f-dem").value=C.demands;$("f-dem").oninput=e=>{C.demands=e.target.value;save()};
  const cats=[...new Set(META.umbrellas.map(u=>u.category))];
- $("f-ros").innerHTML=cats.map(c=>`<optgroup label="${esc(c)}">`+META.umbrellas.filter(u=>u.category===c).map(u=>`<option value="${u.id}">${esc(u.name)} (${u.specialties.length} roles)</option>`).join("")+"</optgroup>").join("");
- $("rcount").textContent=`${META.umbrellas.length} umbrellas · ${META.umbrellas.reduce((n,u)=>n+u.specialties.length,0)} roles`;$("f-rsearch").oninput=roster;$("f-ros").value=C.roster;$("f-ros").onchange=e=>{C.roster=e.target.value;save();roster();refreshLib()};
+ $("f-ros").innerHTML=`<option value="all">★ ALL healthcare — browse every umbrella (${META.umbrellas.length})</option>`+cats.map(c=>`<optgroup label="${esc(c)}">`+META.umbrellas.filter(u=>u.category===c).map(u=>`<option value="${u.id}">${esc(u.name)} (${u.specialties.length} roles)</option>`).join("")+"</optgroup>").join("");
+ $("rcount").textContent=`${META.umbrellas.length} umbrellas · ${META.umbrellas.reduce((n,u)=>n+u.specialties.length,0)} roles`;$("f-rsearch").oninput=roster;if(!C.roster)C.roster="all";$("f-ros").value=C.roster;$("f-ros").onchange=e=>{C.roster=e.target.value;save();roster();refreshLib()};
  $("f-umb").innerHTML='<option value="auto">auto (router decides from the question)</option>'+cats.map(c=>`<optgroup label="${esc(c)}">`+META.umbrellas.filter(u=>u.category===c).map(u=>`<option value="${u.id}">${esc(u.name)}</option>`).join("")+"</optgroup>").join("");$("f-umb").value=C.umbrella;$("f-umb").onchange=e=>{C.umbrella=e.target.value;save()};
  PR.forEach(p=>slider(p[0],p[1],p[2],p[3],p[4],"p-sec4"));PR3.forEach(p=>slider(p[0],p[1],p[2],p[3],p[4],"p-sec3"));
  PR4.forEach(p=>slider(p[0],p[1],p[2],p[3],p[4],"p-sec4b"));
+ $("p-all").checked=!!C.params.consult_all;$("p-all").onchange=()=>{C.params.consult_all=$("p-all").checked;save()};
  $("p-clr").checked=C.params.require_clearance??META.defaults.require_clearance;$("p-reach").checked=C.params.auto_reach??META.defaults.auto_reach;$("p-lib").checked=C.params.use_library??META.defaults.use_library;
  [$("p-clr"),$("p-reach"),$("p-lib")].forEach(c=>c.onchange=()=>{C.params.require_clearance=$("p-clr").checked;C.params.auto_reach=$("p-reach").checked;C.params.use_library=$("p-lib").checked;save()});
  $("lib-scope").onchange=loadLib;$("libsec").ontoggle=()=>{if($("libsec").open)refreshLib()};

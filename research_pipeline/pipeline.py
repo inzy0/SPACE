@@ -37,6 +37,7 @@ class Config:
     auto_reach: bool = True  # extend the panel (paediatrics, geriatrics, pharmacy, emergency, public health ...) to the question's demands
     max_reach_extra: int = 3
     use_library: bool = True  # per-specialty + per-umbrella evidence score library
+    consult_all: bool = False  # one expert from EVERY umbrella joins the panel (broad, expensive with a real LLM)
     llm_understanding: bool = False  # let the LLM refine the pyramid slots (needs a real LLM)
 
 
@@ -56,6 +57,7 @@ class RunResult:
     understanding: dict | None = None
     reach: dict | None = None
     awaiting: bool = False
+    coverage: list | None = None
 
 
 class _LibSource:
@@ -116,12 +118,13 @@ class ResearchPipeline:
         tr.emit("reach", "Reach: extend to the question's demands", 2, ["clearance"], {"scale": reach["scale"], "auto_reach": c.auto_reach},
                 {"extra_experts": reach["reasons"] or ["none needed"], "top_external +": reach["top_external_delta"], "evidence +": reach["evidence_delta"], "multimorbidity": reach["multimorbidity"]})
         required = list(dict.fromkeys(list(c.required) + reach["extra_required"]))
-        r = do_route(question, self.tax, weights, c.top_internal, c.top_external + reach["top_external_delta"], required, c.excluded, c.umbrella, concepts=u.concepts)
+        r = do_route(question, self.tax, weights, c.top_internal, c.top_external + reach["top_external_delta"], required, c.excluded, c.umbrella, concepts=u.concepts, consult_all=c.consult_all)
         tr.emit("in:memory", "Learned memory", 0, inputs={"umbrella": pre.umbrella.id},
                 outputs={"expert_weights": {k: round(v, 2) for k, v in weights.items()}, "few_shot_examples": len(examples), "library_items": self.library.size() if c.use_library else 0})
         tr.emit("route", "Route (multi-term)", 4, ["reach", "in:memory"], {"terms": [f"{x['surface']}→{x['canonical']}" for x in u.concepts if not x["negated"]][:8], "required": required},
                 {"umbrella": r.umbrella.name, "body_areas": r.body_areas, "internal": [s.name for s in r.internal], "external": [s.name for s in r.external],
-                 "umbrella_scores": {k: round(v, 1) for k, v in r.scores.items() if v}})
+                 "umbrella_scores": {k: round(v, 1) for k, v in r.scores.items() if v},
+                 "coverage": f"{len(r.coverage)} umbrellas: " + ", ".join(f"{n} {s}" for s, n in sorted({(x['status']): sum(1 for y in r.coverage if y['status'] == x['status']) for x in r.coverage}.items()))})
         experts = [s.id for s in r.internal + r.external]
         scopes = experts + [umb(r.umbrella.id)]
         frame, cterms = u.frame(), u.frame_terms()
@@ -181,7 +184,7 @@ class ResearchPipeline:
         tr.emit("store", "Learn: store, weights, library", 11, [last_score],
                 {"status": status, "composite": sc.composite}, {"run_id": rid, "attempts_logged": attempts, "library_updated": c.use_library, "export": "sft + preference pairs"}, status="ok")
         tr.emit("followups", "Follow-up questions", 11, [last_score], {"open_issues": sc.failing}, {"queue": fups})
-        return RunResult(question, ans, sc, status, attempts, fups, tr.events, r.umbrella.id, depth, rid, parent, u.to_dict(), reach)
+        return RunResult(question, ans, sc, status, attempts, fups, tr.events, r.umbrella.id, depth, rid, parent, u.to_dict(), reach, False, r.coverage)
 
     def _panel(self, tr, question, r, evidence, sfx, frame=""):
         def logger(stage, lane):

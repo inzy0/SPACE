@@ -95,6 +95,13 @@ For real answers: `export ANTHROPIC_API_KEY=...` and pick *Anthropic API* in the
 | **Knowledge** | pasted/uploaded documents with a quality weight (plus the server `--corpus` folder) |
 | **Learning** | background training on a question list; export SFT + preference pairs |
 
+## All specialties, always visible
+
+Every run reports **specialty coverage for all 35 umbrellas**: lead, added by reach, consulted, or available but not needed. The
+Setup roster opens on *ALL healthcare* (every umbrella and all 263 roles, expandable). For a deliberately broad review tick
+**consult ALL healthcare specialties** (or `--all-specialties`): one expert from *every* umbrella joins the panel (35 voices, so expect
+many LLM calls). Otherwise the router consults the lead umbrella, the adjacent/relevant ones and anything the reach step adds.
+
 ## Healthcare roster (`taxonomy.py` + `catalog.py`)
 
 35 umbrellas / 260+ roles in 9 categories, every role linked to body areas and carrying a **tier** with its

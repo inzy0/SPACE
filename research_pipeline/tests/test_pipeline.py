@@ -265,5 +265,24 @@ class Tests(unittest.TestCase):
         self.assertTrue(all("workup" in s and "terms" in s for u in app.meta()["umbrellas"] for s in u["specialties"]))
 
 
+    def test_coverage_lists_every_umbrella(self):
+        res = pipe().ask(Q)
+        cov = res.coverage
+        self.assertEqual(len(cov), len(load_taxonomy()))  # all specialties are visible, not just the routed ones
+        self.assertEqual([c["status"] for c in cov].count("lead"), 1)
+        self.assertGreaterEqual({c["status"] for c in cov}, {"lead", "available"})
+
+    def test_consult_all_puts_every_umbrella_on_the_panel(self):
+        tax = load_taxonomy()
+        res = pipe(consult_all=True).ask(Q)
+        spoke = {c["id"] for c in res.coverage if c["status"] != "available"}
+        self.assertEqual(spoke, set(tax))  # every umbrella has at least one expert
+        ext = next(e for e in res.trace if e["node"] == "route")["outputs"]["external"]
+        self.assertGreaterEqual(len(ext), len(tax) - 1)
+        self.assertEqual(res.status, "accepted")
+        r = route(Q, tax, required=["geri.physician"], consult_all=True)
+        self.assertEqual(sum(1 for s in r.external if s.umbrella == "geri"), 1)  # still one voice per umbrella
+
+
 if __name__ == "__main__":
     unittest.main()

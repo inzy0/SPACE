@@ -14,13 +14,14 @@ class Route:
     external: list[Specialty]
     scores: dict[str, float]
     body_areas: list[str]
+    coverage: list = None  # every umbrella with its role in this question: lead / consulted / reach / available
 
 
 def _hits(q: str, qt: set[str], kws) -> int:
     return sum(1 for k in kws if (k in q if " " in k else k in qt or (len(k) >= 5 and any(t.startswith(k) for t in qt))))
 
 
-def route(question, taxonomy, weights=None, top_internal=4, top_external=2, required=(), excluded=(), umbrella=None, concepts=None) -> Route:
+def route(question, taxonomy, weights=None, top_internal=4, top_external=2, required=(), excluded=(), umbrella=None, concepts=None, consult_all=False) -> Route:
     """weights: expert_id -> learned multiplier from past scored runs (Store.expert_weight)."""
     concepts = [c for c in (concepts or []) if not c.get("negated")]
     # lay words / synonyms are expanded to their canonical terms so "brain attack" routes like "stroke"
@@ -57,16 +58,22 @@ def route(question, taxonomy, weights=None, top_internal=4, top_external=2, requ
     req_ext = [allspec[i] for i in required if allspec[i].umbrella != primary.id]
     ext_pool = []
     for uid, u in taxonomy.items():
-        if uid == primary.id:
+        if uid == primary.id or any(s.umbrella == uid for s in req_ext):  # one voice per umbrella (a required role already speaks for its umbrella)
             continue
         adj = 1.0 if uid in primary.adjacent else 0.0
-        if scores[uid] == 0 and not adj:
+        if scores[uid] == 0 and not adj and not consult_all:
             continue
         cands = [(spec_score(s), s) for s in u.specialties if s.id not in excluded and s not in req_ext]
         if cands:  # one voice per umbrella keeps the external panel diverse
             hits, best = max(cands, key=lambda x: (x[0], -order[x[1].id]))
-            ext_pool.append((scores[uid] + 0.5 * adj + hits * 0.5 if (scores[uid] or hits >= 2) else 0, best))
+            ext_pool.append((scores[uid] + 0.5 * adj + hits * 0.5 if (scores[uid] or hits >= 2) else (0.6 if consult_all else 0), best))
     ext_pool.sort(key=lambda x: (-x[0], order[x[1].id]))
-    external = req_ext + [s for sc, s in ext_pool if sc > 0.5][:max(0, top_external - len(req_ext))]
+    external = req_ext + [s for sc, s in ext_pool if sc > 0.5][:max(0, (len(taxonomy) if consult_all else top_external) - len(req_ext))]  # consult_all: one voice from every umbrella
     areas = sorted({a for s in internal for a in s.body_areas if a.lower() in q or _hits(q, qt, [a])}) or list(primary.body_areas[:3])
-    return Route(primary, internal, external, scores, areas)
+    cov = []
+    for uid, u in taxonomy.items():
+        mine = [s.name for s in internal + external if s.umbrella == uid]
+        req = [s.name for s in req_ext if s.umbrella == uid]
+        cov.append(dict(id=uid, name=u.name, category=u.category, roles=len(u.specialties), relevance=round(scores[uid], 1),
+                        status="lead" if uid == primary.id else "reach" if req else "consulted" if mine else "available", consulted=mine))
+    return Route(primary, internal, external, scores, areas, cov)
